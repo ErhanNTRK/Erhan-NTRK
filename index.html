@@ -1,236 +1,1818 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#0d1117">
-    <title>NTRK — Kişisel Asistan</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #0d1117;
-            --glass: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --border: #21262d;
-            --accent-gradient: linear-gradient(135deg, #38bdf8, #818cf8);
-            --green-gradient: linear-gradient(135deg, #34d399, #10b981);
-            --red-gradient: linear-gradient(135deg, #fb7185, #e11d48);
-            --gold-gradient: linear-gradient(135deg, #fbbf24, #f59e0b);
-            --text: #c9d1d9;
-            --text-vibrant: #f0f6fc;
-            --radius: 20px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0f1923">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NTRK">
+<title>NTRK — Kişisel Asistan</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f1a;
+    --surface: #111827;
+    --surface2: #1a2535;
+    --border: #1e2d42;
+    --accent: #3b82f6;
+    --accent2: #06b6d4;
+    --accent3: #8b5cf6;
+    --gold: #f59e0b;
+    --green: #10b981;
+    --red: #ef4444;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #475569;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: var(--bg); 
-            color: var(--text); 
-            min-height: 100vh; 
-            background-image: radial-gradient(circle at 50% -20%, #1e293b 0%, #0d1117 80%);
-            background-attachment: fixed;
-        }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        /* ===== APP LAYOUT ===== */
-        #app { padding-bottom: 100px; animation: fadeIn 0.8s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-        .topbar { 
-            position: sticky; top: 0; z-index: 100; 
-            background: rgba(13, 17, 23, 0.85); backdrop-filter: blur(15px); 
-            border-bottom: 1px solid var(--glass-border); 
-            padding: 18px 25px; display: flex; justify-content: space-between; align-items: center; 
-        }
-        .topbar-logo { font-family: 'Poppins'; font-weight: 800; font-size: 24px; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  /* ===== LOGIN ===== */
+  #loginScreen {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000;
+    flex-direction: column;
+    gap: 32px;
+    padding: 24px;
+  }
 
-        .section { display: none; padding: 25px; }
-        .section.active { display: block; }
+  .login-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 56px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -2px;
+  }
 
-        .card { 
-            background: var(--glass); 
-            border: 1px solid var(--glass-border); 
-            backdrop-filter: blur(10px);
-            border-radius: var(--radius); 
-            padding: 22px; margin-bottom: 18px; 
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-        }
+  .login-sub { color: var(--text2); font-size: 14px; text-align: center; margin-top: -20px; }
 
-        input { 
-            width: 100%; padding: 15px; background: rgba(0,0,0,0.3); 
-            border: 1px solid var(--border); border-radius: 12px; 
-            color: white; margin-bottom: 12px; font-size: 16px;
-        }
+  .login-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    width: 100%;
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
 
-        .btn { 
-            padding: 15px; border-radius: 12px; border: none; cursor: pointer; 
-            font-family: 'Poppins'; font-weight: 600; font-size: 14px;
-            transition: 0.3s; width: 100%; display: flex; align-items: center; justify-content: center;
-        }
-        .btn-primary { background: var(--accent-gradient); color: white; }
-        .btn-primary:active { transform: scale(0.97); }
-        .btn-secondary { background: var(--glass); color: var(--text); border: 1px solid var(--glass-border); }
+  .login-box h2 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; }
+  .login-box p { color: var(--text2); font-size: 13px; }
 
-        /* ===== BOTTOM NAV ===== */
-        .bottom-nav { 
-            position: fixed; bottom: 0; left: 0; right: 0; 
-            background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(20px); 
-            border-top: 1px solid var(--glass-border); 
-            display: flex; height: 75px; z-index: 90;
-        }
-        .nav-item { 
-            flex: 1; display: flex; flex-direction: column; align-items: center; 
-            justify-content: center; color: #8b949e; font-size: 11px; border: none; background: none; 
-            transition: 0.2s;
-        }
-        .nav-item.active { color: #38bdf8; font-weight: 600; }
-        .nav-icon { font-size: 22px; margin-bottom: 4px; }
+  input[type="password"], input[type="text"], input[type="number"], input[type="date"], textarea, select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    padding: 12px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
 
-        /* ===== DASHBOARD ELEMENTS ===== */
-        .quote-card {
-            background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(129, 140, 248, 0.08));
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            text-align: center; padding: 35px 20px;
-        }
-        .quote-text { font-style: italic; color: var(--text-vibrant); font-size: 17px; line-height: 1.6; margin-bottom: 10px; }
-        .quote-author { color: #38bdf8; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-        .stat-val { font-family: 'Poppins'; font-size: 24px; font-weight: 700; }
-    </style>
+  input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 80px; }
+  select option { background: var(--surface); }
+
+  .btn {
+    padding: 13px 20px;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #2563eb; transform: translateY(-1px); }
+  .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--accent); }
+  .btn-danger { background: #7f1d1d; color: #fca5a5; }
+  .btn-success { background: #064e3b; color: #6ee7b7; }
+  .btn-gold { background: #78350f; color: #fcd34d; }
+  .btn-sm { padding: 8px 14px; font-size: 13px; }
+  .btn-full { width: 100%; }
+
+  #loginError { color: var(--red); font-size: 13px; text-align: center; display: none; }
+
+  /* ===== APP ===== */
+  #app { display: none; padding-bottom: 80px; }
+
+  /* ===== TOP BAR ===== */
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,15,26,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .topbar-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .topbar-right { display: flex; gap: 8px; align-items: center; }
+
+  .topbar-section {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text2);
+  }
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: rgba(10,15,26,0.97);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    z-index: 100;
+  }
+
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 4px 12px;
+    cursor: pointer;
+    gap: 4px;
+    transition: all 0.2s;
+    border: none;
+    background: none;
+    color: var(--text3);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+  }
+
+  .nav-item.active { color: var(--accent); }
+  .nav-item .nav-icon { font-size: 22px; line-height: 1; }
+
+  /* ===== SECTIONS ===== */
+  .section { display: none; padding: 20px; min-height: calc(100vh - 140px); }
+  .section.active { display: block; }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title span { font-size: 16px; }
+
+  /* ===== DASHBOARD ===== */
+  .dashboard-greeting {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .dashboard-date { color: var(--text2); font-size: 14px; margin-bottom: 24px; }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .stat-icon { font-size: 24px; }
+  .stat-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; }
+  .stat-value { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; }
+  .stat-value.green { color: var(--green); }
+  .stat-value.gold { color: var(--gold); }
+  .stat-value.blue { color: var(--accent); }
+  .stat-value.purple { color: var(--accent3); }
+
+  /* ===== FORM ROWS ===== */
+  .form-row { margin-bottom: 12px; }
+  .form-label { font-size: 12px; color: var(--text2); margin-bottom: 6px; display: block; font-weight: 500; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+  /* ===== LIST ITEMS ===== */
+  .list-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .list-item-left { flex: 1; min-width: 0; }
+  .list-item-title { font-weight: 500; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .list-item-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .list-item-right { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+  .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge-green { background: #064e3b; color: #6ee7b7; }
+  .badge-red { background: #7f1d1d; color: #fca5a5; }
+  .badge-gold { background: #78350f; color: #fcd34d; }
+  .badge-blue { background: #1e3a5f; color: #93c5fd; }
+  .badge-purple { background: #3b1a6e; color: #c4b5fd; }
+
+  .delete-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--text3); font-size: 18px; padding: 4px;
+    transition: color 0.2s;
+  }
+  .delete-btn:hover { color: var(--red); }
+
+  /* ===== PROGRESS BAR ===== */
+  .progress-track {
+    background: var(--surface2);
+    border-radius: 99px;
+    height: 8px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.5s ease;
+  }
+
+  .progress-fill.gold { background: linear-gradient(90deg, var(--gold), #fb923c); }
+  .progress-fill.green { background: linear-gradient(90deg, var(--green), #34d399); }
+  .progress-fill.red { background: linear-gradient(90deg, var(--red), #f97316); }
+
+  /* ===== TABS ===== */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab {
+    padding: 8px 16px;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text2);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .tab.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 500;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border-radius: 24px 24px 0 0;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    padding: 24px 20px 40px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 85vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .modal-handle {
+    width: 40px; height: 4px;
+    background: var(--border);
+    border-radius: 99px;
+    margin: 0 auto 8px;
+  }
+
+  .modal-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  /* ===== DIVIDER ===== */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+  /* ===== WATER TRACKER ===== */
+  .water-display {
+    text-align: center;
+    padding: 20px 0;
+  }
+  .water-amount {
+    font-family: 'Syne', sans-serif;
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--accent2);
+  }
+  .water-unit { font-size: 18px; color: var(--text2); }
+  .water-goal { font-size: 13px; color: var(--text2); margin-top: 4px; }
+  .water-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+
+  /* ===== SMOKE TRACKER ===== */
+  .smoke-counter {
+    text-align: center;
+    padding: 16px 0;
+  }
+  .smoke-days {
+    font-family: 'Syne', sans-serif;
+    font-size: 52px;
+    font-weight: 800;
+    color: var(--green);
+  }
+  .smoke-label { color: var(--text2); font-size: 14px; }
+  .smoke-savings { font-size: 22px; font-weight: 700; color: var(--gold); margin-top: 8px; }
+
+  /* ===== CHART SIMPLE ===== */
+  .bar-chart { display: flex; gap: 6px; align-items: flex-end; height: 80px; margin-top: 12px; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .bar { width: 100%; border-radius: 6px 6px 0 0; background: var(--accent); min-height: 4px; transition: height 0.4s; }
+  .bar-label { font-size: 9px; color: var(--text3); }
+
+  /* ===== EMPTY STATE ===== */
+  .empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text3);
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-text { font-size: 14px; }
+
+  /* ===== CHIP ===== */
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .chip {
+    padding: 5px 12px;
+    border-radius: 99px;
+    font-size: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .chip.selected { background: var(--accent); border-color: var(--accent); color: white; }
+
+  /* ===== AILE ===== */
+  .family-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
+  .family-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .family-card:hover { border-color: var(--accent); }
+  .family-avatar {
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    background: var(--surface2);
+    margin: 0 auto 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    overflow: hidden;
+    border: 2px solid var(--border);
+  }
+  .family-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .family-name { font-weight: 600; font-size: 14px; }
+  .family-role { font-size: 11px; color: var(--text2); }
+
+  /* ===== VACCINE ===== */
+  .vaccine-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .vaccine-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .vaccine-dot.done { background: var(--green); }
+  .vaccine-dot.pending { background: var(--text3); }
+  .vaccine-dot.upcoming { background: var(--gold); }
+  .vaccine-name { flex: 1; font-size: 14px; }
+  .vaccine-date { font-size: 12px; color: var(--text2); }
+
+  /* ===== FINANS ===== */
+  .balance-display {
+    text-align: center;
+    padding: 16px 0;
+  }
+  .balance-amount {
+    font-family: 'Syne', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+  }
+  .balance-label { font-size: 13px; color: var(--text2); }
+
+  /* ===== NOTE CARDS ===== */
+  .note-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .note-card:hover { border-color: var(--accent); }
+  .note-card-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .note-card-preview { font-size: 13px; color: var(--text2); overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .note-card-footer { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+  .note-card-date { font-size: 11px; color: var(--text3); margin-left: auto; }
+
+  /* ===== SPORT ===== */
+  .exercise-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+  }
+  .exercise-icon { font-size: 24px; }
+  .exercise-name { font-weight: 500; font-size: 14px; }
+  .exercise-detail { font-size: 12px; color: var(--text2); }
+
+  /* ===== SCROLL HINT ===== */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+</style>
 </head>
 <body>
 
+<!-- ===== LOGIN ===== -->
+<div id="loginScreen">
+  <div class="login-logo">NTRK</div>
+  <p class="login-sub">Kişisel Asistanın</p>
+  <div class="login-box">
+    <h2>🔐 Giriş Yap</h2>
+    <p id="loginDesc">Şifreni gir</p>
+    <input type="password" id="loginInput" placeholder="Şifre..." onkeydown="if(event.key==='Enter')doLogin()">
+    <div id="loginError">❌ Hatalı şifre!</div>
+    <button class="btn btn-primary btn-full" onclick="doLogin()">Giriş</button>
+    <p id="setupHint" style="font-size:12px;color:var(--text3);text-align:center;"></p>
+  </div>
+</div>
+
+<!-- ===== APP ===== -->
 <div id="app">
-    <div class="topbar">
-        <div class="topbar-logo">NTRK</div>
-        <div style="font-size: 10px; color: #34d399; border: 1px solid #34d399; padding: 2px 8px; border-radius: 20px;">CANLI</div>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-logo">NTRK</div>
+    <div class="topbar-section" id="topbarTitle">Ana Sayfa</div>
+    <div class="topbar-right">
+      <button class="btn btn-secondary btn-sm" onclick="logout()">Çıkış</button>
+    </div>
+  </div>
+
+  <!-- SECTIONS -->
+
+  <!-- DASHBOARD -->
+  <div class="section active" id="sec-home">
+    <div class="dashboard-greeting" id="greeting">Merhaba! 👋</div>
+    <div class="dashboard-date" id="dateDisplay"></div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">💧</div>
+        <div class="stat-label">Su</div>
+        <div class="stat-value blue" id="dash-water">0 ml</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💸</div>
+        <div class="stat-label">Bakiye</div>
+        <div class="stat-value green" id="dash-balance">₺0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📝</div>
+        <div class="stat-label">Notlar</div>
+        <div class="stat-value purple" id="dash-notes">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💪</div>
+        <div class="stat-label">Bugün Spor</div>
+        <div class="stat-value gold" id="dash-sport">—</div>
+      </div>
     </div>
 
-    <div id="home" class="section active">
-        <div class="card quote-card">
-            <div id="greetingQuote" class="quote-text">Yükleniyor...</div>
-            <div id="quoteAuthor" class="quote-author"></div>
+    <div class="card">
+      <div class="card-title"><span>⚡</span> Hızlı Erişim</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <button class="btn btn-secondary" onclick="goSection('sec-wallet')">💼 Varlıklar</button>
+        <button class="btn btn-secondary" onclick="goSection('sec-finance')">💸 Finans</button>
+        <button class="btn btn-secondary" onclick="goSection('sec-notes')">📝 Notlar</button>
+        <button class="btn btn-secondary" onclick="goSection('sec-health')">💪 Sağlık</button>
+      </div>
+    </div>
+
+    <div class="card" id="reminderCard" style="display:none;">
+      <div class="card-title"><span>🔔</span> Hatırlatmalar</div>
+      <div id="reminderList"></div>
+    </div>
+  </div>
+
+  <!-- AİLE -->
+  <div class="section" id="sec-family">
+    <div class="tabs">
+      <div class="tab active" onclick="setFamilyTab('members',this)">Üyeler</div>
+      <div class="tab" onclick="setFamilyTab('photos',this)">Fotoğraflar</div>
+      <div class="tab" onclick="setFamilyTab('notes',this)">Notlar</div>
+    </div>
+
+    <div id="ft-members">
+      <button class="btn btn-primary btn-full" style="margin-bottom:16px;" onclick="openModal('addMemberModal')">+ Aile Üyesi Ekle</button>
+      <div class="family-grid" id="familyGrid"></div>
+    </div>
+
+    <div id="ft-photos" style="display:none;">
+      <button class="btn btn-primary btn-full" style="margin-bottom:16px;" onclick="openModal('addPhotoModal')">+ Fotoğraf Ekle</button>
+      <div id="photoGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;"></div>
+    </div>
+
+    <div id="ft-notes" style="display:none;">
+      <button class="btn btn-primary btn-full" style="margin-bottom:16px;" onclick="openModal('addFamilyNoteModal')">+ Not Ekle</button>
+      <div id="familyNotesList"></div>
+    </div>
+  </div>
+
+  <!-- WALLET -->
+  <div class="section" id="sec-wallet">
+    <div class="tabs">
+      <div class="tab active" onclick="setWalletTab('assets',this)">Varlıklar</div>
+      <div class="tab" onclick="setWalletTab('summary',this)">Özet</div>
+    </div>
+
+    <div id="wt-assets">
+      <div class="card">
+        <div class="card-title"><span>🥇</span> Altın</div>
+        <div class="form-row">
+          <label class="form-label">Altın Miktarı (gram)</label>
+          <input type="number" id="goldAmount" placeholder="0" oninput="saveAssets()">
         </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
-            <div class="card" onclick="showSec('health', document.querySelector('[onclick*=\'health\']'))">
-                <p style="font-size:11px; color:#8b949e; margin-bottom:8px; text-transform:uppercase;">💧 Su</p>
-                <span id="h-water" class="stat-val" style="color:#38bdf8">0 ml</span>
-            </div>
-            <div class="card" onclick="showSec('finance', document.querySelector('[onclick*=\'finance\']'))">
-                <p style="font-size:11px; color:#8b949e; margin-bottom:8px; text-transform:uppercase;">💰 Nakit</p>
-                <span id="h-balance" class="stat-val" style="color:#34d399">0 ₺</span>
-            </div>
-            <div class="card" style="grid-column: 1 / -1; border-left: 4px solid #fbbf24;">
-                <p style="font-size:11px; color:#8b949e; margin-bottom:8px; text-transform:uppercase;">🥇 Altın Gr (Canlı Tahmin)</p>
-                <span id="h-gold" class="stat-val" style="color:#fbbf24">Hesaplanıyor...</span>
-            </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
+          <span style="color:var(--text2);font-size:13px;">Güncel Fiyat (gram):</span>
+          <span id="goldPrice" style="font-weight:700;color:var(--gold);">Yükleniyor...</span>
         </div>
-    </div>
-
-    <div id="finance" class="section">
-        <div class="card" style="text-align: center;">
-            <p style="color:#8b949e; margin-bottom:10px;">Toplam Bakiye</p>
-            <h1 id="totalBalance" style="font-size: 50px; margin-bottom: 20px; color: #f0f6fc;">0 ₺</h1>
-            <input type="number" id="moneyInput" placeholder="Miktar (₺)" inputmode="decimal">
-            <div style="display: flex; gap: 12px;">
-                <button class="btn btn-primary" style="background:var(--green-gradient);" onclick="updateMoney('in')">GELİR (+)</button>
-                <button class="btn btn-primary" style="background:var(--red-gradient);" onclick="updateMoney('out')">GİDER (-)</button>
-            </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+          <span style="color:var(--text2);font-size:13px;">Toplam Değer:</span>
+          <span id="goldTotal" style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--gold);">₺0</span>
         </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span>📈</span> Hisse Senetleri</div>
+        <button class="btn btn-primary btn-sm" style="margin-bottom:12px;" onclick="openModal('addStockModal')">+ Hisse Ekle</button>
+        <div id="stockList"></div>
+      </div>
     </div>
 
-    <div id="health" class="section">
-        <div class="card" style="text-align: center; padding: 40px 20px;">
-            <h3 style="margin-bottom: 10px;">Su Tüketimi</h3>
-            <div style="font-size: 60px; font-weight: 800; color: #38bdf8; margin: 20px 0;" id="waterDisplay">0 ml</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                <button class="btn btn-secondary" onclick="addWater(250)">💧 +250ml</button>
-                <button class="btn btn-secondary" onclick="addWater(500)">🍼 +500ml</button>
-            </div>
-            <button class="btn btn-secondary" style="margin-top: 20px; color: #fb7185; border: 1px solid rgba(251,113,133,0.3);" onclick="resetWater()">Sıfırla</button>
+    <div id="wt-summary" style="display:none;">
+      <div class="card">
+        <div class="card-title"><span>💼</span> Toplam Varlık</div>
+        <div class="balance-display">
+          <div class="balance-amount gold" id="totalAssets">₺0</div>
+          <div class="balance-label">Tahmini Toplam Değer</div>
         </div>
+        <hr class="divider">
+        <div id="assetBreakdown"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FİNANS -->
+  <div class="section" id="sec-finance">
+    <div class="tabs">
+      <div class="tab active" onclick="setFinTab('overview',this)">Genel</div>
+      <div class="tab" onclick="setFinTab('income',this)">Gelir</div>
+      <div class="tab" onclick="setFinTab('expense',this)">Gider</div>
+      <div class="tab" onclick="setFinTab('debt',this)">Borç/Kredi</div>
     </div>
 
-    <div class="bottom-nav">
-        <button class="nav-item active" onclick="showSec('home', this)">
-            <span class="nav-icon">🏠</span><span>Ana Sayfa</span>
-        </button>
-        <button class="nav-item" onclick="showSec('finance', this)">
-            <span class="nav-icon">💸</span><span>Finans</span>
-        </button>
-        <button class="nav-item" onclick="showSec('health', this)">
-            <span class="nav-icon">💪</span><span>Sağlık</span>
-        </button>
+    <div id="ft-overview">
+      <div class="card">
+        <div class="card-title"><span>⚖️</span> Bu Ay</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div style="text-align:center;">
+            <div style="font-size:12px;color:var(--green);margin-bottom:4px;">GELİR</div>
+            <div id="fin-income" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--green);">₺0</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:12px;color:var(--red);margin-bottom:4px;">GİDER</div>
+            <div id="fin-expense" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--red);">₺0</div>
+          </div>
+        </div>
+        <hr class="divider">
+        <div style="text-align:center;">
+          <div style="font-size:12px;color:var(--text2);margin-bottom:4px;">NET BAKİYE</div>
+          <div id="fin-net" style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;" class="green">₺0</div>
+        </div>
+      </div>
+      <div id="recentTransactions"></div>
     </div>
+
+    <div id="ft-income" style="display:none;">
+      <button class="btn btn-success btn-full" style="margin-bottom:16px;" onclick="openModal('addIncomeModal')">+ Gelir Ekle</button>
+      <div id="incomeList"></div>
+    </div>
+
+    <div id="ft-expense" style="display:none;">
+      <button class="btn btn-danger btn-full" style="margin-bottom:16px;" onclick="openModal('addExpenseModal')">+ Gider Ekle</button>
+      <div id="expenseList"></div>
+    </div>
+
+    <div id="ft-debt" style="display:none;">
+      <button class="btn btn-gold btn-full" style="margin-bottom:16px;" onclick="openModal('addDebtModal')">+ Borç / Kredi Ekle</button>
+      <div id="debtList"></div>
+    </div>
+  </div>
+
+  <!-- NOTLAR -->
+  <div class="section" id="sec-notes">
+    <div style="display:flex;gap:10px;margin-bottom:16px;">
+      <input type="text" id="noteSearch" placeholder="Not ara..." oninput="renderNotes()" style="flex:1;">
+      <button class="btn btn-primary" onclick="openModal('addNoteModal')">+</button>
+    </div>
+    <div class="tabs" id="noteTabs">
+      <div class="tab active" onclick="filterNoteTag('all',this)">Tümü</div>
+    </div>
+    <div id="notesList"></div>
+  </div>
+
+  <!-- SAĞLIK -->
+  <div class="section" id="sec-health">
+    <div class="tabs">
+      <div class="tab active" onclick="setHealthTab('water',this)">💧 Su</div>
+      <div class="tab" onclick="setHealthTab('sport',this)">💪 Spor</div>
+      <div class="tab" onclick="setHealthTab('calorie',this)">🍎 Kalori</div>
+      <div class="tab" onclick="setHealthTab('smoke',this)">🚭 Sigara</div>
+      <div class="tab" onclick="setHealthTab('alcohol',this)">🍷 Alkol</div>
+      <div class="tab" onclick="setHealthTab('vaccine',this)">💉 Aşı</div>
+    </div>
+
+    <!-- SU -->
+    <div id="ht-water">
+      <div class="card">
+        <div class="card-title"><span>💧</span> Su Takibi</div>
+        <div class="water-display">
+          <div class="water-amount" id="waterAmount">0</div>
+          <div class="water-unit">ml</div>
+          <div class="water-goal" id="waterGoalText">Hedef: 2500 ml</div>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="waterBar" style="width:0%"></div></div>
+        <div class="water-btns">
+          <button class="btn btn-secondary" onclick="addWater(100)">+100ml</button>
+          <button class="btn btn-secondary" onclick="addWater(200)">+200ml</button>
+          <button class="btn btn-primary" onclick="addWater(250)">+1 Bardak</button>
+          <button class="btn btn-secondary" onclick="addWater(500)">+500ml</button>
+        </div>
+        <hr class="divider">
+        <div class="form-row">
+          <label class="form-label">Günlük Hedef (ml)</label>
+          <input type="number" id="waterGoalInput" placeholder="2500" oninput="saveWaterGoal()">
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="resetWater()">Sıfırla</button>
+      </div>
+    </div>
+
+    <!-- SPOR -->
+    <div id="ht-sport" style="display:none;">
+      <button class="btn btn-primary btn-full" style="margin-bottom:16px;" onclick="openModal('addSportModal')">+ Antrenman Ekle</button>
+      <div id="sportList"></div>
+    </div>
+
+    <!-- KALORİ -->
+    <div id="ht-calorie" style="display:none;">
+      <div class="card">
+        <div class="card-title"><span>🔥</span> Bugün</div>
+        <div style="text-align:center;padding:12px 0;">
+          <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--gold);" id="calTotal">0</div>
+          <div style="font-size:13px;color:var(--text2);">kcal tüketildi</div>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-full" style="margin-bottom:16px;" onclick="openModal('addCalorieModal')">+ Yemek Ekle</button>
+      <div id="calorieList"></div>
+    </div>
+
+    <!-- SİGARA -->
+    <div id="ht-smoke" style="display:none;">
+      <div class="card">
+        <div class="card-title"><span>🚭</span> Sigara Takibi</div>
+        <div id="smokeNotSet">
+          <p style="color:var(--text2);font-size:14px;margin-bottom:16px;">Sigarayı bıraktığın tarihi gir:</p>
+          <input type="date" id="smokeQuitDate">
+          <button class="btn btn-success btn-full" style="margin-top:10px;" onclick="setSmokeDate()">Kaydet</button>
+        </div>
+        <div id="smokeStats" style="display:none;">
+          <div class="smoke-counter">
+            <div class="smoke-days" id="smokeDays">0</div>
+            <div class="smoke-label">gündür sigarasız 🎉</div>
+            <div class="smoke-savings" id="smokeSavings">₺0 tasarruf</div>
+          </div>
+          <hr class="divider">
+          <div class="form-row">
+            <label class="form-label">Günlük paket sayısı (fiyat hesabı için)</label>
+            <input type="number" id="smokePackPerDay" placeholder="1" oninput="calcSmokeSavings()">
+          </div>
+          <div class="form-row">
+            <label class="form-label">Paket fiyatı (₺)</label>
+            <input type="number" id="smokePackPrice" placeholder="60" oninput="calcSmokeSavings()">
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="resetSmoke()">Sıfırla</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALKOL -->
+    <div id="ht-alcohol" style="display:none;">
+      <button class="btn btn-primary btn-full" style="margin-bottom:16px;" onclick="openModal('addAlcoholModal')">+ Kayıt Ekle</button>
+      <div id="alcoholList"></div>
+    </div>
+
+    <!-- AŞI -->
+    <div id="ht-vaccine" style="display:none;">
+      <button class="btn btn-primary btn-full" style="margin-bottom:16px;" onclick="openModal('addChildModal')">+ Çocuk Profili Ekle</button>
+      <div id="childList"></div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <button class="nav-item active" onclick="goSection('sec-home',this,'Ana Sayfa')">
+      <span class="nav-icon">🏠</span><span>Ana Sayfa</span>
+    </button>
+    <button class="nav-item" onclick="goSection('sec-family',this,'Aile')">
+      <span class="nav-icon">👨‍👩‍👧</span><span>Aile</span>
+    </button>
+    <button class="nav-item" onclick="goSection('sec-wallet',this,'Varlık')">
+      <span class="nav-icon">💼</span><span>Varlık</span>
+    </button>
+    <button class="nav-item" onclick="goSection('sec-finance',this,'Finans')">
+      <span class="nav-icon">💸</span><span>Finans</span>
+    </button>
+    <button class="nav-item" onclick="goSection('sec-notes',this,'Notlar')">
+      <span class="nav-icon">📝</span><span>Notlar</span>
+    </button>
+    <button class="nav-item" onclick="goSection('sec-health',this,'Sağlık')">
+      <span class="nav-icon">💪</span><span>Sağlık</span>
+    </button>
+  </div>
+</div>
+
+<!-- ===== MODALS ===== -->
+
+<!-- Add Member -->
+<div class="modal-overlay" id="addMemberModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">👤 Aile Üyesi Ekle</div>
+    <div class="form-row"><label class="form-label">Ad Soyad</label><input type="text" id="mName" placeholder="Ad Soyad"></div>
+    <div class="form-row"><label class="form-label">Yakınlık</label>
+      <select id="mRole">
+        <option>Eş</option><option>Çocuk</option><option>Anne</option><option>Baba</option><option>Kardeş</option><option>Diğer</option>
+      </select>
+    </div>
+    <div class="form-row"><label class="form-label">Doğum Tarihi</label><input type="date" id="mBirth"></div>
+    <div class="form-row"><label class="form-label">Not</label><textarea id="mNote" placeholder="Notlar..."></textarea></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-secondary btn-full" onclick="closeModal('addMemberModal')">İptal</button>
+      <button class="btn btn-primary btn-full" onclick="addMember()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Photo -->
+<div class="modal-overlay" id="addPhotoModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📸 Fotoğraf Ekle</div>
+    <div class="form-row"><label class="form-label">Başlık</label><input type="text" id="photoTitle" placeholder="Fotoğraf başlığı"></div>
+    <div class="form-row"><label class="form-label">Fotoğraf Seç</label><input type="file" id="photoFile" accept="image/*" style="background:none;border:none;padding:0;color:var(--text2)"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-secondary btn-full" onclick="closeModal('addPhotoModal')">İptal</button>
+      <button class="btn btn-primary btn-full" onclick="addPhoto()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Family Note -->
+<div class="modal-overlay" id="addFamilyNoteModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📝 Aile Notu</div>
+    <div class="form-row"><label class="form-label">Başlık</label><input type="text" id="fnTitle" placeholder="Başlık"></div>
+    <div class="form-row"><label class="form-label">Not</label><textarea id="fnContent" placeholder="Notunuz..."></textarea></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-secondary btn-full" onclick="closeModal('addFamilyNoteModal')">İptal</button>
+      <button class="btn btn-primary btn-full" onclick="addFamilyNote()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Stock -->
+<div class="modal-overlay" id="addStockModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📈 Hisse Ekle</div>
+    <div class="form-row"><label class="form-label">Hisse Kodu (BIST)</label><input type="text" id="stockSymbol" placeholder="TOASO, THYAO..."></div>
+    <div class="form-row"><label class="form-label">Adet</label><input type="number" id="stockQty" placeholder="100"></div>
+    <div class="form-row"><label class="form-label">Alış Fiyatı (₺)</label><input type="number" id="stockBuyPrice" placeholder="150.50"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-secondary btn-full" onclick="closeModal('addStockModal')">İptal</button>
+      <button class="btn btn-primary btn-full" onclick="addStock()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Income -->
+<div class="modal-overlay" id="addIncomeModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">💚 Gelir Ekle</div>
+    <div class="form-row"><label class="form-label">Açıklama</label><input type="text" id="incDesc" placeholder="Maaş, kira..."></div>
+    <div class="form-row"><label class="form-label">Tutar (₺)</label><input type="number" id="incAmount" placeholder="0"></div>
+    <div class="form-row"><label class="form-label">Tarih</label><input type="date" id="incDate"></div>
+    <div class="form-row"><label class="form-label">Kategori</label>
+      <select id="incCat"><option>Maaş</option><option>Kira</option><option>Ek Gelir</option><option>Diğer</option></select>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-secondary btn-full" onclick="closeModal('addIncomeModal')">İptal</button>
+      <button class="btn btn-success btn-full" onclick="addIncome()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Expense -->
+<div class="modal-overlay" id="addExpenseModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🔴 Gider Ekle</div>
+    <div class="form-row"><label class="form-label">Açıklama</label><input type="text" id="expDesc" placeholder="Market, fatura..."></div>
+    <div class="form-row"><label class="form-label">Tutar (₺)</label><input type="number" id="expAmount" placeholder="0"></div>
+    <div class="form-row"><label class="form-label">Tarih</label><input type="date" id="expDate"></div>
+    <div class="form-row"><label class="form-label">Kategori</label>
+      <select id="expCat"><option>Market</option><option>Fatura</option><option>Yakıt</option><option>Sağlık</option><option>Eğlence</option><option>Giyim</option><option>Diğer</option></select>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-secondary btn-full" onclick="closeModal('addExpenseModal')">İptal</button>
+      <button class="btn btn-danger btn-full" onclick="addExpense()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Debt -->
+<div class="modal-overlay" id="addDebtModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">💳 Borç / Kredi Ekle</div>
+    <div class="form-row"><label class="form-label">Açıklama</label><input type="text" id="debtDesc" placeholder="Konut kredisi, Ahmet'e borç..."></div>
+    <div class="form-row"><label class="form-label">Tür</label>
+      <select id="debtType"><option value="borrow">Bende borç var (öderim)</option><option value="lend">Başkasında borç var (alırım)</option></select>
+    </div>
+    <div class="form-row"><label class="form-label">Toplam Tutar (₺)</label><input type="number" id="debtTotal" placeholder="0"></div>
+    <div class="form-row"><label class="form-label">Aylık Taksit (₺)</label><input type="number" id="debtMonthly" placeholder="0"></div>
+    <div class="form-row"><label class="form-label">Bitiş Tarihi</label><input type="date" id="debtEnd"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-secondary btn-full" onclick="closeModal('addDebtModal')">İptal</button>
+      <button class="btn btn-gold btn-full" onclick="addDebt()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Note -->
+<div class="modal-overlay" id="addNoteModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📝 Not Ekle</div>
+    <div class="form-row"><label class="form-label">Başlık</label><input type="text" id="noteTitle" placeholder="Başlık"></div>
+    <div class="form-row"><label class="form-label">İçerik</label><textarea id="noteContent" placeholder="Notunuz..." style="min-height:120px;"></textarea></div>
+    <div class="form-row"><label class="form-label">Klasör / Etiket</label><input type="text" id="noteTag" placeholder="Örn: İş, Aile, Alışveriş"></div>
+    <div class="form-row"><label class="form-label">Hatırlatıcı (opsiyonel)</label><input type="datetime-local" id="noteReminder"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-secondary btn-full" onclick="closeModal('addNoteModal')">İptal</button>
+      <button class="btn btn-primary btn-full" onclick="addNote()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Sport -->
+<div class="modal-overlay" id="addSportModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">💪 Antrenman Ekle</div>
+    <div class="form-row"><label class="form-label">Egzersiz Türü</label>
+      <select id="sportType">
+        <option>🏃 Koşu</option><option>🚴 Bisiklet</option><option>🏋️ Ağırlık</option><option>🧘 Yoga</option>
+        <option>🏊 Yüzme</option><option>⚽ Futbol</option><option>🎾 Tenis</option><option>🚶 Yürüyüş</option><option>💪 Diğer</option>
+      </select>
+    </div>
+    <div class="form-grid">
+      <div class="form-row"><label class="form-label">Süre (dk)</label><input type="number" id="sportDuration" placeholder="30"></div>
+      <div class="form-row"><label class="form-label">Kalori (kcal)</label><input type="number" id="sportCalorie" placeholder="200"></div>
+    </div>
+    <div class="form-row"><label class="form-label">Not</label><input type="text" id="sportNote" placeholder="Opsiyonel not"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-secondary btn-full" onclick="closeModal('addSportModal')">İptal</button>
+      <button class="btn btn-primary btn-full" onclick="addSport()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Calorie -->
+<div class="modal-overlay" id="addCalorieModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🍎 Yemek Ekle</div>
+    <div class="form-row"><label class="form-label">Yemek Adı</label><input type="text" id="calFood" placeholder="Tavuk döner, salata..."></div>
+    <div class="form-row"><label class="form-label">Kalori (kcal)</label><input type="number" id="calAmount" placeholder="0"></div>
+    <div class="form-row">
+      <label class="form-label">Yaygın Yemekler</label>
+      <div class="chips">
+        <div class="chip" onclick="setCalorie(this,'Çorba',90)">🍲 Çorba 90</div>
+        <div class="chip" onclick="setCalorie(this,'Pilav',200)">🍚 Pilav 200</div>
+        <div class="chip" onclick="setCalorie(this,'Tavuk Döner',400)">🌯 Döner 400</div>
+        <div class="chip" onclick="setCalorie(this,'Salata',50)">🥗 Salata 50</div>
+        <div class="chip" onclick="setCalorie(this,'Ekmek',80)">🍞 Ekmek 80</div>
+        <div class="chip" onclick="setCalorie(this,'Simit',250)">🥯 Simit 250</div>
+        <div class="chip" onclick="setCalorie(this,'Çay',5)">☕ Çay 5</div>
+        <div class="chip" onclick="setCalorie(this,'Kahve',10)">☕ Kahve 10</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-secondary btn-full" onclick="closeModal('addCalorieModal')">İptal</button>
+      <button class="btn btn-primary btn-full" onclick="addCalorie()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Alcohol -->
+<div class="modal-overlay" id="addAlcoholModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🍷 Alkol Kaydı</div>
+    <div class="form-row"><label class="form-label">İçecek</label>
+      <select id="alcType"><option>🍺 Bira</option><option>🍷 Şarap</option><option>🥃 Viski</option><option>🍸 Kokteyl</option><option>Diğer</option></select>
+    </div>
+    <div class="form-row"><label class="form-label">Miktar (cl)</label><input type="number" id="alcAmount" placeholder="33"></div>
+    <div class="form-row"><label class="form-label">Tarih</label><input type="date" id="alcDate"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-secondary btn-full" onclick="closeModal('addAlcoholModal')">İptal</button>
+      <button class="btn btn-primary btn-full" onclick="addAlcohol()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Child -->
+<div class="modal-overlay" id="addChildModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">👶 Çocuk Profili</div>
+    <div class="form-row"><label class="form-label">Ad</label><input type="text" id="childName" placeholder="Ad"></div>
+    <div class="form-row"><label class="form-label">Doğum Tarihi</label><input type="date" id="childBirth"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-secondary btn-full" onclick="closeModal('addChildModal')">İptal</button>
+      <button class="btn btn-primary btn-full" onclick="addChild()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Vaccine -->
+<div class="modal-overlay" id="addVaccineModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="vaccineModalTitle">💉 Aşı Ekle</div>
+    <input type="hidden" id="vaccineChildId">
+    <div class="form-row"><label class="form-label">Aşı Adı</label><input type="text" id="vaccineName" placeholder="BCG, Hepatit B..."></div>
+    <div class="form-row"><label class="form-label">Tarih / Planlanan Tarih</label><input type="date" id="vaccineDate"></div>
+    <div class="form-row"><label class="form-label">Durum</label>
+      <select id="vaccineStatus"><option value="done">✅ Yapıldı</option><option value="upcoming">📅 Planlandı</option></select>
+    </div>
+    <div class="form-row"><label class="form-label">Not</label><input type="text" id="vaccineNote" placeholder="Opsiyonel"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-secondary btn-full" onclick="closeModal('addVaccineModal')">İptal</button>
+      <button class="btn btn-primary btn-full" onclick="addVaccine()">Kaydet</button>
+    </div>
+  </div>
 </div>
 
 <script>
-    const quotes = [
-        { s: "Hayat, sen başka planlar yaparken başına gelenlerdir.", a: "John Lennon" },
-        { s: "Eğitim, evreni okuma kabiliyetidir.", a: "Mustafa Kemal Atatürk" },
-        { s: "Mutluluk, sahip olduklarının tadını çıkarmaktır.", a: "Marcus Aurelius" },
-        { s: "Nereye gideceğini bilmiyorsan, yolun önemi yoktur.", a: "Lewis Carroll" },
-        { s: "Zamanın değerini bilin, çünkü o geri gelmez.", a: "Seneca" },
-        { s: "Kendine inan, dünyanın sana inanmasını sağla.", a: "Anonim" },
-        { s: "Gelecek, bugün ne yaptığınıza bağlıdır.", a: "Mahatma Gandhi" },
-        { s: "Karanlığı lanetlemektense bir mum yakmak daha iyidir.", a: "Konfüçyüs" },
-        { s: "Gülümsemek, ruhun en kısa yoludur.", a: "Anonim" }
-    ];
+// ===== STATE =====
+let state = {};
 
-    function setRandomQuote() {
-        const index = Math.floor(Math.random() * quotes.length);
-        document.getElementById('greetingQuote').innerText = quotes[index].s;
-        document.getElementById('quoteAuthor').innerText = "- " + quotes[index].a;
-    }
+function loadState() {
+  try { state = JSON.parse(localStorage.getItem('ntrk_data') || '{}'); } catch(e) { state = {}; }
+  if (!state.members) state.members = [];
+  if (!state.photos) state.photos = [];
+  if (!state.familyNotes) state.familyNotes = [];
+  if (!state.stocks) state.stocks = [];
+  if (!state.goldAmount) state.goldAmount = 0;
+  if (!state.incomes) state.incomes = [];
+  if (!state.expenses) state.expenses = [];
+  if (!state.debts) state.debts = [];
+  if (!state.notes) state.notes = [];
+  if (!state.water) state.water = { today: 0, goal: 2500, date: '' };
+  if (!state.sports) state.sports = [];
+  if (!state.calories) state.calories = [];
+  if (!state.alcohol) state.alcohol = [];
+  if (!state.children) state.children = [];
+  if (!state.smokeQuit) state.smokeQuit = null;
+}
 
-    let data = JSON.parse(localStorage.getItem('ntrk_final_data_v3')) || { balance: 0, water: 0 };
+function saveState() { localStorage.setItem('ntrk_data', JSON.stringify(state)); }
 
-    function saveData() {
-        localStorage.setItem('ntrk_final_data_v3', JSON.stringify(data));
-        updateUI();
-    }
+// ===== AUTH =====
+function doLogin() {
+  const input = document.getElementById('loginInput').value;
+  const stored = localStorage.getItem('ntrk_pass');
+  if (!stored) {
+    if (input.length < 4) { showLoginError('En az 4 karakter gir!'); return; }
+    localStorage.setItem('ntrk_pass', input);
+    enterApp();
+  } else {
+    if (input === stored) { enterApp(); }
+    else { showLoginError('Hatalı şifre!'); }
+  }
+}
 
-    function showSec(id, el) {
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        el.classList.add('active');
-    }
+function showLoginError(msg) {
+  const el = document.getElementById('loginError');
+  el.textContent = '❌ ' + msg;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 2000);
+}
 
-    function updateMoney(type) {
-        const val = parseFloat(document.getElementById('moneyInput').value);
-        if(!val || val < 0) return;
-        data.balance += (type === 'in' ? val : -val);
-        document.getElementById('moneyInput').value = '';
-        saveData();
-    }
+function enterApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  loadState();
+  initApp();
+}
 
-    function addWater(ml) { data.water += ml; saveData(); }
-    function resetWater() { data.water = 0; saveData(); }
+function logout() {
+  saveState();
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginInput').value = '';
+}
 
-    async function fetchGoldPrice() {
-        try {
-            const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-            const resData = await response.json();
-            const price = (2450 / 31.1) * resData.rates.TRY; 
-            document.getElementById('h-gold').innerText = Math.floor(price).toLocaleString('tr-TR') + " ₺";
-        } catch (e) { document.getElementById('h-gold').innerText = "Güncellenemedi"; }
-    }
+// check setup
+window.onload = function() {
+  const stored = localStorage.getItem('ntrk_pass');
+  if (!stored) {
+    document.getElementById('loginDesc').textContent = 'İlk kullanım: Şifreni belirle';
+    document.getElementById('setupHint').textContent = 'Bu şifre sadece bu cihazda geçerlidir';
+  }
+};
 
-    function updateUI() {
-        document.getElementById('h-water').innerText = data.water + " ml";
-        document.getElementById('waterDisplay').innerText = data.water + " ml";
-        document.getElementById('h-balance').innerText = data.balance.toLocaleString('tr-TR') + " ₺";
-        document.getElementById('totalBalance').innerText = data.balance.toLocaleString('tr-TR') + " ₺";
-    }
+// ===== NAVIGATION =====
+function goSection(id, btn, title) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('topbarTitle').textContent = title || '';
+  if (id === 'sec-home') refreshDashboard();
+  if (id === 'sec-wallet') { renderStocks(); renderAssetSummary(); loadGoldPrice(); }
+  if (id === 'sec-finance') renderFinance();
+  if (id === 'sec-notes') renderNotes();
+  if (id === 'sec-family') { renderFamily(); renderPhotos(); renderFamilyNotes(); }
+  if (id === 'sec-health') { renderWater(); renderSports(); renderCalories(); renderAlcohol(); renderChildren(); renderSmoke(); }
+}
 
-    // Uygulama yüklendiğinde çalışacaklar
-    window.onload = () => {
-        setRandomQuote();
-        updateUI();
-        fetchGoldPrice();
-    };
+// ===== INIT =====
+function initApp() {
+  const now = new Date();
+  const days = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+  const months = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  document.getElementById('dateDisplay').textContent = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+  const h = now.getHours();
+  let gr = h < 12 ? 'Günaydın! ☀️' : h < 18 ? 'İyi günler! 👋' : 'İyi akşamlar! 🌙';
+  document.getElementById('greeting').textContent = gr;
+  checkWaterReset();
+  checkCalorieReset();
+  refreshDashboard();
+  scheduleReminders();
+}
+
+function refreshDashboard() {
+  const w = state.water;
+  document.getElementById('dash-water').textContent = (w.today || 0) + ' ml';
+  const inc = state.incomes.filter(i => isThisMonth(i.date)).reduce((a,b) => a + (+b.amount), 0);
+  const exp = state.expenses.filter(i => isThisMonth(i.date)).reduce((a,b) => a + (+b.amount), 0);
+  const net = inc - exp;
+  document.getElementById('dash-balance').textContent = '₺' + net.toLocaleString('tr-TR');
+  document.getElementById('dash-balance').className = 'stat-value ' + (net >= 0 ? 'green' : 'red');
+  document.getElementById('dash-notes').textContent = state.notes.length;
+  const todaySport = state.sports.filter(s => isToday(s.date));
+  document.getElementById('dash-sport').textContent = todaySport.length > 0 ? todaySport.length + ' seans' : '—';
+  renderReminders();
+}
+
+function isToday(dateStr) {
+  if (!dateStr) return false;
+  const d = new Date(dateStr);
+  const n = new Date();
+  return d.getDate() === n.getDate() && d.getMonth() === n.getMonth() && d.getFullYear() === n.getFullYear();
+}
+
+function isThisMonth(dateStr) {
+  if (!dateStr) return false;
+  const d = new Date(dateStr);
+  const n = new Date();
+  return d.getMonth() === n.getMonth() && d.getFullYear() === n.getFullYear();
+}
+
+function renderReminders() {
+  const now = new Date();
+  const upcoming = state.notes.filter(n => {
+    if (!n.reminder) return false;
+    const rd = new Date(n.reminder);
+    return rd > now && rd - now < 7 * 24 * 3600000;
+  });
+  const card = document.getElementById('reminderCard');
+  const list = document.getElementById('reminderList');
+  if (upcoming.length === 0) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  list.innerHTML = upcoming.map(n => `
+    <div class="list-item">
+      <div class="list-item-left">
+        <div class="list-item-title">${n.title}</div>
+        <div class="list-item-sub">⏰ ${new Date(n.reminder).toLocaleString('tr-TR')}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function scheduleReminders() {
+  // Check every minute for reminders
+  setInterval(() => {
+    const now = new Date();
+    state.notes.forEach(n => {
+      if (!n.reminder || n.reminderFired) return;
+      const rd = new Date(n.reminder);
+      if (rd <= now) {
+        n.reminderFired = true;
+        saveState();
+        if ('Notification' in window && Notification.permission === 'granted') {
+          new Notification('📝 NTRK Hatırlatıcı', { body: n.title });
+        } else {
+          alert('⏰ Hatırlatıcı: ' + n.title);
+        }
+      }
+    });
+  }, 60000);
+  if ('Notification' in window) Notification.requestPermission();
+}
+
+// ===== MODALS =====
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('open');
+});
+
+// ===== FAMILY =====
+function setFamilyTab(tab, el) {
+  document.querySelectorAll('#sec-family .tabs .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  ['members','photos','notes'].forEach(t => {
+    const el = document.getElementById('ft-' + t);
+    if (el) el.style.display = t === tab ? 'block' : 'none';
+  });
+}
+
+function addMember() {
+  const name = document.getElementById('mName').value.trim();
+  if (!name) return;
+  state.members.push({ id: Date.now(), name, role: document.getElementById('mRole').value, birth: document.getElementById('mBirth').value, note: document.getElementById('mNote').value });
+  saveState(); closeModal('addMemberModal'); renderFamily();
+  ['mName','mBirth','mNote'].forEach(id => document.getElementById(id).value = '');
+}
+
+function renderFamily() {
+  const grid = document.getElementById('familyGrid');
+  if (state.members.length === 0) {
+    grid.innerHTML = '<div class="empty" style="grid-column:span 2"><div class="empty-icon">👨‍👩‍👧</div><div class="empty-text">Henüz üye eklenmedi</div></div>';
+    return;
+  }
+  grid.innerHTML = state.members.map(m => `
+    <div class="family-card">
+      <div class="family-avatar">${m.photo ? `<img src="${m.photo}">` : '👤'}</div>
+      <div class="family-name">${m.name}</div>
+      <div class="family-role">${m.role}</div>
+      ${m.birth ? `<div style="font-size:11px;color:var(--text3);margin-top:4px;">${formatDate(m.birth)}</div>` : ''}
+      <button class="delete-btn" onclick="deleteMember(${m.id})">🗑</button>
+    </div>
+  `).join('');
+}
+
+function deleteMember(id) { state.members = state.members.filter(m => m.id !== id); saveState(); renderFamily(); }
+
+function addPhoto() {
+  const file = document.getElementById('photoFile').files[0];
+  const title = document.getElementById('photoTitle').value.trim() || 'Fotoğraf';
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    state.photos.push({ id: Date.now(), title, src: e.target.result });
+    saveState(); closeModal('addPhotoModal'); renderPhotos();
+    document.getElementById('photoTitle').value = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderPhotos() {
+  const grid = document.getElementById('photoGrid');
+  if (state.photos.length === 0) {
+    grid.innerHTML = '<div class="empty" style="grid-column:span 3"><div class="empty-icon">📸</div><div class="empty-text">Fotoğraf yok</div></div>';
+    return;
+  }
+  grid.innerHTML = state.photos.map(p => `
+    <div style="position:relative;border-radius:10px;overflow:hidden;aspect-ratio:1;background:var(--surface2);">
+      <img src="${p.src}" style="width:100%;height:100%;object-fit:cover;">
+      <button class="delete-btn" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);border-radius:50%;width:28px;height:28px;font-size:14px;" onclick="deletePhoto(${p.id})">🗑</button>
+    </div>
+  `).join('');
+}
+
+function deletePhoto(id) { state.photos = state.photos.filter(p => p.id !== id); saveState(); renderPhotos(); }
+
+function addFamilyNote() {
+  const title = document.getElementById('fnTitle').value.trim();
+  const content = document.getElementById('fnContent').value.trim();
+  if (!title) return;
+  state.familyNotes.push({ id: Date.now(), title, content, date: new Date().toISOString() });
+  saveState(); closeModal('addFamilyNoteModal'); renderFamilyNotes();
+  document.getElementById('fnTitle').value = ''; document.getElementById('fnContent').value = '';
+}
+
+function renderFamilyNotes() {
+  const el = document.getElementById('familyNotesList');
+  if (state.familyNotes.length === 0) { el.innerHTML = '<div class="empty"><div class="empty-icon">📝</div><div class="empty-text">Not yok</div></div>'; return; }
+  el.innerHTML = state.familyNotes.map(n => `
+    <div class="note-card">
+      <div class="note-card-title">${n.title}</div>
+      <div class="note-card-preview">${n.content}</div>
+      <div class="note-card-footer">
+        <span class="note-card-date">${formatDate(n.date)}</span>
+        <button class="delete-btn" onclick="deleteFamilyNote(${n.id})">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function deleteFamilyNote(id) { state.familyNotes = state.familyNotes.filter(n => n.id !== id); saveState(); renderFamilyNotes(); }
+
+// ===== WALLET =====
+function setWalletTab(tab, el) {
+  document.querySelectorAll('#sec-wallet .tabs .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('wt-assets').style.display = tab === 'assets' ? 'block' : 'none';
+  document.getElementById('wt-summary').style.display = tab === 'summary' ? 'block' : 'none';
+  if (tab === 'summary') renderAssetSummary();
+}
+
+async function loadGoldPrice() {
+  document.getElementById('goldPrice').textContent = 'Yükleniyor...';
+  try {
+    const r = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+    const d = await r.json();
+    const usdTry = d.rates.TRY;
+    // Gold ~3320 USD/oz = 3320/31.1 per gram
+    const goldUsd = 3320 / 31.1035;
+    const goldTry = goldUsd * usdTry;
+    document.getElementById('goldPrice').textContent = '₺' + goldTry.toFixed(0) + ' / gr';
+    state.goldPriceTry = goldTry;
+    saveState();
+    updateGoldTotal();
+  } catch(e) {
+    document.getElementById('goldPrice').textContent = 'Bağlantı yok';
+  }
+}
+
+function saveAssets() {
+  state.goldAmount = parseFloat(document.getElementById('goldAmount').value) || 0;
+  saveState();
+  updateGoldTotal();
+  renderAssetSummary();
+}
+
+function updateGoldTotal() {
+  const price = state.goldPriceTry || 0;
+  const total = (state.goldAmount || 0) * price;
+  document.getElementById('goldTotal').textContent = '₺' + total.toLocaleString('tr-TR', {maximumFractionDigits:0});
+}
+
+function addStock() {
+  const symbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
+  const qty = parseFloat(document.getElementById('stockQty').value) || 0;
+  const buyPrice = parseFloat(document.getElementById('stockBuyPrice').value) || 0;
+  if (!symbol || !qty) return;
+  state.stocks.push({ id: Date.now(), symbol, qty, buyPrice });
+  saveState(); closeModal('addStockModal'); renderStocks();
+  ['stockSymbol','stockQty','stockBuyPrice'].forEach(id => document.getElementById(id).value = '');
+}
+
+function renderStocks() {
+  const el = document.getElementById('stockList');
+  if (state.stocks.length === 0) { el.innerHTML = '<div class="empty"><div class="empty-icon">📈</div><div class="empty-text">Hisse eklenmedi</div></div>'; return; }
+  el.innerHTML = state.stocks.map(s => {
+    const total = s.qty * s.buyPrice;
+    return `
+      <div class="list-item">
+        <div class="list-item-left">
+          <div class="list-item-title">${s.symbol}</div>
+          <div class="list-item-sub">${s.qty} adet × ₺${s.buyPrice}</div>
+        </div>
+        <div class="list-item-right">
+          <span class="badge badge-blue">₺${total.toLocaleString('tr-TR',{maximumFractionDigits:0})}</span>
+          <button class="delete-btn" onclick="deleteStock(${s.id})">🗑</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+  renderAssetSummary();
+}
+
+function deleteStock(id) { state.stocks = state.stocks.filter(s => s.id !== id); saveState(); renderStocks(); }
+
+function renderAssetSummary() {
+  const goldVal = (state.goldAmount || 0) * (state.goldPriceTry || 0);
+  const stockVal = state.stocks.reduce((a, s) => a + s.qty * s.buyPrice, 0);
+  const total = goldVal + stockVal;
+  const el = document.getElementById('totalAssets');
+  if (el) el.textContent = '₺' + total.toLocaleString('tr-TR', {maximumFractionDigits:0});
+  const bd = document.getElementById('assetBreakdown');
+  if (bd) bd.innerHTML = `
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+      <span style="color:var(--text2);">🥇 Altın (${state.goldAmount || 0} gr)</span>
+      <span style="color:var(--gold);font-weight:600;">₺${goldVal.toLocaleString('tr-TR',{maximumFractionDigits:0})}</span>
+    </div>
+    ${state.stocks.map(s => `
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+      <span style="color:var(--text2);">📈 ${s.symbol} (${s.qty} adet)</span>
+      <span style="color:var(--accent);font-weight:600;">₺${(s.qty*s.buyPrice).toLocaleString('tr-TR',{maximumFractionDigits:0})}</span>
+    </div>`).join('')}
+  `;
+  // update dash
+  const dashEl = document.getElementById('dash-balance');
+}
+
+// ===== FİNANS =====
+function setFinTab(tab, el) {
+  document.querySelectorAll('#sec-finance .tabs .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  ['overview','income','expense','debt'].forEach(t => {
+    document.getElementById('ft-' + t).style.display = t === tab ? 'block' : 'none';
+  });
+}
+
+function addIncome() {
+  const desc = document.getElementById('incDesc').value.trim();
+  const amount = parseFloat(document.getElementById('incAmount').value) || 0;
+  if (!desc || !amount) return;
+  state.incomes.push({ id: Date.now(), desc, amount, date: document.getElementById('incDate').value || new Date().toISOString().split('T')[0], cat: document.getElementById('incCat').value });
+  saveState(); closeModal('addIncomeModal'); renderFinance();
+  ['incDesc','incAmount','incDate'].forEach(id => document.getElementById(id).value = '');
+}
+
+function addExpense() {
+  const desc = document.getElementById('expDesc').value.trim();
+  const amount = parseFloat(document.getElementById('expAmount').value) || 0;
+  if (!desc || !amount) return;
+  state.expenses.push({ id: Date.now(), desc, amount, date: document.getElementById('expDate').value || new Date().toISOString().split('T')[0], cat: document.getElementById('expCat').value });
+  saveState(); closeModal('addExpenseModal'); renderFinance();
+  ['expDesc','expAmount','expDate'].forEach(id => document.getElementById(id).value = '');
+}
+
+function addDebt() {
+  const desc = document.getElementById('debtDesc').value.trim();
+  if (!desc) return;
+  state.debts.push({ id: Date.now(), desc, type: document.getElementById('debtType').value, total: parseFloat(document.getElementById('debtTotal').value) || 0, monthly: parseFloat(document.getElementById('debtMonthly').value) || 0, end: document.getElementById('debtEnd').value });
+  saveState(); closeModal('addDebtModal'); renderFinance();
+}
+
+function renderFinance() {
+  const inc = state.incomes.filter(i => isThisMonth(i.date)).reduce((a,b) => a + (+b.amount), 0);
+  const exp = state.expenses.filter(i => isThisMonth(i.date)).reduce((a,b) => a + (+b.amount), 0);
+  const net = inc - exp;
+  document.getElementById('fin-income').textContent = '₺' + inc.toLocaleString('tr-TR');
+  document.getElementById('fin-expense').textContent = '₺' + exp.toLocaleString('tr-TR');
+  const netEl = document.getElementById('fin-net');
+  netEl.textContent = '₺' + net.toLocaleString('tr-TR');
+  netEl.style.color = net >= 0 ? 'var(--green)' : 'var(--red)';
+
+  const recent = document.getElementById('recentTransactions');
+  const all = [...state.incomes.map(i => ({...i, kind:'income'})), ...state.expenses.map(e => ({...e, kind:'expense'}))].sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,5);
+  recent.innerHTML = all.length ? `<div class="card-title" style="margin-top:8px;"><span>🕐</span> Son İşlemler</div>` + all.map(t => `
+    <div class="list-item">
+      <div class="list-item-left">
+        <div class="list-item-title">${t.desc}</div>
+        <div class="list-item-sub">${t.cat} • ${formatDate(t.date)}</div>
+      </div>
+      <span class="badge ${t.kind==='income'?'badge-green':'badge-red'}">${t.kind==='income'?'+':'-'}₺${(+t.amount).toLocaleString('tr-TR')}</span>
+    </div>
+  `).join('') : '';
+
+  const incList = document.getElementById('incomeList');
+  incList.innerHTML = state.incomes.length ? state.incomes.slice().reverse().map(i => `
+    <div class="list-item">
+      <div class="list-item-left"><div class="list-item-title">${i.desc}</div><div class="list-item-sub">${i.cat} • ${formatDate(i.date)}</div></div>
+      <div class="list-item-right"><span class="badge badge-green">+₺${(+i.amount).toLocaleString('tr-TR')}</span><button class="delete-btn" onclick="deleteIncome(${i.id})">🗑</button></div>
+    </div>`).join('') : '<div class="empty"><div class="empty-icon">💚</div><div class="empty-text">Gelir kaydı yok</div></div>';
+
+  const expList = document.getElementById('expenseList');
+  expList.innerHTML = state.expenses.length ? state.expenses.slice().reverse().map(e => `
+    <div class="list-item">
+      <div class="list-item-left"><div class="list-item-title">${e.desc}</div><div class="list-item-sub">${e.cat} • ${formatDate(e.date)}</div></div>
+      <div class="list-item-right"><span class="badge badge-red">-₺${(+e.amount).toLocaleString('tr-TR')}</span><button class="delete-btn" onclick="deleteExpense(${e.id})">🗑</button></div>
+    </div>`).join('') : '<div class="empty"><div class="empty-icon">🔴</div><div class="empty-text">Gider kaydı yok</div></div>';
+
+  const debtList = document.getElementById('debtList');
+  debtList.innerHTML = state.debts.length ? state.debts.map(d => `
+    <div class="list-item">
+      <div class="list-item-left">
+        <div class="list-item-title">${d.desc}</div>
+        <div class="list-item-sub">${d.type==='borrow'?'Bende borç':'Başkasında borç'} ${d.monthly?'• ₺'+d.monthly+'/ay':''} ${d.end?'• '+formatDate(d.end):''}</div>
+      </div>
+      <div class="list-item-right">
+        <span class="badge ${d.type==='borrow'?'badge-red':'badge-green'}">₺${(+d.total).toLocaleString('tr-TR')}</span>
+        <button class="delete-btn" onclick="deleteDebt(${d.id})">🗑</button>
+      </div>
+    </div>`).join('') : '<div class="empty"><div class="empty-icon">💳</div><div class="empty-text">Borç/Kredi kaydı yok</div></div>';
+
+  refreshDashboard();
+}
+
+function deleteIncome(id) { state.incomes = state.incomes.filter(i => i.id !== id); saveState(); renderFinance(); }
+function deleteExpense(id) { state.expenses = state.expenses.filter(e => e.id !== id); saveState(); renderFinance(); }
+function deleteDebt(id) { state.debts = state.debts.filter(d => d.id !== id); saveState(); renderFinance(); }
+
+// ===== NOTLAR =====
+let activeNoteTag = 'all';
+
+function addNote() {
+  const title = document.getElementById('noteTitle').value.trim();
+  const content = document.getElementById('noteContent').value.trim();
+  if (!title) return;
+  const tag = document.getElementById('noteTag').value.trim() || 'Genel';
+  const reminder = document.getElementById('noteReminder').value;
+  state.notes.push({ id: Date.now(), title, content, tag, reminder, date: new Date().toISOString(), reminderFired: false });
+  saveState(); closeModal('addNoteModal'); renderNotes();
+  ['noteTitle','noteContent','noteTag','noteReminder'].forEach(id => document.getElementById(id).value = '');
+}
+
+function filterNoteTag(tag, el) {
+  activeNoteTag = tag;
+  document.querySelectorAll('#noteTabs .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderNotes();
+}
+
+function renderNotes() {
+  const search = document.getElementById('noteSearch').value.toLowerCase();
+  let notes = state.notes;
+  if (activeNoteTag !== 'all') notes = notes.filter(n => n.tag === activeNoteTag);
+  if (search) notes = notes.filter(n => n.title.toLowerCase().includes(search) || n.content.toLowerCase().includes(search));
+
+  // Render tags
+  const tags = ['all', ...new Set(state.notes.map(n => n.tag))];
+  const tabsEl = document.getElementById('noteTabs');
+  tabsEl.innerHTML = tags.map(t => `<div class="tab ${t === activeNoteTag ? 'active' : ''}" onclick="filterNoteTag('${t}',this)">${t === 'all' ? 'Tümü' : t}</div>`).join('');
+
+  const el = document.getElementById('notesList');
+  if (notes.length === 0) { el.innerHTML = '<div class="empty"><div class="empty-icon">📝</div><div class="empty-text">Not bulunamadı</div></div>'; return; }
+  el.innerHTML = notes.slice().reverse().map(n => `
+    <div class="note-card">
+      <div class="note-card-title">${n.title}</div>
+      <div class="note-card-preview">${n.content}</div>
+      <div class="note-card-footer">
+        <span class="badge badge-blue">${n.tag}</span>
+        ${n.reminder ? `<span class="badge badge-purple">⏰ ${new Date(n.reminder).toLocaleString('tr-TR',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span>` : ''}
+        <span class="note-card-date">${formatDate(n.date)}</span>
+        <button class="delete-btn" onclick="deleteNote(${n.id})">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function deleteNote(id) { state.notes = state.notes.filter(n => n.id !== id); saveState(); renderNotes(); refreshDashboard(); }
+
+// ===== SAĞLIK =====
+function setHealthTab(tab, el) {
+  document.querySelectorAll('#sec-health .tabs .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  ['water','sport','calorie','smoke','alcohol','vaccine'].forEach(t => {
+    document.getElementById('ht-' + t).style.display = t === tab ? 'block' : 'none';
+  });
+}
+
+// SU
+function checkWaterReset() {
+  const today = new Date().toDateString();
+  if (state.water.date !== today) { state.water.today = 0; state.water.date = today; saveState(); }
+}
+
+function renderWater() {
+  const w = state.water;
+  document.getElementById('waterAmount').textContent = w.today || 0;
+  document.getElementById('waterGoalInput').value = w.goal || 2500;
+  document.getElementById('waterGoalText').textContent = `Hedef: ${w.goal || 2500} ml`;
+  const pct = Math.min(100, ((w.today || 0) / (w.goal || 2500)) * 100);
+  document.getElementById('waterBar').style.width = pct + '%';
+}
+
+function addWater(ml) {
+  state.water.today = (state.water.today || 0) + ml;
+  saveState(); renderWater(); refreshDashboard();
+}
+
+function resetWater() { state.water.today = 0; saveState(); renderWater(); refreshDashboard(); }
+function saveWaterGoal() { state.water.goal = parseInt(document.getElementById('waterGoalInput').value) || 2500; saveState(); renderWater(); }
+
+// SPOR
+function addSport() {
+  const type = document.getElementById('sportType').value;
+  const duration = parseInt(document.getElementById('sportDuration').value) || 0;
+  const cal = parseInt(document.getElementById('sportCalorie').value) || 0;
+  const note = document.getElementById('sportNote').value;
+  state.sports.push({ id: Date.now(), type, duration, cal, note, date: new Date().toISOString() });
+  saveState(); closeModal('addSportModal'); renderSports(); refreshDashboard();
+  ['sportDuration','sportCalorie','sportNote'].forEach(id => document.getElementById(id).value = '');
+}
+
+function renderSports() {
+  const el = document.getElementById('sportList');
+  if (state.sports.length === 0) { el.innerHTML = '<div class="empty"><div class="empty-icon">💪</div><div class="empty-text">Antrenman kaydı yok</div></div>'; return; }
+  el.innerHTML = state.sports.slice().reverse().map(s => `
+    <div class="exercise-item">
+      <div class="exercise-icon">${s.type.split(' ')[0]}</div>
+      <div style="flex:1;">
+        <div class="exercise-name">${s.type}</div>
+        <div class="exercise-detail">${s.duration} dk ${s.cal ? '• ' + s.cal + ' kcal' : ''} ${s.note ? '• ' + s.note : ''}</div>
+        <div class="exercise-detail" style="color:var(--text3);">${formatDate(s.date)}</div>
+      </div>
+      <button class="delete-btn" onclick="deleteSport(${s.id})">🗑</button>
+    </div>
+  `).join('');
+}
+
+function deleteSport(id) { state.sports = state.sports.filter(s => s.id !== id); saveState(); renderSports(); refreshDashboard(); }
+
+// KALORİ
+function checkCalorieReset() {
+  const today = new Date().toDateString();
+  if (state.calorieDate !== today) { state.calorieDate = today; saveState(); }
+}
+
+function setCalorie(el, name, cal) {
+  document.getElementById('calFood').value = name;
+  document.getElementById('calAmount').value = cal;
+  document.querySelectorAll('#addCalorieModal .chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function addCalorie() {
+  const food = document.getElementById('calFood').value.trim();
+  const amount = parseInt(document.getElementById('calAmount').value) || 0;
+  if (!food || !amount) return;
+  state.calories.push({ id: Date.now(), food, amount, date: new Date().toISOString() });
+  saveState(); closeModal('addCalorieModal'); renderCalories();
+  document.getElementById('calFood').value = ''; document.getElementById('calAmount').value = '';
+}
+
+function renderCalories() {
+  const today = state.calories.filter(c => isToday(c.date));
+  const total = today.reduce((a,b) => a + b.amount, 0);
+  document.getElementById('calTotal').textContent = total;
+  const el = document.getElementById('calorieList');
+  if (state.calories.length === 0) { el.innerHTML = '<div class="empty"><div class="empty-icon">🍎</div><div class="empty-text">Yemek kaydı yok</div></div>'; return; }
+  el.innerHTML = state.calories.slice().reverse().map(c => `
+    <div class="list-item">
+      <div class="list-item-left"><div class="list-item-title">${c.food}</div><div class="list-item-sub">${formatDate(c.date)}</div></div>
+      <div class="list-item-right"><span class="badge badge-gold">${c.amount} kcal</span><button class="delete-btn" onclick="deleteCalorie(${c.id})">🗑</button></div>
+    </div>`).join('');
+}
+
+function deleteCalorie(id) { state.calories = state.calories.filter(c => c.id !== id); saveState(); renderCalories(); }
+
+// SİGARA
+function setSmokeDate() {
+  const d = document.getElementById('smokeQuitDate').value;
+  if (!d) return;
+  state.smokeQuit = d;
+  saveState(); renderSmoke();
+}
+
+function renderSmoke() {
+  if (!state.smokeQuit) {
+    document.getElementById('smokeNotSet').style.display = 'block';
+    document.getElementById('smokeStats').style.display = 'none';
+    return;
+  }
+  document.getElementById('smokeNotSet').style.display = 'none';
+  document.getElementById('smokeStats').style.display = 'block';
+  const days = Math.floor((Date.now() - new Date(state.smokeQuit)) / 86400000);
+  document.getElementById('smokeDays').textContent = days;
+  calcSmokeSavings();
+}
+
+function calcSmokeSavings() {
+  const days = Math.floor((Date.now() - new Date(state.smokeQuit)) / 86400000);
+  const packs = parseFloat(document.getElementById('smokePackPerDay').value) || 1;
+  const price = parseFloat(document.getElementById('smokePackPrice').value) || 60;
+  const savings = days * packs * price;
+  document.getElementById('smokeSavings').textContent = '₺' + savings.toLocaleString('tr-TR', {maximumFractionDigits:0}) + ' tasarruf';
+}
+
+function resetSmoke() { state.smokeQuit = null; saveState(); renderSmoke(); }
+
+// ALKOL
+function addAlcohol() {
+  const type = document.getElementById('alcType').value;
+  const amount = parseInt(document.getElementById('alcAmount').value) || 0;
+  const date = document.getElementById('alcDate').value || new Date().toISOString().split('T')[0];
+  state.alcohol.push({ id: Date.now(), type, amount, date });
+  saveState(); closeModal('addAlcoholModal'); renderAlcohol();
+}
+
+function renderAlcohol() {
+  const el = document.getElementById('alcoholList');
+  if (state.alcohol.length === 0) { el.innerHTML = '<div class="empty"><div class="empty-icon">🍷</div><div class="empty-text">Kayıt yok</div></div>'; return; }
+  el.innerHTML = state.alcohol.slice().reverse().map(a => `
+    <div class="list-item">
+      <div class="list-item-left"><div class="list-item-title">${a.type}</div><div class="list-item-sub">${formatDate(a.date)}</div></div>
+      <div class="list-item-right"><span class="badge badge-purple">${a.amount} cl</span><button class="delete-btn" onclick="deleteAlcohol(${a.id})">🗑</button></div>
+    </div>`).join('');
+}
+
+function deleteAlcohol(id) { state.alcohol = state.alcohol.filter(a => a.id !== id); saveState(); renderAlcohol(); }
+
+// AŞI
+function addChild() {
+  const name = document.getElementById('childName').value.trim();
+  const birth = document.getElementById('childBirth').value;
+  if (!name) return;
+  state.children.push({ id: Date.now(), name, birth, vaccines: [] });
+  saveState(); closeModal('addChildModal'); renderChildren();
+  document.getElementById('childName').value = ''; document.getElementById('childBirth').value = '';
+}
+
+function renderChildren() {
+  const el = document.getElementById('childList');
+  if (state.children.length === 0) { el.innerHTML = '<div class="empty"><div class="empty-icon">👶</div><div class="empty-text">Çocuk profili yok</div></div>'; return; }
+  el.innerHTML = state.children.map(c => `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;">👶 ${c.name}</div>
+          ${c.birth ? `<div style="font-size:12px;color:var(--text2);">${formatDate(c.birth)}</div>` : ''}
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-primary btn-sm" onclick="openVaccineModal(${c.id},'${c.name}')">+ Aşı</button>
+          <button class="delete-btn" onclick="deleteChild(${c.id})">🗑</button>
+        </div>
+      </div>
+      ${c.vaccines.length ? c.vaccines.map(v => `
+        <div class="vaccine-row">
+          <div class="vaccine-dot ${v.status === 'done' ? 'done' : 'upcoming'}"></div>
+          <div class="vaccine-name">${v.name}</div>
+          <div class="vaccine-date">${formatDate(v.date)}</div>
+          <span class="badge ${v.status === 'done' ? 'badge-green' : 'badge-gold'}">${v.status === 'done' ? '✅ Yapıldı' : '📅 Planlandı'}</span>
+          <button class="delete-btn" onclick="deleteVaccine(${c.id},${v.id})">🗑</button>
+        </div>`).join('') : '<div style="font-size:13px;color:var(--text3);">Henüz aşı kaydı yok</div>'}
+    </div>
+  `).join('');
+}
+
+function openVaccineModal(childId, childName) {
+  document.getElementById('vaccineChildId').value = childId;
+  document.getElementById('vaccineModalTitle').textContent = `💉 ${childName} — Aşı Ekle`;
+  openModal('addVaccineModal');
+}
+
+function addVaccine() {
+  const childId = parseInt(document.getElementById('vaccineChildId').value);
+  const name = document.getElementById('vaccineName').value.trim();
+  const date = document.getElementById('vaccineDate').value;
+  const status = document.getElementById('vaccineStatus').value;
+  const note = document.getElementById('vaccineNote').value;
+  if (!name) return;
+  const child = state.children.find(c => c.id === childId);
+  if (!child) return;
+  child.vaccines.push({ id: Date.now(), name, date, status, note });
+  saveState(); closeModal('addVaccineModal'); renderChildren();
+  ['vaccineName','vaccineDate','vaccineNote'].forEach(id => document.getElementById(id).value = '');
+  // Reminder for upcoming vaccines
+  if (status === 'upcoming' && date) {
+    state.notes.push({ id: Date.now(), title: `💉 Aşı Hatırlatıcı: ${child.name} - ${name}`, content: note, tag: 'Aşı', reminder: date + 'T09:00', date: new Date().toISOString(), reminderFired: false });
+    saveState();
+  }
+}
+
+function deleteVaccine(childId, vaccineId) {
+  const child = state.children.find(c => c.id === childId);
+  if (!child) return;
+  child.vaccines = child.vaccines.filter(v => v.id !== vaccineId);
+  saveState(); renderChildren();
+}
+
+function deleteChild(id) { state.children = state.children.filter(c => c.id !== id); saveState(); renderChildren(); }
+
+// ===== HELPERS =====
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
+  } catch(e) { return dateStr; }
+}
 </script>
-
 </body>
 </html>
