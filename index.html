@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0d1117">
-    <title>NTRK — Modern Kişisel Asistan</title>
+    <title>NTRK — Kişisel Asistan</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -32,23 +32,9 @@
             background-attachment: fixed;
         }
 
-        /* ===== LOGIN SCREEN ===== */
-        #loginScreen { 
-            position: fixed; inset: 0; background: var(--bg); 
-            display: flex; align-items: center; justify-content: center; 
-            z-index: 1000; flex-direction: column; gap: 25px; padding: 30px; 
-        }
-        
-        .login-logo {
-            font-family: 'Poppins'; font-size: 56px; font-weight: 800;
-            background: var(--accent-gradient);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            letter-spacing: -2px;
-        }
-
         /* ===== APP LAYOUT ===== */
-        #app { display: none; padding-bottom: 100px; animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        #app { padding-bottom: 100px; animation: fadeIn 0.8s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .topbar { 
             position: sticky; top: 0; z-index: 100; 
@@ -82,6 +68,7 @@
             transition: 0.3s; width: 100%; display: flex; align-items: center; justify-content: center;
         }
         .btn-primary { background: var(--accent-gradient); color: white; }
+        .btn-primary:active { transform: scale(0.97); }
         .btn-secondary { background: var(--glass); color: var(--text); border: 1px solid var(--glass-border); }
 
         /* ===== BOTTOM NAV ===== */
@@ -94,43 +81,11 @@
         .nav-item { 
             flex: 1; display: flex; flex-direction: column; align-items: center; 
             justify-content: center; color: #8b949e; font-size: 11px; border: none; background: none; 
+            transition: 0.2s;
         }
         .nav-item.active { color: #38bdf8; font-weight: 600; }
         .nav-icon { font-size: 22px; margin-bottom: 4px; }
 
         /* ===== DASHBOARD ELEMENTS ===== */
         .quote-card {
-            background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(129, 140, 248, 0.08));
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            text-align: center; padding: 35px 20px;
-        }
-        .quote-text { font-style: italic; color: var(--text-vibrant); font-size: 17px; line-height: 1.6; margin-bottom: 10px; }
-        .quote-author { color: #38bdf8; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-        .stat-val { font-family: 'Poppins'; font-size: 24px; font-weight: 700; }
-    </style>
-</head>
-<body>
-
-<div id="loginScreen">
-    <div class="login-logo">NTRK</div>
-    <div style="width: 100%; max-width: 320px;">
-        <input type="password" id="passInput" placeholder="Şifreyi Girin (1234)">
-        <button class="btn btn-primary" onclick="checkLogin()">UYGULAMAYI AÇ</button>
-    </div>
-</div>
-
-<div id="app">
-    <div class="topbar">
-        <div class="topbar-logo">NTRK</div>
-        <button onclick="logout()" style="background:none; border:none; color:#fb7185; font-weight:600; font-size:12px;">GÜVENLİ ÇIKIŞ</button>
-    </div>
-
-    <div id="home" class="section active">
-        <div class="card quote-card">
-            <div id="greetingQuote" class="quote-text">Yükleniyor...</div>
-            <div id="quoteAuthor" class="quote-author"></div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
-            <div class="card">
-                <p style="font-size:11px; color:#8b94
+            background: linear-gradient(135deg, rgba(56, 189, 248,
