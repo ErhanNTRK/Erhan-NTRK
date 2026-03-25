@@ -250,7 +250,7 @@ select option{background:var(--surface);}
           <span id="goldTotal" style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:900;color:var(--gold);letter-spacing:-1px;">₺0</span>
         </div>
         <div style="font-size:11px;color:var(--text3);margin-top:8px;text-align:center;" id="priceTime"></div>
-        <button class="btn btn-secondary btn-sm btn-full" style="margin-top:10px;" onclick="loadGoldPrice()">🔄 Fiyatları Güncelle</button>
+        <button class="btn btn-secondary btn-sm btn-full" style="margin-top:10px;" onclick="loadGoldPrice();fetchStockPrices()">🔄 Fiyatları Güncelle</button>
       </div>
       <div class="card">
         <div class="card-title">📈 Hisse Senetleri</div>
@@ -670,7 +670,7 @@ function goSection(id,btn,title){
   if(btn){document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));btn.classList.add('active');}
   document.getElementById('topbarTitle').textContent=title||'';
   if(id==='sec-home')refreshDashboard();
-  if(id==='sec-wallet'){renderStocks();renderAssetSummary();loadGoldPrice();}
+  if(id==='sec-wallet'){renderStocks();renderAssetSummary();loadGoldPrice();fetchStockPrices();}
   if(id==='sec-finance')renderFinance();
   if(id==='sec-notes')renderNotes();
   if(id==='sec-family'){renderFamily();renderPhotos();renderFamilyNotes();}
@@ -744,25 +744,111 @@ function setWalletTab(t,el){document.querySelectorAll('#sec-wallet .tabs .tab').
 async function loadGoldPrice(){
   document.getElementById('goldPrice').textContent='Yükleniyor...';
   try{
-    const r=await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-    const d=await r.json();
-    const usd=d.rates.TRY;
-    document.getElementById('usdTry').textContent=usd.toFixed(2)+' ₺';
-    const gramTry=(3320/31.1035)*usd;
+    // Güncel USD/TRY kuru
+    const rateRes=await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+    const rateData=await rateRes.json();
+    const usdTry=rateData.rates.TRY;
+    document.getElementById('usdTry').textContent=usdTry.toFixed(2)+' ₺';
+
+    // Güncel altın fiyatı (XAU/USD) — metals-api ücretsiz alternatifi olarak
+    // Frankfurter API: EUR bazlı, XAU destekli
+    let goldUsdPerOz=null;
+    try{
+      const goldRes=await fetch('https://api.frankfurter.app/latest?from=XAU&to=USD');
+      const goldData=await goldRes.json();
+      // XAU/USD: 1 ons altın kaç USD
+      goldUsdPerOz=goldData.rates.USD;
+    }catch(e2){
+      // Yedek: metals.live ücretsiz endpoint
+      try{
+        const g2=await fetch('https://metals.live/api/spot');
+        const md=await g2.json();
+        goldUsdPerOz=md.find(x=>x.metal==='gold'||x.symbol==='XAU')?.price||null;
+      }catch(e3){goldUsdPerOz=null;}
+    }
+
+    let gramTry;
+    if(goldUsdPerOz){
+      const gramUsd=goldUsdPerOz/31.1035;
+      gramTry=gramUsd*usdTry;
+    } else {
+      // Son yedek: kur × sabit ons fiyatı (güncellendi: ~3350 USD/oz)
+      gramTry=(3350/31.1035)*usdTry;
+      document.getElementById('priceTime').textContent='⚠️ Altın API erişilemedi, tahmini değer';
+    }
+
     document.getElementById('goldPrice').textContent='₺'+gramTry.toFixed(0);
-    document.getElementById('quarterPrice').textContent='₺'+(gramTry*1.6).toFixed(0);
-    document.getElementById('fullPrice').textContent='₺'+(gramTry*6.6).toFixed(0);
-    state.goldPriceTry=gramTry;saveState();updateGoldTotal();
-    const ga=document.getElementById('goldAmount');if(!ga.value&&state.goldAmount)ga.value=state.goldAmount;
-    document.getElementById('priceTime').textContent='🕐 '+new Date().toLocaleTimeString('tr-TR');
-  }catch(e){document.getElementById('goldPrice').textContent='Bağlantı hatası';}
+    document.getElementById('quarterPrice').textContent='₺'+(gramTry*1.6066).toFixed(0); // çeyrek = 1.6066 gr
+    document.getElementById('fullPrice').textContent='₺'+(gramTry*6.426).toFixed(0);    // tam = 6.426 gr
+    state.goldPriceTry=gramTry;
+    saveState();updateGoldTotal();
+    const ga=document.getElementById('goldAmount');
+    if(!ga.value&&state.goldAmount)ga.value=state.goldAmount;
+    if(!document.getElementById('priceTime').textContent.includes('⚠️'))
+      document.getElementById('priceTime').textContent='🕐 Güncellendi: '+new Date().toLocaleTimeString('tr-TR');
+  }catch(e){
+    document.getElementById('goldPrice').textContent='Bağlantı hatası';
+    document.getElementById('priceTime').textContent='İnternet bağlantını kontrol et';
+  }
 }
 function saveAssets(){state.goldAmount=parseFloat(document.getElementById('goldAmount').value)||0;saveState();updateGoldTotal();renderAssetSummary();}
 function updateGoldTotal(){const v=(state.goldAmount||0)*(state.goldPriceTry||0);document.getElementById('goldTotal').textContent='₺'+v.toLocaleString('tr-TR',{maximumFractionDigits:0});}
-function addStock(){const s=document.getElementById('stockSymbol').value.trim().toUpperCase();const q=parseFloat(document.getElementById('stockQty').value)||0;const p=parseFloat(document.getElementById('stockBuyPrice').value)||0;if(!s||!q)return;state.stocks.push({id:Date.now(),symbol:s,qty:q,buyPrice:p});saveState();closeModal('addStockModal');renderStocks();['stockSymbol','stockQty','stockBuyPrice'].forEach(id=>document.getElementById(id).value='');}
-function renderStocks(){const el=document.getElementById('stockList');if(!state.stocks.length){el.innerHTML='<div class="empty"><div class="empty-icon">📈</div><div class="empty-text">Hisse eklenmedi</div></div>';document.getElementById('stockNote').style.display='none';return;}document.getElementById('stockNote').style.display='block';el.innerHTML=state.stocks.map(s=>`<div class="list-item"><div class="list-item-left"><div class="list-item-title">${s.symbol}</div><div class="list-item-sub">${s.qty} adet × ₺${s.buyPrice} (alış)</div></div><div class="list-item-right"><span class="badge badge-blue">₺${(s.qty*s.buyPrice).toLocaleString('tr-TR',{maximumFractionDigits:0})}</span><button class="delete-btn" onclick="deleteStock(${s.id})">🗑</button></div></div>`).join('');renderAssetSummary();}
+function addStock(){const s=document.getElementById('stockSymbol').value.trim().toUpperCase();const q=parseFloat(document.getElementById('stockQty').value)||0;const p=parseFloat(document.getElementById('stockBuyPrice').value)||0;if(!s||!q)return;state.stocks.push({id:Date.now(),symbol:s,qty:q,buyPrice:p,currentPrice:null});saveState();closeModal('addStockModal');renderStocks();fetchStockPrices();['stockSymbol','stockQty','stockBuyPrice'].forEach(id=>document.getElementById(id).value='');}
+
+async function fetchStockPrices(){
+  if(!state.stocks.length)return;
+  for(const s of state.stocks){
+    try{
+      const symbol=s.symbol.includes('.')?s.symbol:s.symbol+'.IS';
+      const url='https://query1.finance.yahoo.com/v8/finance/chart/'+symbol+'?interval=1d&range=1d';
+      const res=await fetch(url);
+      const data=await res.json();
+      const price=data?.chart?.result?.[0]?.meta?.regularMarketPrice;
+      if(price&&price>0){s.currentPrice=price;}
+    }catch(e){}
+  }
+  saveState();renderStocks();renderAssetSummary();
+}
+
+function renderStocks(){
+  const el=document.getElementById('stockList');
+  if(!state.stocks.length){el.innerHTML='<div class="empty"><div class="empty-icon">📈</div><div class="empty-text">Hisse eklenmedi</div></div>';document.getElementById('stockNote').style.display='none';return;}
+  document.getElementById('stockNote').style.display='block';
+  el.innerHTML=state.stocks.map(s=>{
+    const buyVal=s.qty*s.buyPrice;
+    const hasLive=s.currentPrice&&s.currentPrice>0;
+    const liveVal=hasLive?s.qty*s.currentPrice:null;
+    const diff=hasLive?liveVal-buyVal:null;
+    const diffPct=hasLive?((liveVal-buyVal)/buyVal*100):null;
+    const diffColor=diff>=0?'var(--accent2)':'var(--rose)';
+    return`<div class="list-item">
+      <div class="list-item-left">
+        <div class="list-item-title">${s.symbol}</div>
+        <div class="list-item-sub">${s.qty} adet • Alış: ₺${s.buyPrice}${hasLive?' • Güncel: ₺'+s.currentPrice.toFixed(2):'<span style="color:var(--text3)"> • yükleniyor...</span>'}</div>
+      </div>
+      <div class="list-item-right" style="flex-direction:column;align-items:flex-end;gap:3px;">
+        <span class="badge badge-blue">₺${(hasLive?liveVal:buyVal).toLocaleString('tr-TR',{maximumFractionDigits:0})}</span>
+        ${diff!==null?`<span style="font-size:11px;font-weight:700;color:${diffColor};">${diff>=0?'+':''}₺${diff.toLocaleString('tr-TR',{maximumFractionDigits:0})} (${diffPct>=0?'+':''}${diffPct.toFixed(1)}%)</span>`:''}
+        <button class="delete-btn" onclick="deleteStock(${s.id})">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+  renderAssetSummary();
+}
+
 function deleteStock(id){state.stocks=state.stocks.filter(s=>s.id!==id);saveState();renderStocks();}
-function renderAssetSummary(){const gv=(state.goldAmount||0)*(state.goldPriceTry||0);const sv=state.stocks.reduce((a,s)=>a+s.qty*s.buyPrice,0);const t=gv+sv;const el=document.getElementById('totalAssets');if(el)el.textContent='₺'+t.toLocaleString('tr-TR',{maximumFractionDigits:0});const bd=document.getElementById('assetBreakdown');if(bd)bd.innerHTML=`<div class="asset-value-row"><span class="asset-lbl">🥇 Altın (${state.goldAmount||0} gr)</span><span class="asset-val" style="color:var(--gold);">₺${gv.toLocaleString('tr-TR',{maximumFractionDigits:0})}</span></div>${state.stocks.map(s=>`<div class="asset-value-row"><span class="asset-lbl">📈 ${s.symbol} (${s.qty} adet)</span><span class="asset-val" style="color:var(--accent);">₺${(s.qty*s.buyPrice).toLocaleString('tr-TR',{maximumFractionDigits:0})}</span></div>`).join('')}`;}
+function renderAssetSummary(){
+  const gv=(state.goldAmount||0)*(state.goldPriceTry||0);
+  const sv=state.stocks.reduce((a,s)=>{
+    const price=s.currentPrice&&s.currentPrice>0?s.currentPrice:s.buyPrice;
+    return a+s.qty*price;
+  },0);
+  const t=gv+sv;
+  const el=document.getElementById('totalAssets');
+  if(el)el.textContent='₺'+t.toLocaleString('tr-TR',{maximumFractionDigits:0});
+  const bd=document.getElementById('assetBreakdown');
+  if(bd)bd.innerHTML=`<div class="asset-value-row"><span class="asset-lbl">🥇 Altın (${state.goldAmount||0} gr)</span><span class="asset-val" style="color:var(--gold);">₺${gv.toLocaleString('tr-TR',{maximumFractionDigits:0})}</span></div>${state.stocks.map(s=>{const price=s.currentPrice&&s.currentPrice>0?s.currentPrice:s.buyPrice;const val=s.qty*price;const buyVal=s.qty*s.buyPrice;const diff=val-buyVal;const hasLive=s.currentPrice&&s.currentPrice>0;return`<div class="asset-value-row"><span class="asset-lbl">📈 ${s.symbol} (${s.qty} adet)${hasLive?'':' ⏳'}</span><span class="asset-val" style="color:var(--accent);">₺${val.toLocaleString('tr-TR',{maximumFractionDigits:0})}${hasLive&&diff!==0?` <span style="font-size:11px;color:${diff>=0?'var(--accent2)':'var(--rose)'};">(${diff>=0?'+':''}₺${diff.toLocaleString('tr-TR',{maximumFractionDigits:0})})</span>`:''}</span></div>`;}).join('')}`;
+}
 
 // FİNANS
 function setFinTab(t,el){document.querySelectorAll('#sec-finance .tabs .tab').forEach(x=>x.classList.remove('active'));el.classList.add('active');['overview','income','expense','debt'].forEach(x=>document.getElementById('ft-'+x).style.display=x===t?'block':'none');}
