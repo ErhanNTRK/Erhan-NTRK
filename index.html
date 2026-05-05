@@ -11,20 +11,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Fraunces:ital,wght@0,400;1,300;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#080c14;--bg2:#0d1320;--surface:#111827;--surface2:#162032;--surface3:#1c2a40;
-  --border:#1e2d42;--border2:#243447;
-  --accent:#38bdf8;--accent-dim:rgba(56,189,248,0.12);
-  --accent2:#34d399;--accent2-dim:rgba(52,211,153,0.12);
-  --gold:#fbbf24;--gold-dim:rgba(251,191,36,0.12);
-  --rose:#fb7185;--rose-dim:rgba(251,113,133,0.12);
-  --violet:#a78bfa;--violet-dim:rgba(167,139,250,0.12);
-  --text:#e2e8f0;--text2:#94a3b8;--text3:#475569;
-  --radius:18px;--radius-sm:12px;--radius-xs:8px;
+  --bg:#06080f;--bg2:#080d18;--surface:#0e1521;--surface2:#131d2e;--surface3:#182438;
+  --border:#1a2640;--border2:#1e2e4a;
+  --accent:#818cf8;--accent-dim:rgba(129,140,248,0.14);
+  --accent2:#34d399;--accent2-dim:rgba(52,211,153,0.13);
+  --gold:#f59e0b;--gold-dim:rgba(245,158,11,0.14);
+  --rose:#f87171;--rose-dim:rgba(248,113,113,0.13);
+  --violet:#c084fc;--violet-dim:rgba(192,132,252,0.13);
+  --text:#f1f5f9;--text2:#8899aa;--text3:#334466;
+  --radius:20px;--radius-sm:13px;--radius-xs:9px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
-#loginScreen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000;flex-direction:column;gap:28px;padding:24px;background-image:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(56,189,248,0.08) 0%,transparent 70%);}
-.login-logo{font-family:'Outfit',sans-serif;font-size:64px;font-weight:900;letter-spacing:-4px;background:linear-gradient(135deg,#38bdf8 0%,#34d399 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
+#loginScreen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000;flex-direction:column;gap:28px;padding:24px;background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(129,140,248,0.15) 0%,rgba(192,132,252,0.05) 40%,transparent 70%);}
+.login-logo{font-family:'Outfit',sans-serif;font-size:64px;font-weight:900;letter-spacing:-4px;background:linear-gradient(135deg,#818cf8 0%,#c084fc 50%,#f472b6 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
 .login-tagline{font-family:'Fraunces',serif;font-style:italic;font-size:14px;color:var(--text3);margin-top:6px;text-align:center;}
 .login-box{background:var(--surface);border:1px solid var(--border2);border-radius:24px;padding:28px 24px;width:100%;max-width:380px;display:flex;flex-direction:column;gap:14px;box-shadow:0 24px 60px rgba(0,0,0,0.4);}
 .login-box h2{font-size:18px;font-weight:700;}
@@ -34,8 +34,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 textarea{resize:vertical;min-height:80px;}
 select option{background:var(--surface);}
 .btn{padding:13px 20px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;transition:all .18s;display:inline-flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.01em;}
-.btn-primary{background:linear-gradient(135deg,#38bdf8,#0ea5e9);color:#040810;}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(56,189,248,.3);}
+.btn-primary{background:linear-gradient(135deg,#818cf8,#6366f1);color:#fff;}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(99,102,241,.4);}
 .btn-secondary{background:var(--surface2);color:var(--text);border:1.5px solid var(--border);}
 .btn-secondary:hover{border-color:var(--accent);background:var(--surface3);}
 .btn-danger{background:var(--rose-dim);color:var(--rose);border:1px solid rgba(251,113,133,.2);}
@@ -46,11 +46,11 @@ select option{background:var(--surface);}
 #loginError{color:var(--rose);font-size:13px;text-align:center;display:none;}
 #app{display:none;padding-bottom:84px;}
 .topbar{position:sticky;top:0;z-index:100;background:rgba(8,12,20,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
-.topbar-logo{font-family:'Outfit',sans-serif;font-size:20px;font-weight:900;letter-spacing:-1px;background:linear-gradient(135deg,#38bdf8,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;flex-shrink:0;}
+.topbar-logo{font-family:'Outfit',sans-serif;font-size:20px;font-weight:900;letter-spacing:-1px;background:linear-gradient(135deg,#818cf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;flex-shrink:0;}
 .topbar-section{font-size:15px;font-weight:600;color:var(--text2);flex:1;text-align:center;}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(8,12,20,.97);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom);}
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:9px 4px 11px;cursor:pointer;gap:3px;transition:all .2s;border:none;background:none;color:var(--text3);font-family:'Outfit',sans-serif;font-size:10px;font-weight:500;position:relative;}
-.nav-item::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%) scaleX(0);width:24px;height:2px;background:var(--accent);border-radius:0 0 4px 4px;transition:transform .2s;}
+.nav-item::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%) scaleX(0);width:28px;height:2px;background:linear-gradient(90deg,#818cf8,#c084fc);border-radius:0 0 4px 4px;transition:transform .2s;}
 .nav-item.active{color:var(--accent);}
 .nav-item.active::before{transform:translateX(-50%) scaleX(1);}
 .nav-icon{font-size:20px;line-height:1;}
@@ -58,15 +58,15 @@ select option{background:var(--surface);}
 .section.active{display:block;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;position:relative;overflow:hidden;}
-.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(56,189,248,.2),transparent);}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(129,140,248,.25),transparent);}
 .card-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
 .quote-card{background:linear-gradient(135deg,var(--surface2),var(--surface3));border:1.5px solid var(--border2);border-radius:var(--radius);padding:20px;margin-bottom:14px;position:relative;overflow:hidden;}
 .quote-card::before{content:'"';position:absolute;top:-10px;left:12px;font-family:'Fraunces',serif;font-size:80px;color:rgba(56,189,248,.08);line-height:1;pointer-events:none;}
 .quote-text{font-family:'Fraunces',serif;font-style:italic;font-size:15px;font-weight:300;color:var(--text);line-height:1.6;margin-bottom:10px;}
-.quote-author{font-size:12px;color:var(--accent);font-weight:600;letter-spacing:.05em;}
+.quote-author{font-size:12px;background:linear-gradient(90deg,#818cf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700;letter-spacing:.05em;}
 .dash-hello{margin-bottom:20px;}
 .dash-greeting{font-family:'Outfit',sans-serif;font-size:28px;font-weight:800;letter-spacing:-.5px;line-height:1.1;}
-.dash-greeting span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.dash-greeting span{background:linear-gradient(135deg,#818cf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .dash-date{font-size:13px;color:var(--text3);margin-top:4px;}
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
 .stat-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:16px;display:flex;flex-direction:column;gap:5px;}
@@ -96,7 +96,7 @@ select option{background:var(--surface);}
 .tabs{display:flex;gap:6px;margin-bottom:18px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;}
 .tabs::-webkit-scrollbar{display:none;}
 .tab{padding:7px 14px;border-radius:99px;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s;}
-.tab.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+.tab.active{background:linear-gradient(135deg,rgba(129,140,248,0.15),rgba(192,132,252,0.1));border-color:#818cf8;color:#818cf8;}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:500;display:none;align-items:flex-end;justify-content:center;}
 .modal-overlay.open{display:flex;}
 .modal{background:var(--surface);border-radius:28px 28px 0 0;border:1.5px solid var(--border2);border-bottom:none;padding:24px 20px 40px;width:100%;max-width:600px;max-height:88vh;overflow-y:auto;display:flex;flex-direction:column;gap:12px;animation:slideUp .25s cubic-bezier(.32,.72,0,1);}
@@ -105,14 +105,14 @@ select option{background:var(--surface);}
 .modal-title{font-size:18px;font-weight:700;letter-spacing:-.3px;}
 .progress-track{background:var(--surface2);border-radius:99px;height:6px;overflow:hidden;margin-top:10px;}
 .progress-fill{height:100%;border-radius:99px;transition:width .5s ease;}
-.progress-fill.blue{background:linear-gradient(90deg,#38bdf8,#0ea5e9);}
+.progress-fill.blue{background:linear-gradient(90deg,#818cf8,#6366f1);}
 .water-big{text-align:center;padding:16px 0 8px;}
-.water-num{font-family:'Outfit',sans-serif;font-size:56px;font-weight:900;letter-spacing:-3px;color:var(--accent);line-height:1;}
+.water-num{font-family:'Outfit',sans-serif;font-size:56px;font-weight:900;letter-spacing:-3px;background:linear-gradient(135deg,#818cf8,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
 .water-unit{font-size:18px;color:var(--text2);font-weight:500;}
 .water-goal-txt{font-size:12px;color:var(--text3);margin-top:6px;}
 .water-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px;}
 .smoke-big{text-align:center;padding:16px 0;}
-.smoke-days{font-family:'Outfit',sans-serif;font-size:72px;font-weight:900;letter-spacing:-4px;color:var(--accent2);line-height:1;}
+.smoke-days{font-family:'Outfit',sans-serif;font-size:72px;font-weight:900;letter-spacing:-4px;background:linear-gradient(135deg,#34d399,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
 .smoke-lbl{color:var(--text2);font-size:13px;margin-top:4px;}
 .smoke-save{font-size:24px;font-weight:800;color:var(--gold);margin-top:10px;letter-spacing:-.5px;}
 .family-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;}
@@ -121,7 +121,7 @@ select option{background:var(--surface);}
 .family-avatar{width:56px;height:56px;border-radius:50%;background:var(--surface3);margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:26px;overflow:hidden;border:2px solid var(--border2);}
 .family-avatar img{width:100%;height:100%;object-fit:cover;}
 .family-name{font-weight:700;font-size:14px;}
-.family-role{font-size:11px;color:var(--accent);font-weight:600;margin-top:2px;}
+.family-role{font-size:11px;color:var(--violet);font-weight:600;margin-top:2px;}
 .note-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:10px;transition:border-color .2s;}
 .note-card-title{font-weight:700;font-size:15px;margin-bottom:5px;}
 .note-card-preview{font-size:13px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5;}
@@ -245,7 +245,7 @@ select option{background:var(--surface);}
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><span style="font-size:12px;color:var(--text3);font-weight:500;">TAM ALTIN</span><span id="fullPrice" style="font-weight:700;color:var(--gold);font-size:14px;">—</span></div>
           <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:12px;color:var(--text3);font-weight:500;">USD/TRY</span><span id="usdTry" style="font-weight:700;color:var(--accent);font-size:14px;">—</span></div>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;background:var(--gold-dim);border-radius:var(--radius-sm);padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(251,191,36,0.06));border:1px solid rgba(245,158,11,0.2);border-radius:var(--radius-sm);padding:14px;">
           <span style="font-size:13px;color:var(--text2);">Toplam Değer</span>
           <span id="goldTotal" style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:900;color:var(--gold);letter-spacing:-1px;">₺0</span>
         </div>
@@ -743,53 +743,82 @@ function deleteFamilyNote(id){state.familyNotes=state.familyNotes.filter(n=>n.id
 function setWalletTab(t,el){document.querySelectorAll('#sec-wallet .tabs .tab').forEach(x=>x.classList.remove('active'));el.classList.add('active');document.getElementById('wt-assets').style.display=t==='assets'?'block':'none';document.getElementById('wt-summary').style.display=t==='summary'?'block':'none';if(t==='summary')renderAssetSummary();}
 async function loadGoldPrice(){
   document.getElementById('goldPrice').textContent='Yükleniyor...';
-  try{
-    // Güncel USD/TRY kuru
-    const rateRes=await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-    const rateData=await rateRes.json();
-    const usdTry=rateData.rates.TRY;
-    document.getElementById('usdTry').textContent=usdTry.toFixed(2)+' ₺';
+  document.getElementById('priceTime').textContent='';
 
-    // Güncel altın fiyatı (XAU/USD) — metals-api ücretsiz alternatifi olarak
-    // Frankfurter API: EUR bazlı, XAU destekli
-    let goldUsdPerOz=null;
+  // Strateji: 3 farklı kaynaktan USD/TRY + XAU/USD çek, ilk çalışanı kullan
+  let usdTry=null;
+  let goldUsdPerOz=null;
+
+  // 1. USD/TRY kuru — çoklu kaynak
+  const rateSources=[
+    'https://api.exchangerate-api.com/v4/latest/USD',
+    'https://open.er-api.com/v6/latest/USD'
+  ];
+  for(const url of rateSources){
     try{
-      const goldRes=await fetch('https://api.frankfurter.app/latest?from=XAU&to=USD');
-      const goldData=await goldRes.json();
-      // XAU/USD: 1 ons altın kaç USD
-      goldUsdPerOz=goldData.rates.USD;
-    }catch(e2){
-      // Yedek: metals.live ücretsiz endpoint
-      try{
-        const g2=await fetch('https://metals.live/api/spot');
-        const md=await g2.json();
-        goldUsdPerOz=md.find(x=>x.metal==='gold'||x.symbol==='XAU')?.price||null;
-      }catch(e3){goldUsdPerOz=null;}
-    }
-
-    let gramTry;
-    if(goldUsdPerOz){
-      const gramUsd=goldUsdPerOz/31.1035;
-      gramTry=gramUsd*usdTry;
-    } else {
-      // Son yedek: kur × sabit ons fiyatı (güncellendi: ~3350 USD/oz)
-      gramTry=(3350/31.1035)*usdTry;
-      document.getElementById('priceTime').textContent='⚠️ Altın API erişilemedi, tahmini değer';
-    }
-
-    document.getElementById('goldPrice').textContent='₺'+gramTry.toFixed(0);
-    document.getElementById('quarterPrice').textContent='₺'+(gramTry*1.6066).toFixed(0); // çeyrek = 1.6066 gr
-    document.getElementById('fullPrice').textContent='₺'+(gramTry*6.426).toFixed(0);    // tam = 6.426 gr
-    state.goldPriceTry=gramTry;
-    saveState();updateGoldTotal();
-    const ga=document.getElementById('goldAmount');
-    if(!ga.value&&state.goldAmount)ga.value=state.goldAmount;
-    if(!document.getElementById('priceTime').textContent.includes('⚠️'))
-      document.getElementById('priceTime').textContent='🕐 Güncellendi: '+new Date().toLocaleTimeString('tr-TR');
-  }catch(e){
-    document.getElementById('goldPrice').textContent='Bağlantı hatası';
-    document.getElementById('priceTime').textContent='İnternet bağlantını kontrol et';
+      const r=await fetch(url);const d=await r.json();
+      usdTry=d.rates?.TRY||d.conversion_rates?.TRY||null;
+      if(usdTry)break;
+    }catch(e){}
   }
+
+  // 2. Altın fiyatı — önce goldapi.io (ücretsiz, CORS yok), sonra alternative
+  // goldprice.org JSON endpoint — CORS izinli, ücretsiz
+  try{
+    const r=await fetch('https://data-asg.goldprice.org/dbXRates/USD');
+    const d=await r.json();
+    // d.items[0].xauPrice = 1 gram altın USD cinsinden
+    if(d?.items?.[0]?.xauPrice){
+      goldUsdPerOz=d.items[0].xauPrice*31.1035; // gram → ons
+    }
+  }catch(e){}
+
+  // Yedek: paxos/itbit gold price feed
+  if(!goldUsdPerOz){
+    try{
+      const r=await fetch('https://api.metals.dev/v1/latest?api_key=demo&currency=USD&unit=toz');
+      const d=await r.json();
+      goldUsdPerOz=d?.metals?.gold||null;
+    }catch(e){}
+  }
+
+  // Son yedek: openexchangerates ücretsiz tier ile XAU
+  if(!goldUsdPerOz){
+    try{
+      // XAU/TRY doğrudan: investing.com public feed proxy
+      const r=await fetch('https://query1.finance.yahoo.com/v8/finance/chart/GC%3DF?interval=1d&range=1d');
+      const d=await r.json();
+      goldUsdPerOz=d?.chart?.result?.[0]?.meta?.regularMarketPrice||null;
+    }catch(e){}
+  }
+
+  if(!usdTry){
+    document.getElementById('goldPrice').textContent='Kur alınamadı';
+    document.getElementById('priceTime').textContent='⚠️ İnternet bağlantısını kontrol et';
+    return;
+  }
+
+  document.getElementById('usdTry').textContent=usdTry.toFixed(2)+' ₺';
+
+  let gramTry;
+  let source='';
+  if(goldUsdPerOz&&goldUsdPerOz>500){
+    gramTry=(goldUsdPerOz/31.1035)*usdTry;
+    source='🟢 Canlı fiyat';
+  } else {
+    // Sabit yedek — ons fiyatı ~3380 USD (Mayıs 2025)
+    gramTry=(3380/31.1035)*usdTry;
+    source='🟡 Tahmini (API erişilemedi)';
+  }
+
+  document.getElementById('goldPrice').textContent='₺'+gramTry.toFixed(0);
+  document.getElementById('quarterPrice').textContent='₺'+(gramTry*1.6066).toFixed(0);
+  document.getElementById('fullPrice').textContent='₺'+(gramTry*6.426).toFixed(0);
+  state.goldPriceTry=gramTry;
+  saveState();updateGoldTotal();
+  const ga=document.getElementById('goldAmount');
+  if(!ga.value&&state.goldAmount)ga.value=state.goldAmount;
+  document.getElementById('priceTime').textContent=source+' • '+new Date().toLocaleTimeString('tr-TR');
 }
 function saveAssets(){state.goldAmount=parseFloat(document.getElementById('goldAmount').value)||0;saveState();updateGoldTotal();renderAssetSummary();}
 function updateGoldTotal(){const v=(state.goldAmount||0)*(state.goldPriceTry||0);document.getElementById('goldTotal').textContent='₺'+v.toLocaleString('tr-TR',{maximumFractionDigits:0});}
