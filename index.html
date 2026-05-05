@@ -21,6 +21,14 @@
   --text:#f1f5f9;--text2:#8899aa;--text3:#334466;
   --radius:20px;--radius-sm:13px;--radius-xs:9px;
 }
+/* ── TEMA: koyu-mor (varsayılan) ── */
+body.theme-dark{--bg:#06080f;--bg2:#080d18;--surface:#0e1521;--surface2:#131d2e;--surface3:#182438;--border:#1a2640;--border2:#1e2e4a;--text:#f1f5f9;--text2:#8899aa;--text3:#334466;}
+/* ── TEMA: gece mavisi ── */
+body.theme-navy{--bg:#070b14;--bg2:#0b1220;--surface:#0f1929;--surface2:#152035;--surface3:#1a2840;--border:#1c2d44;--border2:#223350;--text:#e8f0fe;--text2:#7a90aa;--text3:#2e4060;}
+/* ── TEMA: slate (orta ton) ── */
+body.theme-slate{--bg:#0f1117;--bg2:#141820;--surface:#1a1f2e;--surface2:#20263a;--surface3:#272e44;--border:#2a334a;--border2:#303b54;--text:#e2e8f0;--text2:#8896aa;--text3:#3a4a60;}
+/* ── TEMA: açık (light) ── */
+body.theme-light{--bg:#f0f4f8;--bg2:#e4eaf2;--surface:#ffffff;--surface2:#f0f4f8;--surface3:#e4eaf2;--border:#cbd5e0;--border2:#b0bec5;--text:#1a202c;--text2:#4a5568;--text3:#a0aec0;}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
 #loginScreen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000;flex-direction:column;gap:28px;padding:24px;background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(129,140,248,0.15) 0%,rgba(192,132,252,0.05) 40%,transparent 70%);}
@@ -398,13 +406,71 @@ select option{background:var(--surface);}
     </div>
   </div>
 
+
+  <!-- TAKVİM -->
+  <div class="section" id="sec-calendar">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+      <button class="btn btn-secondary btn-sm" onclick="calPrevMonth()">‹</button>
+      <div id="calMonthTitle" style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:800;"></div>
+      <button class="btn btn-secondary btn-sm" onclick="calNextMonth()">›</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px;">
+      <div style="text-align:center;font-size:11px;font-weight:700;color:var(--text3);padding:4px;">Pzt</div>
+      <div style="text-align:center;font-size:11px;font-weight:700;color:var(--text3);padding:4px;">Sal</div>
+      <div style="text-align:center;font-size:11px;font-weight:700;color:var(--text3);padding:4px;">Çar</div>
+      <div style="text-align:center;font-size:11px;font-weight:700;color:var(--text3);padding:4px;">Per</div>
+      <div style="text-align:center;font-size:11px;font-weight:700;color:var(--text3);padding:4px;">Cum</div>
+      <div style="text-align:center;font-size:11px;font-weight:700;color:var(--accent);padding:4px;">Cmt</div>
+      <div style="text-align:center;font-size:11px;font-weight:700;color:var(--rose);padding:4px;">Paz</div>
+    </div>
+    <div id="calGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:20px;"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:700;color:var(--text2);" id="calDayTitle">Etkinlikler</div>
+      <button class="btn btn-primary btn-sm" onclick="openModal('addEventModal')">+ Ekle</button>
+    </div>
+    <div id="calEventList"></div>
+  </div>
+
+  <!-- AYARLAR -->
+  <div class="section" id="sec-settings">
+    <div class="card">
+      <div class="card-title">🎨 Tema</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <button class="btn btn-secondary theme-btn" onclick="setTheme('dark')" id="t-dark">🌑 Koyu Mor</button>
+        <button class="btn btn-secondary theme-btn" onclick="setTheme('navy')" id="t-navy">🌊 Gece Mavisi</button>
+        <button class="btn btn-secondary theme-btn" onclick="setTheme('slate')" id="t-slate">🌫️ Orta Koyu</button>
+        <button class="btn btn-secondary theme-btn" onclick="setTheme('light')" id="t-light">☀️ Açık</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">👤 Profil</div>
+      <div class="form-row"><label class="form-label">Adın</label>
+        <input type="text" id="settingName" placeholder="Adını gir...">
+      </div>
+      <button class="btn btn-primary btn-full" onclick="saveName()">Kaydet</button>
+    </div>
+    <div class="card">
+      <div class="card-title">🔐 Şifre Değiştir</div>
+      <div class="form-row"><label class="form-label">Mevcut Şifre</label><input type="password" id="oldPass" placeholder="Mevcut şifre"></div>
+      <div class="form-row"><label class="form-label">Yeni Şifre</label><input type="password" id="newPass" placeholder="Yeni şifre (min 4 karakter)"></div>
+      <div id="passMsg" style="font-size:13px;text-align:center;display:none;"></div>
+      <button class="btn btn-primary btn-full" onclick="changePassword()">Şifreyi Güncelle</button>
+    </div>
+    <div class="card">
+      <div class="card-title">🗑️ Tehlikeli Alan</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Tüm verilerini sıfırlar. Bu işlem geri alınamaz!</p>
+      <button class="btn btn-danger btn-full" onclick="resetAll()">Tüm Verileri Sil</button>
+    </div>
+  </div>
+
   <div class="bottom-nav">
     <button class="nav-item active" onclick="goSection('sec-home',this,'Ana Sayfa')"><span class="nav-icon">🏠</span><span>Ana Sayfa</span></button>
     <button class="nav-item" onclick="goSection('sec-family',this,'Aile')"><span class="nav-icon">👨‍👩‍👧</span><span>Aile</span></button>
     <button class="nav-item" onclick="goSection('sec-wallet',this,'Varlık')"><span class="nav-icon">💼</span><span>Varlık</span></button>
     <button class="nav-item" onclick="goSection('sec-finance',this,'Finans')"><span class="nav-icon">💸</span><span>Finans</span></button>
-    <button class="nav-item" onclick="goSection('sec-notes',this,'Notlar')"><span class="nav-icon">📝</span><span>Notlar</span></button>
+    <button class="nav-item" onclick="goSection('sec-calendar',this,'Takvim')"><span class="nav-icon">📅</span><span>Takvim</span></button>
     <button class="nav-item" onclick="goSection('sec-health',this,'Sağlık')"><span class="nav-icon">💪</span><span>Sağlık</span></button>
+    <button class="nav-item" onclick="goSection('sec-settings',this,'Ayarlar')"><span class="nav-icon">⚙️</span><span>Ayarlar</span></button>
   </div>
 </div>
 
@@ -605,6 +671,37 @@ select option{background:var(--surface);}
   <div style="display:flex;gap:10px;"><button class="btn btn-secondary btn-full" onclick="closeModal('addVaccineModal')">İptal</button><button class="btn btn-primary btn-full" onclick="addVaccine()">Kaydet</button></div>
 </div></div>
 
+<div class="modal-overlay" id="addEventModal"><div class="modal">
+  <div class="modal-handle"></div><div class="modal-title">📅 Etkinlik Ekle</div>
+  <div class="form-row"><label class="form-label">Başlık</label><input type="text" id="evTitle" placeholder="Toplantı, Doğum Günü, Aşı..."></div>
+  <div class="form-row"><label class="form-label">Tür</label>
+    <select id="evType">
+      <option value="event">📌 Genel Etkinlik</option>
+      <option value="birthday">🎂 Doğum Günü</option>
+      <option value="meeting">💼 Toplantı</option>
+      <option value="vaccine">💉 Aşı</option>
+      <option value="health">🏥 Sağlık</option>
+      <option value="reminder">🔔 Hatırlatıcı</option>
+      <option value="holiday">🎉 Tatil / Özel Gün</option>
+    </select>
+  </div>
+  <div class="form-grid">
+    <div class="form-row"><label class="form-label">Tarih</label><input type="date" id="evDate"></div>
+    <div class="form-row"><label class="form-label">Saat (opsiyonel)</label><input type="time" id="evTime"></div>
+  </div>
+  <div class="form-row"><label class="form-label">Not</label><textarea id="evNote" placeholder="Açıklama..."></textarea></div>
+  <div class="form-row">
+    <label class="form-label">Tekrar</label>
+    <select id="evRepeat">
+      <option value="none">Tekrar Yok</option>
+      <option value="weekly">Her Hafta</option>
+      <option value="monthly">Her Ay</option>
+      <option value="yearly">Her Yıl</option>
+    </select>
+  </div>
+  <div style="display:flex;gap:10px;"><button class="btn btn-secondary btn-full" onclick="closeModal('addEventModal')">İptal</button><button class="btn btn-primary btn-full" onclick="addEvent()">Kaydet</button></div>
+</div></div>
+
 <script>
 const QUOTES=[
   {text:"Düşünüyorum, o halde varım.",author:"René Descartes"},
@@ -636,7 +733,7 @@ function getDailyQuote(){const d=Math.floor(Date.now()/86400000);return QUOTES[d
 let state={};
 function loadState(){
   try{state=JSON.parse(localStorage.getItem('ntrk_data')||'{}');}catch(e){state={};}
-  const defs={members:[],photos:[],familyNotes:[],stocks:[],goldAmount:0,incomes:[],expenses:[],debts:[],notes:[],water:{today:0,goal:2500,date:''},calories:[],alcohol:[],children:[],smokeQuit:null};
+  const defs={members:[],photos:[],familyNotes:[],stocks:[],goldAmount:0,incomes:[],expenses:[],debts:[],notes:[],water:{today:0,goal:2500,date:''},calories:[],alcohol:[],children:[],smokeQuit:null,events:[]};
   Object.keys(defs).forEach(k=>{if(state[k]===undefined)state[k]=defs[k];});
 }
 function saveState(){localStorage.setItem('ntrk_data',JSON.stringify(state));}
@@ -675,6 +772,8 @@ function goSection(id,btn,title){
   if(id==='sec-notes')renderNotes();
   if(id==='sec-family'){renderFamily();renderPhotos();renderFamilyNotes();}
   if(id==='sec-health'){renderWater();renderCalories();renderAlcohol();renderChildren();renderSmoke();}
+  if(id==='sec-calendar'){initCalendar();}
+  if(id==='sec-settings'){const n=localStorage.getItem('ntrk_name')||'';document.getElementById('settingName').value=n;}
 }
 
 function initApp(){
@@ -689,7 +788,7 @@ function initApp(){
   const q=getDailyQuote();
   document.getElementById('quoteText').textContent=q.text;
   document.getElementById('quoteAuthor').textContent='— '+q.author;
-  checkWaterReset();refreshDashboard();scheduleReminders();
+  checkWaterReset();refreshDashboard();scheduleReminders();loadTheme();if(!state.events)state.events=[];
 }
 
 function refreshDashboard(){
@@ -940,6 +1039,206 @@ function openVaccineModal(cid,cn){document.getElementById('vaccineChildId').valu
 function addVaccine(){const cid=parseInt(document.getElementById('vaccineChildId').value);const n=document.getElementById('vaccineName').value.trim();const d=document.getElementById('vaccineDate').value;const s=document.getElementById('vaccineStatus').value;const nt=document.getElementById('vaccineNote').value;if(!n)return;const ch=state.children.find(c=>c.id===cid);if(!ch)return;ch.vaccines.push({id:Date.now(),name:n,date:d,status:s,note:nt});saveState();closeModal('addVaccineModal');renderChildren();['vaccineName','vaccineDate','vaccineNote'].forEach(id=>document.getElementById(id).value='');if(s==='upcoming'&&d){state.notes.push({id:Date.now(),title:`💉 Aşı: ${ch.name} — ${n}`,content:nt,tag:'Aşı',reminder:d+'T09:00',date:new Date().toISOString(),reminderFired:false});saveState();}}
 function deleteVaccine(cid,vid){const ch=state.children.find(c=>c.id===cid);if(ch)ch.vaccines=ch.vaccines.filter(v=>v.id!==vid);saveState();renderChildren();}
 function deleteChild(id){state.children=state.children.filter(c=>c.id!==id);saveState();renderChildren();}
+
+
+// ═══════════════════════════════════════════
+// TAKVİM
+// ═══════════════════════════════════════════
+let calYear=new Date().getFullYear();
+let calMonth=new Date().getMonth();
+let calSelectedDay=new Date().toISOString().split('T')[0];
+
+function initCalendar(){
+  if(!state.events)state.events=[];
+  renderCalendar();
+}
+
+function calPrevMonth(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendar();}
+function calNextMonth(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendar();}
+
+function renderCalendar(){
+  const months=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  document.getElementById('calMonthTitle').textContent=months[calMonth]+' '+calYear;
+
+  const firstDay=new Date(calYear,calMonth,1).getDay();
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  // Haftayı Pzt başlat: 0=Paz→6, 1=Pzt→0
+  const startOffset=(firstDay===0?6:firstDay-1);
+  const today=new Date().toISOString().split('T')[0];
+
+  let html='';
+  // Boş hücreler
+  for(let i=0;i<startOffset;i++) html+='<div></div>';
+
+  for(let d=1;d<=daysInMonth;d++){
+    const dateStr=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday=dateStr===today;
+    const isSelected=dateStr===calSelectedDay;
+    const hasEvent=(state.events||[]).some(e=>e.date===dateStr||isRecurringOnDate(e,dateStr));
+    const dotColor=getEventDotColor(dateStr);
+
+    html+=`<div onclick="selectCalDay('${dateStr}')" style="
+      aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+      border-radius:50%;cursor:pointer;font-size:13px;font-weight:${isToday?'800':'500'};
+      background:${isSelected?'var(--accent)':isToday?'var(--accent-dim)':'transparent'};
+      color:${isSelected?'#fff':isToday?'var(--accent)':'var(--text)'};
+      border:${isSelected?'2px solid var(--accent)':isToday?'1.5px solid var(--accent)':'1.5px solid transparent'};
+      transition:all .15s;position:relative;
+    ">
+      ${d}
+      ${hasEvent?`<div style="width:5px;height:5px;border-radius:50%;background:${dotColor};position:absolute;bottom:3px;"></div>`:''}
+    </div>`;
+  }
+  document.getElementById('calGrid').innerHTML=html;
+  renderDayEvents(calSelectedDay);
+}
+
+function getEventDotColor(dateStr){
+  const ev=(state.events||[]).find(e=>e.date===dateStr||isRecurringOnDate(e,dateStr));
+  if(!ev)return'var(--accent)';
+  const colors={birthday:'var(--rose)',meeting:'var(--accent)',vaccine:'var(--accent2)',health:'var(--accent2)',reminder:'var(--gold)',holiday:'var(--violet)',event:'var(--accent)'};
+  return colors[ev.type]||'var(--accent)';
+}
+
+function isRecurringOnDate(ev,dateStr){
+  if(!ev.repeat||ev.repeat==='none')return false;
+  const orig=new Date(ev.date);
+  const check=new Date(dateStr);
+  if(check<orig)return false;
+  if(ev.repeat==='weekly'){
+    const diff=(check-orig)/86400000;
+    return diff%7===0;
+  }
+  if(ev.repeat==='monthly') return orig.getDate()===check.getDate()&&check>orig;
+  if(ev.repeat==='yearly') return orig.getDate()===check.getDate()&&orig.getMonth()===check.getMonth()&&check.getFullYear()>orig.getFullYear();
+  return false;
+}
+
+function selectCalDay(dateStr){
+  calSelectedDay=dateStr;
+  renderCalendar();
+}
+
+function renderDayEvents(dateStr){
+  const d=new Date(dateStr);
+  const days=['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+  const months=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  document.getElementById('calDayTitle').textContent=`${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]}`;
+
+  // Bu güne ait etkinlikler (tekrar edenler dahil)
+  const evs=(state.events||[]).filter(e=>e.date===dateStr||isRecurringOnDate(e,dateStr));
+
+  // Yaklaşan etkinlikler (7 gün içinde) — seçili gün bugünse göster
+  const today=new Date().toISOString().split('T')[0];
+  let upcomingHtml='';
+  if(dateStr===today){
+    const soon=(state.events||[]).filter(e=>{
+      const dd=new Date(e.date);
+      const now=new Date();
+      const diff=(dd-now)/86400000;
+      return diff>0&&diff<=7;
+    }).sort((a,b)=>new Date(a.date)-new Date(b.date));
+    if(soon.length){
+      upcomingHtml=`<div style="font-size:12px;font-weight:700;color:var(--gold);margin:14px 0 8px;letter-spacing:.06em;">🔔 YAKLAŞAN (7 GÜN)</div>`+
+        soon.map(e=>`<div class="list-item" style="margin-bottom:6px;">
+          <div class="list-item-left">
+            <div class="list-item-title">${getEvIcon(e.type)} ${e.title}</div>
+            <div class="list-item-sub">${e.date}${e.time?' • '+e.time:''}</div>
+          </div>
+        </div>`).join('');
+    }
+  }
+
+  const el=document.getElementById('calEventList');
+  if(!evs.length&&!upcomingHtml){
+    el.innerHTML='<div class="empty" style="padding:24px 0;"><div class="empty-icon">📅</div><div class="empty-text">Bu gün etkinlik yok</div></div>'+upcomingHtml;
+    return;
+  }
+
+  el.innerHTML=evs.map(e=>`
+    <div class="list-item" style="margin-bottom:8px;border-left:3px solid ${getEventDotColor(dateStr)};">
+      <div class="list-item-left">
+        <div class="list-item-title">${getEvIcon(e.type)} ${e.title}</div>
+        <div class="list-item-sub">${e.time?e.time+' • ':''}${getEvLabel(e.type)}${e.repeat&&e.repeat!=='none'?' • 🔁 '+getRepeatLabel(e.repeat):''}${e.note?' • '+e.note:''}</div>
+      </div>
+      <button class="delete-btn" onclick="deleteEvent(${e.id})">🗑</button>
+    </div>`).join('')+upcomingHtml;
+}
+
+function getEvIcon(t){return{birthday:'🎂',meeting:'💼',vaccine:'💉',health:'🏥',reminder:'🔔',holiday:'🎉',event:'📌'}[t]||'📌';}
+function getEvLabel(t){return{birthday:'Doğum Günü',meeting:'Toplantı',vaccine:'Aşı',health:'Sağlık',reminder:'Hatırlatıcı',holiday:'Özel Gün',event:'Etkinlik'}[t]||'Etkinlik';}
+function getRepeatLabel(r){return{weekly:'Haftalık',monthly:'Aylık',yearly:'Yıllık'}[r]||'';}
+
+function addEvent(){
+  const title=document.getElementById('evTitle').value.trim();
+  const date=document.getElementById('evDate').value;
+  if(!title||!date)return;
+  if(!state.events)state.events=[];
+  state.events.push({
+    id:Date.now(),title,type:document.getElementById('evType').value,
+    date,time:document.getElementById('evTime').value,
+    note:document.getElementById('evNote').value,
+    repeat:document.getElementById('evRepeat').value
+  });
+  saveState();closeModal('addEventModal');
+  calSelectedDay=date;
+  // Takvimi o ayı gösterecek şekilde ayarla
+  const d=new Date(date);calYear=d.getFullYear();calMonth=d.getMonth();
+  renderCalendar();
+  ['evTitle','evNote','evTime'].forEach(id=>document.getElementById(id).value='');
+}
+
+function deleteEvent(id){state.events=state.events.filter(e=>e.id!==id);saveState();renderDayEvents(calSelectedDay);}
+
+// ═══════════════════════════════════════════
+// AYARLAR
+// ═══════════════════════════════════════════
+function setTheme(t){
+  document.body.className=document.body.className.replace(/theme-\S+/g,'').trim();
+  document.body.classList.add('theme-'+t);
+  localStorage.setItem('ntrk_theme',t);
+  // Aktif buton vurgula
+  document.querySelectorAll('.theme-btn').forEach(b=>b.classList.remove('btn-primary'));
+  const btn=document.getElementById('t-'+t);
+  if(btn){btn.classList.remove('btn-secondary');btn.classList.add('btn-primary');}
+}
+
+function loadTheme(){
+  const t=localStorage.getItem('ntrk_theme')||'dark';
+  setTheme(t);
+}
+
+function saveName(){
+  const n=document.getElementById('settingName').value.trim();
+  if(!n)return;
+  localStorage.setItem('ntrk_name',n);
+  // Karşılamayı güncelle
+  const h=new Date().getHours();
+  const gr=h<12?'Günaydın':h<18?'İyi günler':'İyi akşamlar';
+  document.getElementById('greeting').innerHTML=`${gr}, <span>${n}</span>! 👋`;
+  document.getElementById('settingName').value='';
+  alert('İsim kaydedildi ✓');
+}
+
+function changePassword(){
+  const old=document.getElementById('oldPass').value;
+  const nw=document.getElementById('newPass').value;
+  const msg=document.getElementById('passMsg');
+  const stored=localStorage.getItem('ntrk_pass');
+  msg.style.display='block';
+  if(old!==stored){msg.style.color='var(--rose)';msg.textContent='❌ Mevcut şifre hatalı';return;}
+  if(nw.length<4){msg.style.color='var(--rose)';msg.textContent='❌ Şifre en az 4 karakter olmalı';return;}
+  localStorage.setItem('ntrk_pass',nw);
+  msg.style.color='var(--accent2)';msg.textContent='✅ Şifre güncellendi';
+  document.getElementById('oldPass').value='';document.getElementById('newPass').value='';
+  setTimeout(()=>msg.style.display='none',3000);
+}
+
+function resetAll(){
+  if(confirm('Tüm veriler silinecek. Emin misin?')){
+    localStorage.clear();location.reload();
+  }
+}
 
 function formatDate(ds){if(!ds)return'';try{return new Date(ds).toLocaleDateString('tr-TR',{day:'numeric',month:'short',year:'numeric'});}catch(e){return ds;}}
 </script>
