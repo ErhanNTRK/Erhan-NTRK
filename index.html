@@ -844,50 +844,18 @@ async function loadGoldPrice(){
   document.getElementById('goldPrice').textContent='Yükleniyor...';
   document.getElementById('priceTime').textContent='';
 
-  // Strateji: 3 farklı kaynaktan USD/TRY + XAU/USD çek, ilk çalışanı kullan
+  // ── 1. USD/TRY Kuru ──────────────────────────────────────────────────────
   let usdTry=null;
-  let goldUsdPerOz=null;
-
-  // 1. USD/TRY kuru — çoklu kaynak
-  const rateSources=[
-    'https://api.exchangerate-api.com/v4/latest/USD',
-    'https://open.er-api.com/v6/latest/USD'
-  ];
-  for(const url of rateSources){
-    try{
-      const r=await fetch(url);const d=await r.json();
-      usdTry=d.rates?.TRY||d.conversion_rates?.TRY||null;
-      if(usdTry)break;
-    }catch(e){}
-  }
-
-  // 2. Altın fiyatı — önce goldapi.io (ücretsiz, CORS yok), sonra alternative
-  // goldprice.org JSON endpoint — CORS izinli, ücretsiz
   try{
-    const r=await fetch('https://data-asg.goldprice.org/dbXRates/USD');
+    const r=await fetch('https://open.er-api.com/v6/latest/USD');
     const d=await r.json();
-    // d.items[0].xauPrice = 1 gram altın USD cinsinden
-    if(d?.items?.[0]?.xauPrice){
-      goldUsdPerOz=d.items[0].xauPrice*31.1035; // gram → ons
-    }
+    usdTry=d?.rates?.TRY||null;
   }catch(e){}
-
-  // Yedek: paxos/itbit gold price feed
-  if(!goldUsdPerOz){
+  if(!usdTry){
     try{
-      const r=await fetch('https://api.metals.dev/v1/latest?api_key=demo&currency=USD&unit=toz');
+      const r=await fetch('https://api.exchangerate-api.com/v4/latest/USD');
       const d=await r.json();
-      goldUsdPerOz=d?.metals?.gold||null;
-    }catch(e){}
-  }
-
-  // Son yedek: openexchangerates ücretsiz tier ile XAU
-  if(!goldUsdPerOz){
-    try{
-      // XAU/TRY doğrudan: investing.com public feed proxy
-      const r=await fetch('https://query1.finance.yahoo.com/v8/finance/chart/GC%3DF?interval=1d&range=1d');
-      const d=await r.json();
-      goldUsdPerOz=d?.chart?.result?.[0]?.meta?.regularMarketPrice||null;
+      usdTry=d?.rates?.TRY||null;
     }catch(e){}
   }
 
@@ -896,18 +864,71 @@ async function loadGoldPrice(){
     document.getElementById('priceTime').textContent='⚠️ İnternet bağlantısını kontrol et';
     return;
   }
-
   document.getElementById('usdTry').textContent=usdTry.toFixed(2)+' ₺';
+
+  // ── 2. ALTIN fiyatı — Claude API ile web araması ─────────────────────────
+  // Önce goldprice.org gram verisini dene (genellikle CORS izinli)
+  let gramUsd=null;
+  try{
+    const r=await fetch('https://data-asg.goldprice.org/dbXRates/USD',{headers:{'X-Requested-With':'XMLHttpRequest'}});
+    const d=await r.json();
+    // xauPrice = 1 troy ounce USD → gram hesapla
+    if(d?.items?.[0]?.xauPrice){
+      gramUsd=d.items[0].xauPrice/31.1035;
+    }
+  }catch(e){}
+
+  // Yahoo Finance GC=F (gold futures) — CORS bazen açık
+  if(!gramUsd){
+    try{
+      const r=await fetch('https://query2.finance.yahoo.com/v8/finance/chart/GC%3DF?interval=1d&range=1d');
+      const d=await r.json();
+      const ozUsd=d?.chart?.result?.[0]?.meta?.regularMarketPrice||null;
+      if(ozUsd&&ozUsd>500) gramUsd=ozUsd/31.1035;
+    }catch(e){}
+  }
+
+  // metals-api.com ücretsiz (sınırlı istek)
+  if(!gramUsd){
+    try{
+      const r=await fetch('https://metals.live/api/spot');
+      const d=await r.json();
+      const item=Array.isArray(d)?d.find(x=>x.metal==='gold'||x.symbol==='XAU'):null;
+      if(item?.price) gramUsd=item.price/31.1035;
+    }catch(e){}
+  }
+
+  // ── 3. Anthropic API — Claude ile web araması (en güvenilir fallback) ────
+  if(!gramUsd){
+    try{
+      const resp=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          model:'claude-sonnet-4-20250514',
+          max_tokens:200,
+          tools:[{type:'web_search_20250305',name:'web_search'}],
+          messages:[{role:'user',content:'What is the current gold price per troy ounce in USD right now? Reply with ONLY a JSON object like: {"price": 3380.50}'}]
+        })
+      });
+      const data=await resp.json();
+      const textBlock=data?.content?.find(b=>b.type==='text');
+      if(textBlock){
+        const match=textBlock.text.match(/"price"\s*:\s*([\d.]+)/);
+        if(match) gramUsd=parseFloat(match[1])/31.1035;
+      }
+    }catch(e){}
+  }
 
   let gramTry;
   let source='';
-  if(goldUsdPerOz&&goldUsdPerOz>500){
-    gramTry=(goldUsdPerOz/31.1035)*usdTry;
+  if(gramUsd&&gramUsd>50){
+    gramTry=gramUsd*usdTry;
     source='🟢 Canlı fiyat';
   } else {
-    // Sabit yedek — ons fiyatı ~3380 USD (Mayıs 2025)
-    gramTry=(3380/31.1035)*usdTry;
-    source='🟡 Tahmini (API erişilemedi)';
+    // Sabit yedek — yaklaşık mevcut piyasa değeri
+    gramTry=(3400/31.1035)*usdTry;
+    source='🟡 Tahmini fiyat';
   }
 
   document.getElementById('goldPrice').textContent='₺'+gramTry.toFixed(0);
@@ -919,10 +940,6 @@ async function loadGoldPrice(){
   if(!ga.value&&state.goldAmount)ga.value=state.goldAmount;
   document.getElementById('priceTime').textContent=source+' • '+new Date().toLocaleTimeString('tr-TR');
 }
-function saveAssets(){state.goldAmount=parseFloat(document.getElementById('goldAmount').value)||0;saveState();updateGoldTotal();renderAssetSummary();}
-function updateGoldTotal(){const v=(state.goldAmount||0)*(state.goldPriceTry||0);document.getElementById('goldTotal').textContent='₺'+v.toLocaleString('tr-TR',{maximumFractionDigits:0});}
-function addStock(){const s=document.getElementById('stockSymbol').value.trim().toUpperCase();const q=parseFloat(document.getElementById('stockQty').value)||0;const p=parseFloat(document.getElementById('stockBuyPrice').value)||0;if(!s||!q)return;state.stocks.push({id:Date.now(),symbol:s,qty:q,buyPrice:p,currentPrice:null});saveState();closeModal('addStockModal');renderStocks();fetchStockPrices();['stockSymbol','stockQty','stockBuyPrice'].forEach(id=>document.getElementById(id).value='');}
-
 async function fetchStockPrices(){
   if(!state.stocks.length)return;
   for(const s of state.stocks){
