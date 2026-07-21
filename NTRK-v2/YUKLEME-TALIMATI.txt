@@ -1,0 +1,71 @@
+═══════════════════════════════════════════════════════════
+  NTRK v2.0 — YÜKLEME TALİMATI
+═══════════════════════════════════════════════════════════
+
+BU PAKETTE NE VAR
+  index.html            → Uygulamanın tamamı (mevcut dosyanın üzerine yazar)
+  manifest.json         → PWA kimliği (telefona kurulabilirlik)
+  sw.js                 → Service worker (çevrimdışı çalışma + güncelleme şeridi)
+  icons/icon-192.png    → Uygulama ikonu
+  icons/icon-512.png    → Uygulama ikonu (büyük)
+  worker-ai-proxy.js    → AI özeti için Cloudflare Worker kodu (İSTEĞE BAĞLI)
+  YUKLEME-TALIMATI.txt  → Bu dosya
+
+───────────────────────────────────────────────────────────
+ADIM ADIM YÜKLEME (GitHub)
+───────────────────────────────────────────────────────────
+1. Bu zip'i çıkar. İçinde yukarıdaki dosyalar ve "icons" klasörü olacak.
+2. github.com/ErhanNTRK/Erhan-NTRK  →  "Add file"  →  "Upload files"
+3. Çıkardığın dosyaların TAMAMINI + "icons" klasörünü pencereye sürükle.
+4. Yükleme listesinde şunları gör:
+      index.html
+      manifest.json
+      sw.js
+      worker-ai-proxy.js
+      icons/icon-192.png
+      icons/icon-512.png
+5. "Commit directly to the main branch" seçili olsun  →  Commit changes
+6. Actions sekmesi yeşil olana kadar bekle (1-2 dakika).
+
+───────────────────────────────────────────────────────────
+KONTROL: YENİ SÜRÜM GELDİ Mİ?
+───────────────────────────────────────────────────────────
+Siteyi aç. Ana sayfanın en altında ve Ayarlar'ın en altında şu yazmalı:
+
+      NTRK v2.0 · 2026.07.20
+
+Bu yazıyı görüyorsan yeni sürüm canlıdadır.
+Telefonda eski görünüyorsa: uygulamayı TAMAMEN kapat, aç, birkaç saniye
+bekle, tekrar kapat ve aç. (İlk açılış indirir, ikinci açılış devreye alır.)
+Tarayıcıda: Ctrl + Shift + R.
+
+───────────────────────────────────────────────────────────
+MEVCUT VERİLERİN NE OLACAK?
+───────────────────────────────────────────────────────────
+Hiçbir şey kaybolmaz. Uygulama aynı veri anahtarını (ntrk_data) kullanır:
+  • Aile üyeleri, notlar, finans kayıtları, aşılar, takvim → aynen durur
+  • Fotoğrafların otomatik olarak IndexedDB'ye taşınır (kota sorunu biter)
+  • Şifren ilk girişte otomatik olarak hash'lenir (düz metin silinir)
+
+İLK İŞİN: Ayarlar → Yedekleme → "Yedek Al". Dosyayı e-postana at.
+Artık telefon kaybında verilerin kurtarılabilir.
+
+───────────────────────────────────────────────────────────
+TELEFONA KURULUM (PWA)
+───────────────────────────────────────────────────────────
+Android/Chrome: Siteyi aç → menü (⋮) → "Uygulamayı yükle"
+iPhone/Safari:  Siteyi aç → Paylaş → "Ana Ekrana Ekle"
+Kurulduktan sonra tam ekran, uygulama gibi ve çevrimdışı çalışır.
+
+───────────────────────────────────────────────────────────
+AI ÖZETİ (İSTEĞE BAĞLI — istemezsen hiç dokunma)
+───────────────────────────────────────────────────────────
+1. dash.cloudflare.com → Workers & Pages → Create → Worker → Deploy
+2. "Edit code" → worker-ai-proxy.js içeriğini yapıştır → Deploy
+3. Settings → Variables and Secrets:
+      ANTHROPIC_KEY = Anthropic anahtarın        (Secret)
+      ACCESS_CODE   = kendi belirlediğin parola   (Secret)
+4. Worker adresini kopyala (https://....workers.dev)
+5. NTRK → Ayarlar → AI Asistan → adresi ve kodu gir → Kaydet
+6. "Haftalık Özet" butonu artık çalışır.
+Anahtarın telefona/siteye asla inmez; Worker'da kalır.

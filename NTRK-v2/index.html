@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#06080f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NTRK">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<title>NTRK — Kişisel Asistan</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Fraunces:ital,wght@0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════ NTRK v2 — Tasarım Sistemi ═══════════
+   Tipografi skalası: 11/13/15/17/22/28. Boşluk: 8pt ızgara.
+   Tek vurgu rengi + nötr yüzeyler (Linear/Things ilkesi). */
+:root{
+  --accent:#818cf8;--accent-dim:rgba(129,140,248,.13);
+  --green:#34d399;--green-dim:rgba(52,211,153,.12);
+  --gold:#f59e0b;--gold-dim:rgba(245,158,11,.13);
+  --rose:#f87171;--rose-dim:rgba(248,113,113,.12);
+  --violet:#c084fc;--violet-dim:rgba(192,132,252,.12);
+  --cyan:#22d3ee;
+  --radius:18px;--radius-sm:12px;--radius-xs:9px;
+  --nav-h:60px;
+}
+body.theme-dark{--bg:#06080f;--surface:#0e1521;--surface2:#131d2e;--surface3:#182438;--border:#1a2640;--border2:#243354;--text:#f1f5f9;--text2:#8899aa;--text3:#4a5a72;--bar:rgba(10,15,26,.92);}
+body.theme-navy{--bg:#070b14;--surface:#0f1929;--surface2:#152035;--surface3:#1a2840;--border:#1c2d44;--border2:#26395a;--text:#e8f0fe;--text2:#7a90aa;--text3:#41556e;--bar:rgba(11,18,32,.92);}
+body.theme-slate{--bg:#0f1117;--surface:#1a1f2e;--surface2:#20263a;--surface3:#272e44;--border:#2a334a;--border2:#344060;--text:#e2e8f0;--text2:#8896aa;--text3:#4a5870;--bar:rgba(20,24,32,.92);}
+body.theme-light{--bg:#f2f5f9;--surface:#ffffff;--surface2:#f0f4f8;--surface3:#e6ecf3;--border:#d8e0ea;--border2:#c2cedb;--text:#17202c;--text2:#51606f;--text3:#94a3b3;--bar:rgba(255,255,255,.92);--accent:#5b64e8;--accent-dim:rgba(91,100,232,.10);}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+button{font-family:inherit;}
+svg.ic{width:20px;height:20px;stroke:currentColor;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+svg.ic.sm{width:16px;height:16px;}svg.ic.lg{width:24px;height:24px;}
+.num{font-variant-numeric:tabular-nums;}
+
+/* ── Giriş ── */
+#loginScreen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000;flex-direction:column;gap:24px;padding:24px;background-image:radial-gradient(ellipse 70% 45% at 50% -8%,var(--accent-dim) 0%,transparent 70%);}
+.login-logo{font-size:56px;font-weight:900;letter-spacing:-3px;color:var(--accent);line-height:1;}
+.login-tagline{font-family:'Fraunces',serif;font-style:italic;font-size:14px;color:var(--text3);margin-top:6px;text-align:center;}
+.login-box{background:var(--surface);border:1.5px solid var(--border2);border-radius:22px;padding:24px;width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px;box-shadow:0 24px 60px rgba(0,0,0,.35);}
+.login-box h2{font-size:17px;font-weight:700;}
+.login-box p{color:var(--text2);font-size:13px;}
+#loginError{color:var(--rose);font-size:13px;text-align:center;display:none;}
+
+/* ── Form ── */
+input,textarea,select{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:11px 14px;font-family:inherit;font-size:15px;outline:none;transition:border-color .18s,box-shadow .18s;-webkit-appearance:none;}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
+textarea{resize:vertical;min-height:76px;}
+select option{background:var(--surface);color:var(--text);}
+input[type="file"]{background:none;border:1.5px dashed var(--border2);padding:14px;color:var(--text2);}
+.form-row{margin-bottom:11px;}
+.form-label{font-size:12px;color:var(--text2);margin-bottom:5px;display:block;font-weight:600;letter-spacing:.01em;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.form-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.hint{font-size:12px;color:var(--text3);}
+
+/* ── Butonlar (min 44px dokunma) ── */
+.btn{min-height:44px;padding:10px 18px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-size:14px;font-weight:600;transition:transform .15s,box-shadow .15s,background .15s,border-color .15s;display:inline-flex;align-items:center;justify-content:center;gap:8px;}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{box-shadow:0 6px 20px var(--accent-dim);}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1.5px solid var(--border);}
+.btn-secondary:hover{border-color:var(--accent);}
+.btn-danger{background:var(--rose-dim);color:var(--rose);border:1px solid rgba(248,113,113,.25);}
+.btn-success{background:var(--green-dim);color:var(--green);border:1px solid rgba(52,211,153,.25);}
+.btn-gold{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(245,158,11,.25);}
+.btn-sm{min-height:34px;padding:6px 12px;font-size:12px;border-radius:var(--radius-xs);}
+.btn-full{width:100%;}
+.icon-btn{min-width:40px;min-height:40px;display:inline-flex;align-items:center;justify-content:center;background:none;border:none;color:var(--text2);cursor:pointer;border-radius:10px;transition:background .15s,color .15s;}
+.icon-btn:hover{background:var(--surface2);color:var(--text);}
+.del{color:var(--text3);}
+.del:hover{color:var(--rose);background:var(--rose-dim);}
+
+/* ── Kabuk ── */
+#app{display:none;padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 12px);}
+.topbar{position:sticky;top:0;z-index:100;background:var(--bar);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;}
+.topbar-logo{font-size:19px;font-weight:900;letter-spacing:-1px;color:var(--accent);}
+.topbar-title{font-size:15px;font-weight:700;flex:1;text-align:center;color:var(--text2);}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--bar);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom);height:calc(var(--nav-h) + env(safe-area-inset-bottom));}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;color:var(--text3);font-size:10.5px;font-weight:600;position:relative;transition:color .18s;}
+.nav-item::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%) scaleX(0);width:26px;height:2.5px;background:var(--accent);border-radius:0 0 4px 4px;transition:transform .22s cubic-bezier(.32,.72,0,1);}
+.nav-item.active{color:var(--accent);}
+.nav-item.active::before{transform:translateX(-50%) scaleX(1);}
+.section{display:none;padding:18px 16px 28px;min-height:60vh;}
+.section.active{display:block;animation:secIn .22s cubic-bezier(.32,.72,0,1);}
+@keyframes secIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.stagger>*{animation:secIn .3s cubic-bezier(.32,.72,0,1) backwards;}
+.stagger>*:nth-child(1){animation-delay:.02s}.stagger>*:nth-child(2){animation-delay:.05s}.stagger>*:nth-child(3){animation-delay:.08s}.stagger>*:nth-child(4){animation-delay:.11s}.stagger>*:nth-child(5){animation-delay:.14s}.stagger>*:nth-child(6){animation-delay:.17s}
+
+/* ── Kartlar ── */
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:12px;}
+.card-title{font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+.card-title .ic{width:15px;height:15px;color:var(--accent);}
+.list-item{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.li-left{flex:1;min-width:0;}
+.li-title{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.li-sub{font-size:12px;color:var(--text2);margin-top:2px;}
+.li-right{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+.badge{padding:4px 10px;border-radius:99px;font-size:11.5px;font-weight:700;white-space:nowrap;}
+.badge-green{background:var(--green-dim);color:var(--green);}
+.badge-red{background:var(--rose-dim);color:var(--rose);}
+.badge-gold{background:var(--gold-dim);color:var(--gold);}
+.badge-blue{background:var(--accent-dim);color:var(--accent);}
+.badge-violet{background:var(--violet-dim);color:var(--violet);}
+.tabs{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{padding:8px 15px;border-radius:99px;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .18s;}
+.tab.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+.empty{text-align:center;padding:40px 16px;color:var(--text3);}
+.empty .ic{width:34px;height:34px;margin-bottom:10px;opacity:.5;}
+.empty-text{font-size:13.5px;font-weight:500;}
+.divider{border:none;border-top:1px solid var(--border);margin:14px 0;}
+hr{border:none;border-top:1px solid var(--border);margin:14px 0;}
+
+/* ── Sheet / Modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:500;display:none;align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border-radius:26px 26px 0 0;border:1.5px solid var(--border2);border-bottom:none;padding:20px 18px calc(28px + env(safe-area-inset-bottom));width:100%;max-width:600px;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;gap:11px;animation:sheetUp .28s cubic-bezier(.32,.72,0,1);}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 4px;flex-shrink:0;}
+.modal-title{font-size:17px;font-weight:800;letter-spacing:-.2px;display:flex;align-items:center;gap:8px;}
+.modal-actions{display:flex;gap:10px;margin-top:4px;}
+
+/* ── Brifing (Dashboard) ── */
+.hello{margin-bottom:16px;}
+.greeting{font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1.15;}
+.greeting span{color:var(--accent);}
+.hello-date{font-size:13px;color:var(--text3);margin-top:3px;}
+.brief-item{display:flex;align-items:flex-start;gap:11px;padding:10px 0;border-bottom:1px solid var(--border);}
+.brief-item:last-child{border-bottom:none;}
+.brief-ic{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.brief-txt{font-size:14px;line-height:1.45;flex:1;}
+.brief-txt b{font-weight:700;}
+.brief-sub{font-size:12px;color:var(--text2);margin-top:1px;}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.stat-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:14px;cursor:pointer;transition:border-color .18s;}
+.stat-card:active{border-color:var(--accent);}
+.stat-lbl{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.06em;display:flex;align-items:center;gap:6px;margin-bottom:7px;}
+.stat-lbl .ic{width:14px;height:14px;}
+.stat-val{font-size:21px;font-weight:800;letter-spacing:-.5px;line-height:1;}
+.quote-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:12px;}
+.quote-text{font-family:'Fraunces',serif;font-style:italic;font-size:14.5px;font-weight:300;line-height:1.55;}
+.quote-author{font-size:12px;color:var(--accent);font-weight:700;margin-top:8px;}
+
+/* ── Takvim ── */
+.cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.cal-month{font-size:17px;font-weight:800;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cal-wd{text-align:center;font-size:10.5px;font-weight:700;color:var(--text3);padding:4px 0;}
+.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;font-size:13px;font-weight:500;position:relative;border:1.5px solid transparent;transition:background .15s;}
+.cal-day.today{color:var(--accent);border-color:var(--accent);font-weight:800;}
+.cal-day.sel{background:var(--accent);color:#fff;font-weight:700;}
+.cal-dots{position:absolute;bottom:3px;display:flex;gap:2px;}
+.cal-dot{width:4.5px;height:4.5px;border-radius:50%;}
+.agenda-day{font-size:12px;font-weight:800;color:var(--text3);letter-spacing:.06em;margin:16px 0 8px;text-transform:uppercase;}
+.agenda-day.today-lbl{color:var(--accent);}
+.ev-item{display:flex;align-items:center;gap:11px;background:var(--surface2);border:1.5px solid var(--border);border-left-width:3px;border-radius:var(--radius-sm);padding:11px 13px;margin-bottom:7px;}
+.ev-ic{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ev-body{flex:1;min-width:0;}
+.ev-title{font-size:14px;font-weight:600;}
+.ev-sub{font-size:12px;color:var(--text2);margin-top:1px;}
+
+/* ── Grafikler (kütüphanesiz) ── */
+.bars{display:flex;align-items:flex-end;gap:8px;height:110px;padding-top:6px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end;}
+.bar-pair{display:flex;gap:3px;align-items:flex-end;height:84px;width:100%;justify-content:center;}
+.bar{width:38%;max-width:16px;border-radius:5px 5px 2px 2px;min-height:3px;transition:height .4s ease;}
+.bar.inc{background:var(--green);}
+.bar.exp{background:var(--rose);}
+.bar-lbl{font-size:10px;color:var(--text3);font-weight:600;}
+.pie{width:120px;height:120px;border-radius:50%;flex-shrink:0;}
+.legend{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0;}
+.leg-row{display:flex;align-items:center;gap:8px;font-size:12.5px;}
+.leg-dot{width:9px;height:9px;border-radius:3px;flex-shrink:0;}
+.leg-name{flex:1;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.progress-track{background:var(--surface3);border-radius:99px;height:7px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:99px;transition:width .5s ease;background:var(--accent);}
+.spark{display:flex;align-items:flex-end;gap:3px;height:44px;}
+.spark i{flex:1;background:var(--accent);border-radius:3px 3px 0 0;min-height:2px;display:block;}
+
+/* ── Arama ── */
+#searchOverlay{position:fixed;inset:0;background:var(--bg);z-index:600;display:none;flex-direction:column;padding:14px 16px;}
+#searchOverlay.open{display:flex;animation:secIn .18s ease;}
+.search-head{display:flex;gap:10px;align-items:center;margin-bottom:14px;}
+.search-results{flex:1;overflow-y:auto;padding-bottom:30px;}
+.sr-group{font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin:14px 0 7px;}
+@keyframes flash{0%{background:var(--accent-dim)}100%{background:transparent}}
+.flash{animation:flash 1.6s ease;}
+
+/* ── Diğer ── */
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.chip{padding:7px 12px;border-radius:99px;font-size:12px;background:var(--surface2);border:1.5px solid var(--border);color:var(--text2);cursor:pointer;transition:all .15s;font-weight:500;}
+.chip.selected,.chip:active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+.family-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.family-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px 12px;text-align:center;cursor:pointer;transition:transform .18s,border-color .18s;}
+.family-card:active{transform:scale(.97);}
+.family-avatar{width:54px;height:54px;border-radius:50%;background:var(--surface3);margin:0 auto 9px;display:flex;align-items:center;justify-content:center;overflow:hidden;border:2px solid var(--border2);color:var(--text2);}
+.family-name{font-weight:700;font-size:14px;}
+.family-role{font-size:11px;color:var(--violet);font-weight:700;margin-top:2px;}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+.note-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:15px;margin-bottom:9px;}
+.note-card.pinned{border-color:var(--gold);}
+.nc-title{font-weight:700;font-size:15px;display:flex;align-items:center;gap:6px;}
+.nc-preview{font-size:13px;color:var(--text2);margin-top:5px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5;}
+.nc-footer{display:flex;gap:6px;margin-top:9px;align-items:center;flex-wrap:wrap;}
+.nc-date{font-size:11px;color:var(--text3);margin-left:auto;}
+.check-line{display:flex;align-items:center;gap:9px;padding:6px 0;font-size:14px;cursor:pointer;border-bottom:1px solid var(--border);}
+.check-line:last-child{border:none;}
+.check-line.done{color:var(--text3);text-decoration:line-through;}
+.check-box{width:19px;height:19px;border-radius:6px;border:1.8px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:transparent;}
+.check-line.done .check-box{background:var(--green);border-color:var(--green);color:#fff;}
+.vaccine-row{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13.5px;}
+.vaccine-row:last-child{border:none;}
+.more-list .list-item{cursor:pointer;}
+.big-center{text-align:center;padding:12px 0;}
+.big-num{font-size:50px;font-weight:900;letter-spacing:-2.5px;line-height:1;}
+#updateBanner{position:fixed;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 10px);left:16px;right:16px;z-index:400;background:var(--surface);border:1.5px solid var(--accent);border-radius:var(--radius-sm);padding:12px 14px;display:none;align-items:center;gap:10px;box-shadow:0 10px 30px rgba(0,0,0,.35);}
+#toast{position:fixed;top:calc(60px + env(safe-area-inset-top));left:50%;transform:translateX(-50%) translateY(-8px);z-index:700;background:var(--surface3);border:1.5px solid var(--border2);color:var(--text);padding:10px 18px;border-radius:99px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;box-shadow:0 8px 24px rgba(0,0,0,.3);}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+::-webkit-scrollbar{width:3px;height:3px;}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;}
+</style>
+</head>
+<body class="theme-dark">
+
+<div id="loginScreen">
+  <div style="text-align:center;"><div class="login-logo">NTRK</div><div class="login-tagline">Kişisel Yaşam Asistanın</div></div>
+  <div class="login-box">
+    <h2 id="loginTitle">Giriş Yap</h2><p id="loginDesc">Şifreni gir</p>
+    <div id="nameFieldWrap" style="display:none;"><label class="form-label">Adın nedir?</label><input type="text" id="nameInput" placeholder="Adınız..."></div>
+    <input type="password" id="loginInput" placeholder="Şifre..." onkeydown="if(event.key==='Enter')Auth.login()">
+    <div id="loginError"></div>
+    <button class="btn btn-primary btn-full" onclick="Auth.login()">Giriş</button>
+    <p id="setupHint" class="hint" style="text-align:center;"></p>
+  </div>
+</div>
+
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-logo">NTRK</div>
+    <div class="topbar-title" id="topbarTitle">Ana Sayfa</div>
+    <button class="icon-btn" onclick="Search.open()" aria-label="Ara"><svg class="ic"><use href="#i-search"/></svg></button>
+    <button class="icon-btn" onclick="Router.go('sec-settings',null,'Ayarlar')" aria-label="Ayarlar"><svg class="ic"><use href="#i-settings"/></svg></button>
+  </div>
+
+  <div class="section active" id="sec-home"></div>
+  <div class="section" id="sec-calendar">
+    <div class="tabs"><div class="tab active" onclick="Cal.setTab('agenda',this)">Ajanda</div><div class="tab" onclick="Cal.setTab('month',this)">Ay Görünümü</div></div>
+    <div id="cal-agenda"></div>
+    <div id="cal-month" style="display:none;">
+      <div class="cal-head"><button class="btn btn-secondary btn-sm" onclick="Cal.prev()">‹</button><div class="cal-month" id="calMonthTitle"></div><button class="btn btn-secondary btn-sm" onclick="Cal.next()">›</button></div>
+      <div class="cal-grid" id="calWd"></div>
+      <div class="cal-grid" id="calGrid" style="margin-top:4px;margin-bottom:18px;"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><div style="font-size:13px;font-weight:700;color:var(--text2);" id="calDayTitle"></div></div>
+      <div id="calEventList"></div>
+    </div>
+    <button class="btn btn-primary btn-full" style="margin-top:12px;" onclick="UI.open('addEventModal')"><svg class="ic sm"><use href="#i-plus"/></svg> Etkinlik Ekle</button>
+  </div>
+  <div class="section" id="sec-finance">
+    <div class="tabs">
+      <div class="tab active" onclick="Fin.setTab('overview',this)">Genel</div>
+      <div class="tab" onclick="Fin.setTab('income',this)">Gelir</div>
+      <div class="tab" onclick="Fin.setTab('expense',this)">Gider</div>
+      <div class="tab" onclick="Fin.setTab('debt',this)">Borç</div>
+      <div class="tab" onclick="Fin.setTab('assets',this)">Varlık</div>
+    </div>
+    <div id="fin-overview"></div>
+    <div id="fin-income" style="display:none;"></div>
+    <div id="fin-expense" style="display:none;"></div>
+    <div id="fin-debt" style="display:none;"></div>
+    <div id="fin-assets" style="display:none;"></div>
+  </div>
+  <div class="section" id="sec-health">
+    <div class="tabs">
+      <div class="tab active" onclick="Health.setTab('water',this)">Su</div>
+      <div class="tab" onclick="Health.setTab('weight',this)">Kilo</div>
+      <div class="tab" onclick="Health.setTab('meds',this)">İlaç</div>
+      <div class="tab" onclick="Health.setTab('bp',this)">Tansiyon</div>
+      <div class="tab" onclick="Health.setTab('sleep',this)">Uyku</div>
+      <div class="tab" onclick="Health.setTab('calorie',this)">Kalori</div>
+      <div class="tab" onclick="Health.setTab('smoke',this)">Sigara</div>
+      <div class="tab" onclick="Health.setTab('alcohol',this)">Alkol</div>
+    </div>
+    <div id="ht-water"></div><div id="ht-weight" style="display:none;"></div><div id="ht-meds" style="display:none;"></div>
+    <div id="ht-bp" style="display:none;"></div><div id="ht-sleep" style="display:none;"></div><div id="ht-calorie" style="display:none;"></div>
+    <div id="ht-smoke" style="display:none;"></div><div id="ht-alcohol" style="display:none;"></div>
+  </div>
+  <div class="section" id="sec-family">
+    <div class="tabs">
+      <div class="tab active" onclick="Fam.setTab('members',this)">Üyeler</div>
+      <div class="tab" onclick="Fam.setTab('children',this)">Çocuklar & Aşı</div>
+      <div class="tab" onclick="Fam.setTab('photos',this)">Fotoğraflar</div>
+      <div class="tab" onclick="Fam.setTab('docs',this)">Belgeler</div>
+      <div class="tab" onclick="Fam.setTab('notes',this)">Aile Notları</div>
+    </div>
+    <div id="fam-members"></div><div id="fam-children" style="display:none;"></div><div id="fam-photos" style="display:none;"></div>
+    <div id="fam-docs" style="display:none;"></div><div id="fam-notes" style="display:none;"></div>
+  </div>
+  <div class="section" id="sec-notes">
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <input type="text" id="noteSearch" placeholder="Not ara..." oninput="Notes.render()" style="flex:1;">
+      <button class="btn btn-primary" onclick="Notes.openAdd()"><svg class="ic sm"><use href="#i-plus"/></svg></button>
+    </div>
+    <div class="tabs" id="noteTabs"></div>
+    <div id="notesList"></div>
+  </div>
+  <div class="section" id="sec-settings"></div>
+
+  <div class="bottom-nav">
+    <button class="nav-item active" data-nav="sec-home" onclick="Router.go('sec-home',this,'Ana Sayfa')"><svg class="ic"><use href="#i-home"/></svg><span>Ana Sayfa</span></button>
+    <button class="nav-item" data-nav="sec-calendar" onclick="Router.go('sec-calendar',this,'Takvim')"><svg class="ic"><use href="#i-cal"/></svg><span>Takvim</span></button>
+    <button class="nav-item" data-nav="sec-finance" onclick="Router.go('sec-finance',this,'Finans')"><svg class="ic"><use href="#i-wallet"/></svg><span>Finans</span></button>
+    <button class="nav-item" data-nav="sec-health" onclick="Router.go('sec-health',this,'Sağlık')"><svg class="ic"><use href="#i-heart"/></svg><span>Sağlık</span></button>
+    <button class="nav-item" data-nav="more" onclick="UI.open('moreSheet')"><svg class="ic"><use href="#i-grid"/></svg><span>Daha</span></button>
+  </div>
+</div>
+
+<div id="toast"></div>
+<div id="updateBanner"><span style="flex:1;font-size:13.5px;font-weight:600;">Yeni sürüm hazır.</span><button class="btn btn-primary btn-sm" onclick="location.reload()">Yenile</button></div>
+
+<div id="searchOverlay">
+  <div class="search-head">
+    <input type="text" id="globalSearchInput" placeholder='Ara: "Mete", "market", "aşı"...' oninput="Search.run()" autocomplete="off">
+    <button class="icon-btn" onclick="Search.close()"><svg class="ic"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="search-results" id="searchResults"><div class="empty"><svg class="ic"><use href="#i-search"/></svg><div class="empty-text">Tüm modüllerde ara: notlar, kişiler, işlemler, etkinlikler…</div></div></div>
+</div>
+
+<!-- ═══ SVG İkon Seti (Lucide türevi, tek vurgu) ═══ -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h5v-6h4v6h5V9.5"/></symbol>
+<symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></symbol>
+<symbol id="i-wallet" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M16 12.5h.5M3 9h18"/></symbol>
+<symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.5C7 16.5 3.5 13.3 3.5 9.6 3.5 7 5.5 5 8 5c1.6 0 3.1.8 4 2.1C12.9 5.8 14.4 5 16 5c2.5 0 4.5 2 4.5 4.6 0 3.7-3.5 6.9-8.5 10.9z"/></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></symbol>
+<symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h0a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55h0a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v0a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></symbol>
+<symbol id="i-edit" viewBox="0 0 24 24"><path d="M17 3.5 20.5 7 8.5 19H5v-3.5z"/><path d="m14.5 6 3.5 3.5"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 17v5M6.5 10.5 12 3l5.5 7.5c1 1.4 0 3.5-2 3.5h-7c-2 0-3-2.1-2-3.5z"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="9" r="2.6"/><path d="M17 14.6c2.7.4 4.5 2.4 4.5 5.4"/></symbol>
+<symbol id="i-note" viewBox="0 0 24 24"><path d="M6 3h9l5 5v13H6z"/><path d="M15 3v5h5M9 12h7M9 16h7"/></symbol>
+<symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3s6.5 7 6.5 11.5a6.5 6.5 0 0 1-13 0C5.5 10 12 3 12 3z"/></symbol>
+<symbol id="i-scale" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 4a8 8 0 0 1 7 5l-4 2-3-4-3 4-4-2a8 8 0 0 1 7-5z"/></symbol>
+<symbol id="i-pill" viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="7" rx="3.5" transform="rotate(-40 12 12.5)"/><path d="m9.5 8 5.5 6.5"/></symbol>
+<symbol id="i-pulse" viewBox="0 0 24 24"><path d="M3 12h4l2.5-6 4 12 2.5-6H21"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/></symbol>
+<symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 21c-4 0-6.5-2.6-6.5-6C5.5 11 9 9 9.5 5.5c2.5 1.5 3 3.7 2.8 5.5 1.2-.5 2.2-1.7 2.2-3.5 2.5 1.8 4 4.3 4 7.5 0 3.4-2.5 6-6.5 6z"/></symbol>
+<symbol id="i-smoke" viewBox="0 0 24 24"><path d="M3 16h13v3H3zM18.5 16v3M21 16v3M17 12c0-2 2-2 2-4s-2-2-2-4"/></symbol>
+<symbol id="i-glass" viewBox="0 0 24 24"><path d="M7 3h10l-1.5 9a3.5 3.5 0 0 1-7 0zM12 15v6M8.5 21h7"/></symbol>
+<symbol id="i-coins" viewBox="0 0 24 24"><circle cx="9" cy="9" r="5.5"/><path d="M14 6.5A5.5 5.5 0 1 1 9.6 14.5"/></symbol>
+<symbol id="i-trend" viewBox="0 0 24 24"><path d="m3 17 6-6 4 4 8-8"/><path d="M15 7h6v6"/></symbol>
+<symbol id="i-gift" viewBox="0 0 24 24"><rect x="4" y="9" width="16" height="12" rx="2"/><path d="M12 9v12M4 13h16M12 9C10 9 7.5 8 7.5 6S10 3.5 12 6c2-2.5 4.5-2 4.5 0S14 9 12 9z"/></symbol>
+<symbol id="i-syringe" viewBox="0 0 24 24"><path d="m18 3 3 3M19.5 4.5 8 16l-4 1-.5 3L7 19.5 18.5 8M13 7l4 4"/></symbol>
+<symbol id="i-camera" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M8.5 7 10 4h4l1.5 3"/><circle cx="12" cy="13" r="3.5"/></symbol>
+<symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3h9l5 5v13H6z"/><path d="M15 3v5h5"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 19a2 2 0 0 0 4 0"/></symbol>
+<symbol id="i-repeat" viewBox="0 0 24 24"><path d="M17 2.5 21 6.5l-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15M7 21.5 3 17.5l4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></symbol>
+<symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5M4 21h16"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v5c0 5 3.2 8.5 7.5 10 4.3-1.5 7.5-5 7.5-10V6z"/></symbol>
+<symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/></symbol>
+<symbol id="i-baby" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4.5"/><path d="M5 21c.5-4 3.4-6.5 7-6.5s6.5 2.5 7 6.5"/><path d="M12 3.5V2"/></symbol>
+<symbol id="i-cake" viewBox="0 0 24 24"><path d="M4 21h16M5 21v-7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v7"/><path d="M5 16c1.5 1.5 3 0 4.5 0s3 1.5 4.5 0 3 0 4.5 0"/><path d="M12 12V9M12 6.5A1.5 1.5 0 0 1 10.5 5c0-1 1.5-2.5 1.5-2.5S13.5 4 13.5 5A1.5 1.5 0 0 1 12 6.5z"/></symbol>
+</svg>
+
+<!-- ═══ Modallar ═══ -->
+<div class="modal-overlay" id="moreSheet" onclick="UI.overlayClose(event,'moreSheet')"><div class="modal"><div class="modal-handle"></div>
+  <div class="more-list">
+    <div class="list-item" onclick="UI.close('moreSheet');Router.go('sec-notes',null,'Notlar')"><div class="li-left" style="display:flex;align-items:center;gap:11px;"><svg class="ic" style="color:var(--gold)"><use href="#i-note"/></svg><div><div class="li-title">Notlar</div><div class="li-sub">Notlar, hatırlatıcılar, listeler</div></div></div><span style="color:var(--text3)">›</span></div>
+    <div class="list-item" onclick="UI.close('moreSheet');Router.go('sec-family',null,'Aile')"><div class="li-left" style="display:flex;align-items:center;gap:11px;"><svg class="ic" style="color:var(--violet)"><use href="#i-users"/></svg><div><div class="li-title">Aile</div><div class="li-sub">Üyeler, çocuklar, aşılar, belgeler</div></div></div><span style="color:var(--text3)">›</span></div>
+    <div class="list-item" onclick="UI.close('moreSheet');Router.go('sec-settings',null,'Ayarlar')"><div class="li-left" style="display:flex;align-items:center;gap:11px;"><svg class="ic" style="color:var(--text2)"><use href="#i-settings"/></svg><div><div class="li-title">Ayarlar</div><div class="li-sub">Tema, yedekleme, güvenlik, AI</div></div></div><span style="color:var(--text3)">›</span></div>
+  </div>
+</div></div>
+
+<div class="modal-overlay" id="memberModal" onclick="UI.overlayClose(event,'memberModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title"><svg class="ic" style="color:var(--violet)"><use href="#i-users"/></svg> <span id="memberModalTitle">Aile Üyesi</span></div>
+  <input type="hidden" id="memberId">
+  <div class="form-grid"><div><label class="form-label">İsim *</label><input id="memberName"></div><div><label class="form-label">Yakınlık</label><select id="memberRole"><option>Eş</option><option>Anne</option><option>Baba</option><option>Kardeş</option><option>Çocuk</option><option>Dede</option><option>Anneanne</option><option>Babaanne</option><option>Diğer</option></select></div></div>
+  <div class="form-grid"><div><label class="form-label">Doğum Tarihi</label><input type="date" id="memberBirth"></div><div><label class="form-label">Kan Grubu</label><select id="memberBlood"><option value="">—</option><option>0 Rh+</option><option>0 Rh-</option><option>A Rh+</option><option>A Rh-</option><option>B Rh+</option><option>B Rh-</option><option>AB Rh+</option><option>AB Rh-</option></select></div></div>
+  <div class="form-row"><label class="form-label">Alerjiler</label><input id="memberAllergy" placeholder="Penisilin, polen..."></div>
+  <div class="form-row"><label class="form-label">Sürekli Kullandığı İlaçlar</label><input id="memberMeds" placeholder="—"></div>
+  <div class="form-grid"><div><label class="form-label">Doktoru</label><input id="memberDoctor"></div><div><label class="form-label">Doktor Tel</label><input id="memberDoctorTel" inputmode="tel"></div></div>
+  <div class="form-row"><label class="form-label">Not</label><input id="memberNote"></div>
+  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('memberModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fam.saveMember()">Kaydet</button></div>
+</div></div>
+
+<div class="modal-overlay" id="photoModal" onclick="UI.overlayClose(event,'photoModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title"><svg class="ic" style="color:var(--violet)"><use href="#i-camera"/></svg> Fotoğraf Ekle</div>
+  <div class="form-row"><label class="form-label">Başlık</label><input id="photoTitle" placeholder="Yaz tatili..."></div>
+  <div class="form-grid"><div><label class="form-label">Tarih</label><input type="date" id="photoDate"></div><div><label class="form-label">Dosya *</label><input type="file" id="photoFile" accept="image/*"></div></div>
+  <p class="hint">Fotoğraflar cihaz veritabanında (IndexedDB) saklanır — kota derdi yok.</p>
+  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('photoModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fam.savePhoto()">Ekle</button></div>
+</div></div>
+
+<div class="modal-overlay" id="docModal" onclick="UI.overlayClose(event,'docModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title"><svg class="ic" style="color:var(--accent)"><use href="#i-doc"/></svg> Belge Ekle</div>
+  <div class="form-row"><label class="form-label">Belge Adı *</label><input id="docTitle" placeholder="Kimlik, rapor, karne..."></div>
+  <div class="form-grid"><div><label class="form-label">Kime Ait</label><select id="docMember"></select></div><div><label class="form-label">Dosya (görsel) *</label><input type="file" id="docFile" accept="image/*"></div></div>
+  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('docModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fam.saveDoc()">Ekle</button></div>
+</div></div>
+
+<div class="modal-overlay" id="viewerModal" onclick="UI.overlayClose(event,'viewerModal')"><div class="modal" style="align-items:center;"><div class="modal-handle"></div>
+  <div class="modal-title" id="viewerTitle"></div><img id="viewerImg" style="max-width:100%;border-radius:14px;" alt="">
+  <button class="btn btn-secondary btn-full" onclick="UI.close('viewerModal')">Kapat</button>
+</div></div>
+
+<div class="modal-overlay" id="famNoteModal" onclick="UI.overlayClose(event,'famNoteModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title">Aile Notu</div>
+  <div class="form-row"><label class="form-label">Not *</label><textarea id="famNoteText"></textarea></div>
+  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('famNoteModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fam.saveFamNote()">Ekle</button></div>
+</div></div>
+
+<div class="modal-overlay" id="childModal" onclick="UI.overlayClose(event,'childModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title"><svg class="ic" style="color:var(--violet)"><use href="#i-baby"/></svg> Çocuk Profili</div>
+  <div class="form-grid"><div><label class="form-label">İsim *</label><input id="childName"></div><div><label class="form-label">Doğum Tarihi *</label><input type="date" id="childBirth"></div></div>
+  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('childModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fam.saveChild()">Ekle</button></div>
+</div></div>
+
+<div class="modal-overlay" id="vaccineModal" onclick="UI.overlayClose(event,'vaccineModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title"><svg class="ic" style="color:var(--green)"><use href="#i-syringe"/></svg> Aşı Ekle</div>
+  <input type="hidden" id="vaccineChildId">
+  <div class="form-row"><label class="form-label">Aşı Adı *</label><input id="vaccineName" placeholder="Hepatit B - 2. doz"></div>
+  <div class="form-grid"><div><label class="form-label">Tarih</label><input type="date" id="vaccineDate"></div><div><label class="form-label">Durum</label><select id="vaccineStatus"><option value="done">✓ Yapıldı</option><option value="upcoming">Planlandı</option></select></div></div>
+  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('vaccineModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fam.saveVaccine()">Ekle</button></div>
+</div></div>
+
+<div class="modal-overlay" id="growthModal" onclick="UI.overlayClose(event,'growthModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title">Boy / Kilo Kaydı</div>
+  <input type="hidden" id="growthChildId">
+  <div class="form-grid3"><div><label class="form-label">Tarih</label><input type="date" id="growthDate"></div><div><label class="form-label">Boy (cm)</label><input type="number" id="growthH" inputmode="decimal"></div><div><label class="form-label">Kilo (kg)</label><input type="number" step="0.1" id="growthW" inputmode="decimal"></div></div>
+  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('growthModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fam.saveGrowth()">Ekle</button></div>
+</div></div>
+
+<div class="modal-overlay" id="txModal" onclick="UI.overlayClose(event,'txModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title" id="txModalTitle">İşlem</div>
+  <input type="hidden" id="txType">
+  <div class="form-row"><label class="form-label">Açıklama *</label><input id="txDesc"></div>
+  <div class="form-grid"><div><label class="form-label">Tutar (₺) *</label><input type="number" step="0.01" id="txAmount" inputmode="decimal"></div><div><label class="form-label">Kategori</label><select id="txCat"></select></div></div>
+  <div class="form-row"><label class="form-label">Tarih</label><input type="date" id="txDate"></div>
+  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('txModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fin.saveTx()">Kaydet</button></div>
+</div></div>
+
+<div class="modal-overlay" id="debtModal" onclick="UI.overlayClose(event,'debtModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title">Borç / Alacak</div>
+  <div class="form-row"><label class="form-label">Açıklama *</label><input id="debtDesc" placeholder="Konut kredisi, Ali'ye borç..."></div>
+  <div class="form-grid"><div><label class="form-label">Tür</label><select id="debtType"><option value="borrow">Borcum var</option><option value="lend">Alacağım var</option></select></div><div><label class="form-label">Toplam (₺) *</label><input type="number" id="debtTotal" inputmode="decimal"></div></div>
+  <div class="form-grid3"><div><label class="form-label">Aylık Taksit</label><input type="number" id="debtMonthly" inputmode="decimal" oninput="Fin.debtPreview()"></div><div><label class="form-label">Taksit Sayısı</label><input type="number" id="debtCount" inputmode="numeric" oninput="Fin.debtPreview()"></div><div><label class="form-label">İlk Taksit</label><input type="date" id="debtStart" oninput="Fin.debtPreview()"></div></div>
+  <p class="hint" id="debtPreviewTxt"></p>
+  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('debtModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fin.saveDebt()">Kaydet</button></div>
+</div></div>
+
+<div class="modal-overlay" id="subModal" onclick="UI.overlayClose(event,'subModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title"><svg class="ic" style="color:var(--accent)"><use href="#i-repeat"/></svg> Abonelik / Düzenli Ödeme</div>
+  <div class="form-row"><label class="form-label">Ad *</label><input id="subName" placeholder="Netflix, aidat, internet..."></div>
+  <div class="form-grid"><div><label class="form-label">Aylık Tutar (₺) *</label><input type="number" step="0.01" id="subAmount" inputmode="decimal"></div><div><label class="form-label">Ödeme Günü (1-28)</label><input type="number" min="1" max="28" id="subDay" inputmode="numeric" value="1"></div></div>
+  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('subModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fin.saveSub()">Kaydet</button></div>
+</div></div>
+
+<div class="modal-overlay" id="stockModal" onclick="UI.overlayClose(event,'stockModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title"><svg class="ic" style="color:var(--green)"><use href="#i-trend"/></svg> Hisse Ekle</div>
+  <div class="form-grid"><div><label class="form-label">Sembol *</label><input id="stockSymbol" placeholder="THYAO" style="text-transform:uppercase"></div><div><label class="form-label">Adet *</label><input type="number" id="stockQty" inputmode="decimal"></div></div>
+  <div class="form-grid"><div><label class="form-label">Alış Fiyatı (₺)</label><input type="number" step="0.01" id="stockBuy" inputmode="decimal"></div><div><label class="form-label">Güncel Fiyat (₺) *</label><input type="number" step="0.01" id="stockCur" inputmode="decimal"></div></div>
+  <p class="hint">Fiyatı elle güncellersin; kart üzerindeki düzenle ile her an değiştirilebilir.</p>
+  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('stockModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fin.saveStock()">Kaydet</button></div>
+</div></div>
+
+<div class="modal-overlay" id="goldModal" onclick="UI.overlayClose(event,'goldModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title"><svg class="ic" style="color:var(--gold)"><use href="#i-coins"/></svg> Altın</div>
+  <div class="form-grid"><div><label class="form-label">Miktar (gram)</label><input type="number" step="0.01" id="goldAmount" inputmode="decimal"></div><div><label class="form-label">Gram Fiyatı (₺)</label><input type="number" step="0.01" id="goldPrice" inputmode="decimal"></div></div>
+  <p class="hint">Gram fiyatını güncel değerle elle girersin; toplam otomatik hesaplanır.</p>
+  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('goldModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fin.saveGold()">Kaydet</button></div>
+</div></div>
+
+<div class="modal-overlay" id="noteModal" onclick="UI.overlayClose(event,'noteModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title"><svg class="ic" style="color:var(--gold)"><use href="#i-note"/></svg> <span id="noteModalTitle">Not</span></div>
+  <input type="hidden" id="noteId">
+  <div class="form-row"><label class="form-label">Başlık *</label><input id="noteTitle"></div>
+  <div class="form-grid"><div><label class="form-label">Tür</label><select id="noteType"><option value="text">Metin</option><option value="check">Kontrol Listesi</option></select></div><div><label class="form-label">Etiket</label><select id="noteTag"><option>Genel</option><option>İş</option><option>Kişisel</option><option>Alışveriş</option><option>Fikir</option></select></div></div>
+  <div class="form-row"><label class="form-label" id="noteContentLbl">İçerik</label><textarea id="noteContent" rows="5"></textarea><p class="hint" id="noteTypeHint" style="display:none;">Her satır bir madde olur; listede dokunarak işaretlersin.</p></div>
+  <div class="form-row"><label class="form-label">Hatırlatıcı (isteğe bağlı)</label><input type="datetime-local" id="noteReminder"></div>
+  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('noteModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Notes.save()">Kaydet</button></div>
+</div></div>
+
+<div class="modal-overlay" id="addEventModal" onclick="UI.overlayClose(event,'addEventModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title"><svg class="ic" style="color:var(--accent)"><use href="#i-cal"/></svg> Etkinlik Ekle</div>
+  <div class="form-row"><label class="form-label">Başlık *</label><input id="eventTitle"></div>
+  <div class="form-grid"><div><label class="form-label">Tarih *</label><input type="date" id="eventDate"></div><div><label class="form-label">Saat</label><input type="time" id="eventTime"></div></div>
+  <div class="form-grid"><div><label class="form-label">Tür</label><select id="eventType"><option value="event">Etkinlik</option><option value="health">Sağlık / Randevu</option><option value="work">İş</option><option value="special">Özel Gün</option></select></div><div><label class="form-label">Tekrar</label><select id="eventRepeat"><option value="none">Tek seferlik</option><option value="weekly">Her hafta</option><option value="monthly">Her ay</option><option value="yearly">Her yıl</option></select></div></div>
+  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('addEventModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Cal.saveEvent()">Kaydet</button></div>
+</div></div>
+
+<div class="modal-overlay" id="quickModal" onclick="UI.overlayClose(event,'quickModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title" id="quickTitle"></div><div id="quickBody"></div>
+  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('quickModal')">İptal</button><button class="btn btn-primary btn-full" id="quickSaveBtn">Kaydet</button></div>
+</div></div>
+
+<div class="modal-overlay" id="calorieModal" onclick="UI.overlayClose(event,'calorieModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title"><svg class="ic" style="color:var(--gold)"><use href="#i-flame"/></svg> Yemek Ekle</div>
+  <div class="form-grid"><div><label class="form-label">Yemek *</label><input id="calFood"></div><div><label class="form-label">Kalori *</label><input type="number" id="calAmount" inputmode="numeric"></div></div>
+  <div class="chips" id="calChips"></div>
+  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('calorieModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Health.saveCalorie()">Ekle</button></div>
+</div></div>
+
+<div class="modal-overlay" id="aiModal" onclick="UI.overlayClose(event,'aiModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title"><svg class="ic" style="color:var(--accent)"><use href="#i-spark"/></svg> AI Özeti</div>
+  <div id="aiBody" style="font-size:14px;line-height:1.65;color:var(--text);white-space:pre-wrap;"></div>
+  <button class="btn btn-secondary btn-full" onclick="UI.close('aiModal')">Kapat</button>
+</div></div>
+<script>
+'use strict';
+/* ═══════════════ NTRK v2 — Uygulama Çekirdeği ═══════════════
+   Dosya içi modül disiplini: Store, Auth, UI, Router + her sekme kendi nesnesi.
+   Veri: localStorage 'ntrk_data' (v1'den otomatik miras) + IndexedDB 'ntrk-files' (fotoğraf/belge). */
+const APP_VERSION = 'NTRK v2.0 · 2026.07.20';
+
+/* ── Yardımcılar ── */
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const para = (n) => '₺' + Number(n || 0).toLocaleString('tr-TR', { maximumFractionDigits: 0 });
+const para2 = (n) => '₺' + Number(n || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+/* Yerel tarih (UTC hatasız): tek "bugün" tanımı */
+const dstr = (d) => { const x = d instanceof Date ? d : new Date(d); return x.getFullYear() + '-' + String(x.getMonth()+1).padStart(2,'0') + '-' + String(x.getDate()).padStart(2,'0'); };
+const todayStr = () => dstr(new Date());
+const addDays = (dateStr, n) => { const d = new Date(dateStr + 'T12:00:00'); d.setDate(d.getDate() + n); return dstr(d); };
+const addMonths = (dateStr, n) => { const d = new Date(dateStr + 'T12:00:00'); d.setMonth(d.getMonth() + n); return dstr(d); };
+const trDate = (dateStr) => new Date(dateStr + 'T12:00:00').toLocaleDateString('tr-TR', { day:'numeric', month:'long', year:'numeric' });
+const trDateShort = (dateStr) => new Date(dateStr + 'T12:00:00').toLocaleDateString('tr-TR', { day:'numeric', month:'short' });
+const monthKey = (dateStr) => (dateStr || '').slice(0, 7);
+const ageOf = (birth) => { if (!birth) return null; const b = new Date(birth + 'T12:00:00'), n = new Date(); let a = n.getFullYear() - b.getFullYear(); const m = n.getMonth() - b.getMonth(); if (m < 0 || (m === 0 && n.getDate() < b.getDate())) a--; return a; };
+async function sha256(text) { const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)); return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join(''); }
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2200); }
+function haptic() { try { navigator.vibrate && navigator.vibrate(10); } catch (e) {} }
+function fileToDataURL(file) { return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file); }); }
+
+/* ── IndexedDB (fotoğraf/belge deposu — localStorage kota bombası burada söndü) ── */
+const IDB = {
+  _db: null,
+  open() { return new Promise((res, rej) => { if (IDB._db) return res(IDB._db); const rq = indexedDB.open('ntrk-files', 1); rq.onupgradeneeded = () => rq.result.createObjectStore('files'); rq.onsuccess = () => { IDB._db = rq.result; res(IDB._db); }; rq.onerror = () => rej(rq.error); }); },
+  async put(id, dataUrl) { const db = await IDB.open(); return new Promise((res, rej) => { const tx = db.transaction('files', 'readwrite'); tx.objectStore('files').put(dataUrl, id); tx.oncomplete = res; tx.onerror = () => rej(tx.error); }); },
+  async get(id) { const db = await IDB.open(); return new Promise((res, rej) => { const rq = db.transaction('files').objectStore('files').get(id); rq.onsuccess = () => res(rq.result || null); rq.onerror = () => rej(rq.error); }); },
+  async del(id) { const db = await IDB.open(); return new Promise((res, rej) => { const tx = db.transaction('files', 'readwrite'); tx.objectStore('files').delete(id); tx.oncomplete = res; tx.onerror = () => rej(tx.error); }); },
+  async keys() { const db = await IDB.open(); return new Promise((res, rej) => { const rq = db.transaction('files').objectStore('files').getAllKeys(); rq.onsuccess = () => res(rq.result || []); rq.onerror = () => rej(rq.error); }); }
+};
+
+/* ── Store: durum + varsayılanlar + v1 göçü ── */
+const Store = {
+  state: null,
+  defaults() { return {
+    v: 2, members: [], photos: [], familyNotes: [], stocks: [], goldAmount: 0, goldPriceTry: 0,
+    incomes: [], expenses: [], debts: [], notes: [],
+    water: { today: 0, goal: 2500, date: todayStr() }, calories: [], alcohol: [], children: [], smokeQuit: null, events: [],
+    subs: [], budgets: {}, weights: [], meds: [], medsTaken: { date: todayStr(), ids: [] }, bp: [], sleep: [], docs: [],
+    profile: { heightCm: 0 }
+  }; },
+  load() {
+    let raw = {};
+    try { raw = JSON.parse(localStorage.getItem('ntrk_data') || '{}'); } catch (e) { raw = {}; }
+    const d = Store.defaults();
+    for (const k of Object.keys(d)) if (raw[k] === undefined) raw[k] = d[k];
+    if (!raw.water || typeof raw.water !== 'object') raw.water = d.water;
+    if (raw.water.date !== todayStr()) { raw.water.today = 0; raw.water.date = todayStr(); }
+    if (!raw.medsTaken || raw.medsTaken.date !== todayStr()) raw.medsTaken = { date: todayStr(), ids: [] };
+    (raw.notes || []).forEach(n => { if (n.pinned === undefined) n.pinned = false; if (!n.type) n.type = 'text'; });
+    (raw.children || []).forEach(c => { if (!c.growth) c.growth = []; if (!c.vaccines) c.vaccines = []; });
+    Store.state = raw;
+  },
+  save() {
+    try { localStorage.setItem('ntrk_data', JSON.stringify(Store.state)); }
+    catch (e) { toast('Kayıt hatası: depolama dolu olabilir. Ayarlar > Yedek alın!'); }
+  },
+  /* v1 göçü: base64 fotoğraflar localStorage'dan IndexedDB'ye taşınır */
+  async migrate() {
+    const s = Store.state; let moved = 0;
+    for (const p of (s.photos || [])) {
+      if (p.src && !p.idb) { const id = p.id || uid(); await IDB.put('photo-' + id, p.src); p.id = id; p.idb = true; delete p.src; if (!p.date) p.date = todayStr(); moved++; }
+    }
+    if (moved > 0) { Store.save(); console.log('Göç: ' + moved + ' fotoğraf IndexedDB\'ye taşındı'); }
+  }
+};
+const S = () => Store.state;
+
+/* ── UI temel ── */
+const UI = {
+  open(id) { $(id).classList.add('open'); haptic(); },
+  close(id) { $(id).classList.remove('open'); },
+  overlayClose(ev, id) { if (ev.target === ev.currentTarget) UI.close(id); },
+  confirm(msg) { return window.confirm(msg); }
+};
+
+/* ── Router ── */
+const Router = {
+  current: 'sec-home',
+  go(id, btn, title) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    $(id).classList.add('active');
+    Router.current = id;
+    $('topbarTitle').textContent = title || '';
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const navMap = { 'sec-home': 'sec-home', 'sec-calendar': 'sec-calendar', 'sec-finance': 'sec-finance', 'sec-health': 'sec-health', 'sec-notes': 'more', 'sec-family': 'more', 'sec-settings': 'more' };
+    const nav = document.querySelector('.nav-item[data-nav="' + navMap[id] + '"]');
+    if (nav) nav.classList.add('active');
+    window.scrollTo({ top: 0 });
+    const R = { 'sec-home': () => Home.render(), 'sec-calendar': () => Cal.render(), 'sec-finance': () => Fin.render(), 'sec-health': () => Health.render(), 'sec-family': () => Fam.render(), 'sec-notes': () => Notes.render(), 'sec-settings': () => Settings.render() };
+    if (R[id]) R[id]();
+  }
+};
+
+/* ── Auth: düz metin şifreden hash'e otomatik geçiş ── */
+const Auth = {
+  init() {
+    const hasHash = !!localStorage.getItem('ntrk_pass_hash');
+    const hasOld = !!localStorage.getItem('ntrk_pass');
+    if (!hasHash && !hasOld) { $('loginTitle').textContent = 'Hoş Geldin!'; $('loginDesc').textContent = 'Kendine bir şifre belirle'; $('nameFieldWrap').style.display = 'block'; $('setupHint').textContent = 'Şifren yalnızca bu cihazda, özetlenmiş (hash) olarak saklanır.'; Auth.mode = 'setup'; }
+    else Auth.mode = 'login';
+  },
+  async login() {
+    const val = $('loginInput').value;
+    if (!val) return;
+    if (Auth.mode === 'setup') {
+      if (val.length < 4) { Auth.err('Şifre en az 4 karakter olmalı.'); return; }
+      localStorage.setItem('ntrk_pass_hash', await sha256(val));
+      const name = $('nameInput').value.trim(); if (name) localStorage.setItem('ntrk_name', name);
+      Auth.enter(); return;
+    }
+    const hash = localStorage.getItem('ntrk_pass_hash');
+    if (hash) { if (await sha256(val) === hash) Auth.enter(); else Auth.err('Şifre hatalı.'); return; }
+    /* v1 göçü: eski düz metin şifre doğrulanır, hash'lenir, düz metin silinir */
+    const old = localStorage.getItem('ntrk_pass');
+    if (val === old) { localStorage.setItem('ntrk_pass_hash', await sha256(val)); localStorage.removeItem('ntrk_pass'); Auth.enter(); }
+    else Auth.err('Şifre hatalı.');
+  },
+  err(m) { const e = $('loginError'); e.textContent = m; e.style.display = 'block'; },
+  async enter() {
+    $('loginScreen').style.display = 'none'; $('app').style.display = 'block';
+    Store.load(); await Store.migrate();
+    document.body.className = 'theme-' + (localStorage.getItem('ntrk_theme') || 'dark');
+    Home.render(); Notes.scheduleReminders();
+  },
+  async changePass(oldP, newP) {
+    const hash = localStorage.getItem('ntrk_pass_hash');
+    if (await sha256(oldP) !== hash) { toast('Mevcut şifre hatalı'); return false; }
+    if (newP.length < 4) { toast('Yeni şifre en az 4 karakter'); return false; }
+    localStorage.setItem('ntrk_pass_hash', await sha256(newP)); toast('Şifre değiştirildi'); return true;
+  }
+};
+
+/* ═══ Birleşik Etkinlik Kaynağı — Life OS'un kalbi ═══
+   Takvim, doğum günleri, aşılar, taksitler, abonelikler ve not hatırlatıcıları
+   TEK fonksiyondan okunur; veri kopyalanmaz, okuma anında türetilir. */
+const EV_STYLE = {
+  event:   { color: 'var(--accent)', dim: 'var(--accent-dim)', icon: 'i-cal' },
+  health:  { color: 'var(--green)',  dim: 'var(--green-dim)',  icon: 'i-heart' },
+  work:    { color: 'var(--gold)',   dim: 'var(--gold-dim)',   icon: 'i-note' },
+  special: { color: 'var(--violet)', dim: 'var(--violet-dim)', icon: 'i-spark' },
+  bday:    { color: 'var(--violet)', dim: 'var(--violet-dim)', icon: 'i-cake' },
+  vaccine: { color: 'var(--green)',  dim: 'var(--green-dim)',  icon: 'i-syringe' },
+  debt:    { color: 'var(--rose)',   dim: 'var(--rose-dim)',   icon: 'i-wallet' },
+  sub:     { color: 'var(--accent)', dim: 'var(--accent-dim)', icon: 'i-repeat' },
+  note:    { color: 'var(--gold)',   dim: 'var(--gold-dim)',   icon: 'i-bell' }
+};
+function isRecurringOnDate(ev, dateStr) {
+  if (ev.date === dateStr) return true;
+  if (!ev.repeat || ev.repeat === 'none' || ev.date > dateStr) return false;
+  const e = new Date(ev.date + 'T12:00:00'), d = new Date(dateStr + 'T12:00:00');
+  if (ev.repeat === 'weekly') return e.getDay() === d.getDay();
+  if (ev.repeat === 'monthly') return e.getDate() === d.getDate();
+  if (ev.repeat === 'yearly') return e.getDate() === d.getDate() && e.getMonth() === d.getMonth();
+  return false;
+}
+function collectEvents(dateStr) {
+  const s = S(), out = [], [y, mo, dd] = dateStr.split('-');
+  for (const ev of s.events) if (isRecurringOnDate(ev, dateStr)) out.push({ kind: ev.type || 'event', title: ev.title, sub: (ev.time ? ev.time + (ev.repeat && ev.repeat !== 'none' ? ' · tekrarlı' : '') : (ev.repeat && ev.repeat !== 'none' ? 'Tekrarlı' : 'Takvim')), delId: ev.id });
+  const bday = (name, birth, extra) => { if (birth && birth.slice(5) === dateStr.slice(5)) { const age = Number(y) - Number(birth.slice(0, 4)); out.push({ kind: 'bday', title: name + ' — Doğum Günü 🎈', sub: age > 0 ? age + ' yaşına giriyor' : '', }); } };
+  for (const m of s.members) bday(m.name, m.birth);
+  for (const c of s.children) bday(c.name, c.birth);
+  for (const c of s.children) for (const v of c.vaccines) if (v.date === dateStr && v.status !== 'done') out.push({ kind: 'vaccine', title: c.name + ': ' + v.name, sub: 'Planlanan aşı' });
+  for (const n of s.notes) if (n.reminder && n.reminder.slice(0, 10) === dateStr) out.push({ kind: 'note', title: n.title, sub: 'Hatırlatıcı · ' + (n.reminder.slice(11, 16) || '') });
+  for (const dbt of s.debts) {
+    if (dbt.type !== 'borrow' || !dbt.startDate || !dbt.monthly || !dbt.instCount) continue;
+    for (let k = 0; k < dbt.instCount; k++) { const due = addMonths(dbt.startDate, k); if (due === dateStr) out.push({ kind: 'debt', title: 'Taksit: ' + dbt.desc, sub: para(dbt.monthly) + ' · ' + (k + 1) + '/' + dbt.instCount }); if (due > dateStr) break; }
+  }
+  for (const sub of s.subs) if (Number(sub.day) === Number(dd)) out.push({ kind: 'sub', title: sub.name, sub: 'Abonelik ödemesi · ' + para(sub.amount) });
+  return out;
+}
+function evItemHTML(e) {
+  const st = EV_STYLE[e.kind] || EV_STYLE.event;
+  return '<div class="ev-item" style="border-left-color:' + st.color + '"><div class="ev-ic" style="background:' + st.dim + ';color:' + st.color + '"><svg class="ic sm"><use href="#' + st.icon + '"/></svg></div><div class="ev-body"><div class="ev-title">' + esc(e.title) + '</div>' + (e.sub ? '<div class="ev-sub">' + esc(e.sub) + '</div>' : '') + '</div>' + (e.delId ? '<button class="icon-btn del" onclick="Cal.delEvent(\'' + e.delId + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button>' : '') + '</div>';
+}
+
+/* ═══ Ana Sayfa — Asistan Brifingi ═══ */
+const QUOTES = [
+  { t: 'Hayat, onu yaşarken anlaşılmaz; ancak geriye bakınca anlaşılır.', a: 'Kierkegaard' },
+  { t: 'Küçük adımlar, büyük yolculukların başlangıcıdır.', a: 'Lao Tzu' },
+  { t: 'Disiplin, hedefler ile başarı arasındaki köprüdür.', a: 'Jim Rohn' },
+  { t: 'En iyi yatırım, kendine yaptığın yatırımdır.', a: 'Warren Buffett' },
+  { t: 'Bugün yaptıkların, yarının sonuçlarını belirler.', a: 'Mahatma Gandhi' },
+  { t: 'Aile, hayatın fırtınalarına karşı en güvenli limandır.', a: 'Anonim' },
+  { t: 'Sağlık, sahip olduğumuzu unuttuğumuz en büyük servettir.', a: 'Anonim' },
+  { t: 'Zaman, nereye gittiğini bilmeyenler için hiç yetmez.', a: 'Seneca' }
+];
+const Home = {
+  render() {
+    const s = S(), h = new Date().getHours();
+    const name = localStorage.getItem('ntrk_name') || 'Merhaba';
+    const greet = h < 6 ? 'İyi geceler' : h < 12 ? 'Günaydın' : h < 18 ? 'İyi günler' : 'İyi akşamlar';
+    const today = todayStr();
+    const q = QUOTES[new Date().getDate() % QUOTES.length];
+
+    /* Brifing maddeleri (kural bazlı asistan — AI'sız akıl) */
+    const brief = [];
+    const todayEvents = collectEvents(today);
+    if (todayEvents.length) brief.push({ icon: 'i-cal', c: 'accent', txt: '<b>Bugün ' + todayEvents.length + ' kayıt var:</b> ' + esc(todayEvents.slice(0, 3).map(e => e.title).join(', ')) + (todayEvents.length > 3 ? '…' : ''), go: "Router.go('sec-calendar',null,'Takvim')" });
+    for (let i = 1; i <= 7; i++) { const d = addDays(today, i); for (const e of collectEvents(d)) if (e.kind === 'bday') brief.push({ icon: 'i-cake', c: 'violet', txt: '<b>' + esc(e.title.replace(' — Doğum Günü 🎈', '')) + '</b>\'in doğum günü ' + (i === 1 ? 'yarın' : i + ' gün sonra') + ' 🎈', go: "Router.go('sec-calendar',null,'Takvim')" }); }
+    for (let i = 0; i <= 7; i++) { const d = addDays(today, i); for (const e of collectEvents(d)) { if (e.kind === 'debt') brief.push({ icon: 'i-wallet', c: 'rose', txt: '<b>' + esc(e.title.replace('Taksit: ', '')) + '</b> taksiti ' + (i === 0 ? 'bugün' : i === 1 ? 'yarın' : i + ' gün sonra') + ' — ' + esc(e.sub.split(' · ')[0]), go: "Fin.goTab('debt')" }); if (e.kind === 'sub' && i > 0) brief.push({ icon: 'i-repeat', c: 'accent', txt: '<b>' + esc(e.title) + '</b> ödemesi ' + (i === 1 ? 'yarın' : i + ' gün sonra'), go: "Fin.goTab('expense')" }); if (e.kind === 'vaccine' && i > 0) brief.push({ icon: 'i-syringe', c: 'green', txt: esc(e.title) + ' aşısı ' + i + ' gün sonra', go: "Router.go('sec-family',null,'Aile')" }); } }
+    const mNow = monthKey(today), mPrev = monthKey(addMonths(today, -1));
+    const sumM = (arr, mk) => arr.filter(x => monthKey(x.date) === mk).reduce((a, b) => a + Number(b.amount || 0), 0);
+    const expNow = sumM(s.expenses, mNow), expPrev = sumM(s.expenses, mPrev);
+    if (expPrev > 0 && expNow > 0) { const pct = Math.round((expNow - expPrev) / expPrev * 100); if (Math.abs(pct) >= 5) brief.push({ icon: 'i-trend', c: pct > 0 ? 'rose' : 'green', txt: 'Bu ay harcaman geçen aya göre <b>%' + Math.abs(pct) + (pct > 0 ? ' arttı' : ' azaldı') + '</b> (' + para(expNow) + ')', go: "Fin.goTab('overview')" }); }
+    for (const cat of Object.keys(s.budgets)) { const lim = Number(s.budgets[cat]); if (!lim) continue; const spent = s.expenses.filter(x => monthKey(x.date) === mNow && x.cat === cat).reduce((a, b) => a + Number(b.amount), 0); if (spent > lim) brief.push({ icon: 'i-wallet', c: 'rose', txt: '<b>' + esc(cat) + '</b> bütçesi aşıldı: ' + para(spent) + ' / ' + para(lim), go: "Fin.goTab('overview')" }); }
+    if (s.meds.length) { const taken = s.medsTaken.ids.length; brief.push({ icon: 'i-pill', c: taken >= s.meds.length ? 'green' : 'gold', txt: taken >= s.meds.length ? 'Bugünün tüm ilaçları alındı ✓' : '<b>İlaç:</b> bugün ' + taken + '/' + s.meds.length + ' alındı', go: "Health.goTab('meds')" }); }
+    const wPct = Math.round(s.water.today / s.water.goal * 100);
+    if (h >= 14 && wPct < 50) brief.push({ icon: 'i-drop', c: 'accent', txt: 'Su hedefinin sadece <b>%' + wPct + '</b>\'ındasın — bir bardak iyi gider 💧', go: "Health.goTab('water')" });
+    if (!brief.length) brief.push({ icon: 'i-check', c: 'green', txt: 'Her şey yolunda görünüyor. Sakin bir gün ✨', go: '' });
+
+    const colorVar = { accent: 'var(--accent)', green: 'var(--green)', gold: 'var(--gold)', rose: 'var(--rose)', violet: 'var(--violet)' };
+    const dimVar = { accent: 'var(--accent-dim)', green: 'var(--green-dim)', gold: 'var(--gold-dim)', rose: 'var(--rose-dim)', violet: 'var(--violet-dim)' };
+    const briefHTML = brief.slice(0, 6).map(b => '<div class="brief-item" ' + (b.go ? 'style="cursor:pointer" onclick="' + b.go + '"' : '') + '><div class="brief-ic" style="background:' + dimVar[b.c] + ';color:' + colorVar[b.c] + '"><svg class="ic sm"><use href="#' + b.icon + '"/></svg></div><div class="brief-txt">' + b.txt + '</div></div>').join('');
+
+    const assets = Fin.assetsTotal(), debtOpen = Fin.openDebt();
+    const incNow = sumM(s.incomes, mNow);
+    $('sec-home').innerHTML =
+      '<div class="stagger"><div class="hello"><div class="greeting">' + greet + ', <span>' + esc(name) + '</span></div><div class="hello-date">' + new Date().toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long' }) + '</div></div>' +
+      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-spark"/></svg> Günün Brifingi</div>' + briefHTML + '</div>' +
+      '<div class="stats-grid">' +
+        '<div class="stat-card" onclick="Fin.goTab(\'overview\')"><div class="stat-lbl"><svg class="ic" style="color:var(--green)"><use href="#i-trend"/></svg> NET SERVET</div><div class="stat-val num">' + para(assets - debtOpen) + '</div></div>' +
+        '<div class="stat-card" onclick="Fin.goTab(\'overview\')"><div class="stat-lbl"><svg class="ic" style="color:var(--rose)"><use href="#i-wallet"/></svg> BU AY G/G</div><div class="stat-val num" style="font-size:16px;padding-top:4px;"><span style="color:var(--green)">+' + para(incNow) + '</span><br><span style="color:var(--rose)">−' + para(expNow) + '</span></div></div>' +
+        '<div class="stat-card" onclick="Health.goTab(\'water\')"><div class="stat-lbl"><svg class="ic" style="color:var(--accent)"><use href="#i-drop"/></svg> SU</div><div class="stat-val num">' + s.water.today + '<span style="font-size:13px;color:var(--text3)">/' + s.water.goal + '</span></div><div class="progress-track" style="margin-top:8px;"><div class="progress-fill" style="width:' + Math.min(100, wPct) + '%"></div></div></div>' +
+        '<div class="stat-card" onclick="Router.go(\'sec-notes\',null,\'Notlar\')"><div class="stat-lbl"><svg class="ic" style="color:var(--gold)"><use href="#i-note"/></svg> NOTLAR</div><div class="stat-val num">' + s.notes.length + '</div></div>' +
+      '</div>' +
+      '<div class="quote-card"><div class="quote-text">“' + esc(q.t) + '”</div><div class="quote-author">— ' + esc(q.a) + '</div></div>' +
+      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-plus"/></svg> Hızlı Erişim</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">' +
+        '<button class="btn btn-secondary" onclick="Health.addWater(250)"><svg class="ic sm" style="color:var(--accent)"><use href="#i-drop"/></svg> Su +1 Bardak</button>' +
+        '<button class="btn btn-secondary" onclick="Fin.openTx(\'expense\')"><svg class="ic sm" style="color:var(--rose)"><use href="#i-wallet"/></svg> Gider Ekle</button>' +
+        '<button class="btn btn-secondary" onclick="Notes.openAdd()"><svg class="ic sm" style="color:var(--gold)"><use href="#i-note"/></svg> Not Al</button>' +
+        '<button class="btn btn-secondary" onclick="UI.open(\'addEventModal\')"><svg class="ic sm" style="color:var(--green)"><use href="#i-cal"/></svg> Etkinlik</button>' +
+      '</div></div>' +
+      '<p style="text-align:center;font-size:11px;color:var(--text3);margin-top:6px;">' + APP_VERSION + '</p></div>';
+  }
+};
+
+/* ═══ Takvim ═══ */
+const Cal = {
+  cur: new Date(), sel: todayStr(), tab: 'agenda',
+  setTab(t, el) { Cal.tab = t; document.querySelectorAll('#sec-calendar .tab').forEach(x => x.classList.remove('active')); el.classList.add('active'); $('cal-agenda').style.display = t === 'agenda' ? 'block' : 'none'; $('cal-month').style.display = t === 'month' ? 'block' : 'none'; Cal.render(); },
+  render() { if (Cal.tab === 'agenda') Cal.renderAgenda(); else Cal.renderMonth(); },
+  renderAgenda() {
+    let html = '', any = false;
+    for (let i = 0; i < 14; i++) {
+      const d = addDays(todayStr(), i), evs = collectEvents(d);
+      if (!evs.length) continue; any = true;
+      const lbl = i === 0 ? 'Bugün' : i === 1 ? 'Yarın' : new Date(d + 'T12:00:00').toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'short' });
+      html += '<div class="agenda-day' + (i === 0 ? ' today-lbl' : '') + '">' + lbl + '</div>' + evs.map(evItemHTML).join('');
+    }
+    $('cal-agenda').innerHTML = any ? html : '<div class="empty"><svg class="ic"><use href="#i-cal"/></svg><div class="empty-text">Önümüzdeki 14 günde kayıt yok.<br>Doğum günleri, taksitler ve aşılar burada otomatik görünür.</div></div>';
+  },
+  renderMonth() {
+    const y = Cal.cur.getFullYear(), m = Cal.cur.getMonth();
+    $('calMonthTitle').textContent = Cal.cur.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
+    $('calWd').innerHTML = ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'].map(d => '<div class="cal-wd">' + d + '</div>').join('');
+    const first = new Date(y, m, 1); let start = first.getDay() - 1; if (start < 0) start = 6;
+    const days = new Date(y, m + 1, 0).getDate(); let html = '';
+    for (let i = 0; i < start; i++) html += '<div></div>';
+    for (let d = 1; d <= days; d++) {
+      const ds = y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+      const evs = collectEvents(ds);
+      const dots = [...new Set(evs.map(e => (EV_STYLE[e.kind] || EV_STYLE.event).color))].slice(0, 3);
+      html += '<div class="cal-day' + (ds === todayStr() ? ' today' : '') + (ds === Cal.sel ? ' sel' : '') + '" onclick="Cal.selDay(\'' + ds + '\')">' + d + (dots.length ? '<div class="cal-dots">' + dots.map(c => '<span class="cal-dot" style="background:' + c + '"></span>').join('') + '</div>' : '') + '</div>';
+    }
+    $('calGrid').innerHTML = html;
+    $('calDayTitle').textContent = trDate(Cal.sel);
+    const evs = collectEvents(Cal.sel);
+    $('calEventList').innerHTML = evs.length ? evs.map(evItemHTML).join('') : '<div class="empty" style="padding:18px;"><div class="empty-text">Bu günde kayıt yok</div></div>';
+  },
+  selDay(ds) { Cal.sel = ds; Cal.renderMonth(); },
+  prev() { Cal.cur.setMonth(Cal.cur.getMonth() - 1); Cal.renderMonth(); },
+  next() { Cal.cur.setMonth(Cal.cur.getMonth() + 1); Cal.renderMonth(); },
+  saveEvent() {
+    const t = $('eventTitle').value.trim(), d = $('eventDate').value;
+    if (!t || !d) { toast('Başlık ve tarih zorunlu'); return; }
+    S().events.push({ id: uid(), title: t, date: d, time: $('eventTime').value, type: $('eventType').value, repeat: $('eventRepeat').value });
+    Store.save(); UI.close('addEventModal'); $('eventTitle').value = ''; $('eventTime').value = ''; Cal.render(); toast('Etkinlik eklendi'); if (Router.current === 'sec-home') Home.render();
+  },
+  delEvent(id) { if (!UI.confirm('Etkinlik silinsin mi?')) return; S().events = S().events.filter(e => e.id !== id); Store.save(); Cal.render(); }
+};
+
+/* ═══ Global Arama ═══ */
+const Search = {
+  open() { $('searchOverlay').classList.add('open'); setTimeout(() => $('globalSearchInput').focus(), 60); },
+  close() { $('searchOverlay').classList.remove('open'); $('globalSearchInput').value = ''; },
+  run() {
+    const q = $('globalSearchInput').value.trim().toLowerCase();
+    const box = $('searchResults');
+    if (q.length < 2) { box.innerHTML = '<div class="empty"><svg class="ic"><use href="#i-search"/></svg><div class="empty-text">En az 2 harf yaz…</div></div>'; return; }
+    const s = S(), groups = [];
+    const add = (g, title, sub, go) => { let grp = groups.find(x => x.g === g); if (!grp) { grp = { g, items: [] }; groups.push(grp); } if (grp.items.length < 6) grp.items.push({ title, sub, go }); };
+    const hit = (txt) => (txt || '').toLowerCase().includes(q);
+    for (const n of s.notes) if (hit(n.title) || hit(n.content)) add('Notlar', n.title, (n.content || '').slice(0, 60), "Router.go('sec-notes',null,'Notlar')");
+    for (const n of s.familyNotes) if (hit(n.text)) add('Aile Notları', n.text.slice(0, 50), '', "Router.go('sec-family',null,'Aile');Fam.goTab('notes')");
+    for (const m of s.members) if (hit(m.name) || hit(m.note)) add('Aile', m.name, m.role || '', "Router.go('sec-family',null,'Aile')");
+    for (const c of s.children) { if (hit(c.name)) add('Çocuklar', c.name, (ageOf(c.birth) ?? '?') + ' yaşında', "Router.go('sec-family',null,'Aile');Fam.goTab('children')"); for (const v of c.vaccines) if (hit(v.name)) add('Aşılar', c.name + ': ' + v.name, v.date ? trDateShort(v.date) : '', "Router.go('sec-family',null,'Aile');Fam.goTab('children')"); }
+    for (const e of s.events) if (hit(e.title)) add('Takvim', e.title, trDateShort(e.date), "Router.go('sec-calendar',null,'Takvim')");
+    for (const x of s.expenses) if (hit(x.desc) || hit(x.cat)) add('Giderler', x.desc, para(x.amount) + ' · ' + trDateShort(x.date), "Fin.goTab('expense')");
+    for (const x of s.incomes) if (hit(x.desc)) add('Gelirler', x.desc, para(x.amount), "Fin.goTab('income')");
+    for (const d of s.debts) if (hit(d.desc)) add('Borçlar', d.desc, para(d.total), "Fin.goTab('debt')");
+    for (const st of s.stocks) if (hit(st.symbol)) add('Varlıklar', st.symbol, st.qty + ' adet', "Fin.goTab('assets')");
+    for (const p of s.photos) if (hit(p.title)) add('Fotoğraflar', p.title || 'Fotoğraf', p.date ? trDateShort(p.date) : '', "Router.go('sec-family',null,'Aile');Fam.goTab('photos')");
+    for (const dc of s.docs) if (hit(dc.title)) add('Belgeler', dc.title, '', "Router.go('sec-family',null,'Aile');Fam.goTab('docs')");
+    for (const md of s.meds) if (hit(md.name)) add('İlaçlar', md.name, md.dose || '', "Health.goTab('meds')");
+    box.innerHTML = groups.length
+      ? groups.map(g => '<div class="sr-group">' + esc(g.g) + '</div>' + g.items.map(i => '<div class="list-item" style="cursor:pointer" onclick="Search.close();' + i.go + '"><div class="li-left"><div class="li-title">' + esc(i.title) + '</div>' + (i.sub ? '<div class="li-sub">' + esc(i.sub) + '</div>' : '') + '</div><span style="color:var(--text3)">›</span></div>').join('')).join('')
+      : '<div class="empty"><div class="empty-text">"' + esc(q) + '" için sonuç yok</div></div>';
+  }
+};
+
+/* ═══ Finans ═══ */
+const INC_CATS = ['Maaş', 'Kira Geliri', 'Ek İş', 'Yatırım', 'Diğer'];
+const EXP_CATS = ['Market', 'Fatura', 'Yakıt', 'Ulaşım', 'Sağlık', 'Eğitim', 'Giyim', 'Eğlence', 'Restoran', 'Ev', 'Diğer'];
+const PIE_COLORS = ['#818cf8', '#34d399', '#f59e0b', '#f87171', '#c084fc', '#22d3ee', '#fb923c', '#a3e635', '#f472b6', '#94a3b8', '#facc15'];
+const Fin = {
+  tab: 'overview',
+  setTab(t, el) { Fin.tab = t; document.querySelectorAll('#sec-finance .tab').forEach(x => x.classList.remove('active')); if (el) el.classList.add('active'); ['overview', 'income', 'expense', 'debt', 'assets'].forEach(x => $('fin-' + x).style.display = x === t ? 'block' : 'none'); Fin.render(); },
+  goTab(t) { Router.go('sec-finance', null, 'Finans'); const tabs = document.querySelectorAll('#sec-finance .tab'); const idx = { overview: 0, income: 1, expense: 2, debt: 3, assets: 4 }[t] || 0; Fin.setTab(t, tabs[idx]); },
+  assetsTotal() { const s = S(); return (Number(s.goldAmount) || 0) * (Number(s.goldPriceTry) || 0) + s.stocks.reduce((a, st) => a + st.qty * (st.currentPrice || st.buyPrice || 0), 0); },
+  /* Acik borc = odenmemis taksitlerin toplami (odenenler net servetten dusulmez). */
+  openDebt() { return S().debts.filter(d => d.type === 'borrow').reduce((a, d) => {
+    if (d.startDate && d.monthly && d.instCount) { let paid = 0; for (let k = 0; k < d.instCount; k++) if (addMonths(d.startDate, k) <= todayStr()) paid++; return a + Math.max(0, (d.instCount - paid) * Number(d.monthly)); }
+    return a + Number(d.total || 0); }, 0); },
+  render() {
+    const fn = { overview: Fin.renderOverview, income: () => Fin.renderTx('income'), expense: () => Fin.renderTx('expense'), debt: Fin.renderDebts, assets: Fin.renderAssets }[Fin.tab];
+    if (fn) fn();
+  },
+  renderOverview() {
+    const s = S(), mk = monthKey(todayStr());
+    const inc = s.incomes.filter(x => monthKey(x.date) === mk).reduce((a, b) => a + Number(b.amount), 0);
+    const exp = s.expenses.filter(x => monthKey(x.date) === mk).reduce((a, b) => a + Number(b.amount), 0);
+    const subsTotal = s.subs.reduce((a, b) => a + Number(b.amount), 0);
+    const net = inc - exp, save = inc > 0 ? Math.max(0, Math.round(net / inc * 100)) : 0;
+    /* 6 aylık trend */
+    let bars = '', maxV = 1;
+    const months = []; for (let i = 5; i >= 0; i--) { const k = monthKey(addMonths(todayStr(), -i)); const iv = s.incomes.filter(x => monthKey(x.date) === k).reduce((a, b) => a + Number(b.amount), 0); const ev = s.expenses.filter(x => monthKey(x.date) === k).reduce((a, b) => a + Number(b.amount), 0); months.push({ k, iv, ev }); maxV = Math.max(maxV, iv, ev); }
+    bars = months.map(m => '<div class="bar-col"><div class="bar-pair"><span class="bar inc" style="height:' + Math.max(3, m.iv / maxV * 100) + '%"></span><span class="bar exp" style="height:' + Math.max(3, m.ev / maxV * 100) + '%"></span></div><span class="bar-lbl">' + new Date(m.k + '-15').toLocaleDateString('tr-TR', { month: 'short' }) + '</span></div>').join('');
+    /* Kategori pastası */
+    const catSums = {}; s.expenses.filter(x => monthKey(x.date) === mk).forEach(x => { catSums[x.cat || 'Diğer'] = (catSums[x.cat || 'Diğer'] || 0) + Number(x.amount); });
+    const cats = Object.entries(catSums).sort((a, b) => b[1] - a[1]);
+    let pie = '', legend = '', acc = 0;
+    if (exp > 0) { const segs = cats.map(([c, v], i) => { const from = acc / exp * 360; acc += v; const to = acc / exp * 360; return PIE_COLORS[i % PIE_COLORS.length] + ' ' + from.toFixed(1) + 'deg ' + to.toFixed(1) + 'deg'; }); pie = '<div class="pie" style="background:conic-gradient(' + segs.join(',') + ')"></div>'; legend = cats.slice(0, 6).map(([c, v], i) => '<div class="leg-row"><span class="leg-dot" style="background:' + PIE_COLORS[i % PIE_COLORS.length] + '"></span><span class="leg-name">' + esc(c) + '</span><span class="num" style="font-weight:700;font-size:12px;">' + para(v) + '</span></div>').join(''); }
+    /* Bütçeler */
+    const budgetRows = EXP_CATS.map(c => { const lim = Number(s.budgets[c] || 0); const spent = catSums[c] || 0; const pct = lim ? Math.min(100, spent / lim * 100) : 0; return '<div style="margin-bottom:11px;"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:5px;"><span style="font-size:13px;font-weight:600;">' + esc(c) + '</span><span style="display:flex;align-items:center;gap:6px;"><span class="num hint">' + (lim ? para(spent) + ' /' : (spent ? para(spent) : '')) + '</span><input type="number" inputmode="numeric" value="' + (lim || '') + '" placeholder="limit" style="width:86px;padding:5px 8px;font-size:12.5px;" onchange="Fin.setBudget(\'' + c + '\',this.value)"></span></div>' + (lim ? '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%;background:' + (spent > lim ? 'var(--rose)' : 'var(--accent)') + '"></div></div>' : '') + '</div>'; }).join('');
+    $('fin-overview').innerHTML =
+      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-trend"/></svg> Net Servet</div><div class="big-center"><div class="big-num num" style="color:var(--green)">' + para(Fin.assetsTotal() - Fin.openDebt()) + '</div><div class="hint" style="margin-top:6px;">Varlıklar ' + para(Fin.assetsTotal()) + ' − Borçlar ' + para(Fin.openDebt()) + '</div></div></div>' +
+      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-wallet"/></svg> Bu Ay</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center;"><div><div class="hint">GELİR</div><div class="num" style="font-size:17px;font-weight:800;color:var(--green)">' + para(inc) + '</div></div><div><div class="hint">GİDER</div><div class="num" style="font-size:17px;font-weight:800;color:var(--rose)">' + para(exp) + '</div></div><div><div class="hint">NET</div><div class="num" style="font-size:17px;font-weight:800;color:' + (net >= 0 ? 'var(--green)' : 'var(--rose)') + '">' + para(net) + '</div></div></div>' + (inc > 0 ? '<hr><div style="display:flex;justify-content:space-between;font-size:13px;"><span class="hint">Tasarruf oranı</span><b class="num">%' + save + '</b></div>' : '') + (subsTotal ? '<div style="display:flex;justify-content:space-between;font-size:13px;margin-top:6px;"><span class="hint">Sabit aylık ödemeler (' + s.subs.length + ')</span><b class="num">' + para(subsTotal) + '</b></div>' : '') + '</div>' +
+      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-trend"/></svg> 6 Aylık Akış</div><div class="bars">' + bars + '</div><div style="display:flex;gap:14px;justify-content:center;margin-top:10px;font-size:11.5px;color:var(--text2);"><span style="display:flex;align-items:center;gap:5px;"><span class="leg-dot" style="background:var(--green)"></span>Gelir</span><span style="display:flex;align-items:center;gap:5px;"><span class="leg-dot" style="background:var(--rose)"></span>Gider</span></div></div>' +
+      (pie ? '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-wallet"/></svg> Harcama Dağılımı</div><div style="display:flex;gap:16px;align-items:center;">' + pie + '<div class="legend">' + legend + '</div></div></div>' : '') +
+      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-shield"/></svg> Kategori Bütçeleri</div>' + budgetRows + '<p class="hint">Limit girilen kategoriler izlenir; aşım brifinge düşer.</p></div>';
+  },
+  setBudget(cat, val) { const v = Number(val); if (v > 0) S().budgets[cat] = v; else delete S().budgets[cat]; Store.save(); Fin.renderOverview(); },
+  openTx(kind) { $('txType').value = kind; $('txModalTitle').textContent = kind === 'income' ? 'Gelir Ekle' : 'Gider Ekle'; $('txCat').innerHTML = (kind === 'income' ? INC_CATS : EXP_CATS).map(c => '<option>' + c + '</option>').join(''); $('txDesc').value = ''; $('txAmount').value = ''; $('txDate').value = todayStr(); UI.open('txModal'); },
+  saveTx() {
+    const kind = $('txType').value, desc = $('txDesc').value.trim(), amt = Number($('txAmount').value);
+    if (!desc || !amt) { toast('Açıklama ve tutar zorunlu'); return; }
+    S()[kind === 'income' ? 'incomes' : 'expenses'].push({ id: uid(), desc, amount: amt, cat: $('txCat').value, date: $('txDate').value || todayStr() });
+    Store.save(); UI.close('txModal'); toast('Kaydedildi'); Fin.render(); if (Router.current === 'sec-home') Home.render();
+  },
+  delTx(kind, id) { if (!UI.confirm('Kayıt silinsin mi?')) return; const key = kind === 'income' ? 'incomes' : 'expenses'; S()[key] = S()[key].filter(x => x.id !== id); Store.save(); Fin.render(); },
+  renderTx(kind) {
+    const s = S(), key = kind === 'income' ? 'incomes' : 'expenses';
+    const list = [...s[key]].sort((a, b) => b.date.localeCompare(a.date));
+    let subsCard = '';
+    if (kind === 'expense') {
+      subsCard = '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-repeat"/></svg> Abonelikler & Düzenli Ödemeler</div>' +
+        (s.subs.length ? s.subs.map(x => '<div class="list-item"><div class="li-left"><div class="li-title">' + esc(x.name) + '</div><div class="li-sub">Her ayın ' + x.day + '. günü</div></div><div class="li-right"><span class="badge badge-blue num">' + para(x.amount) + '/ay</span><button class="icon-btn del" onclick="Fin.delSub(\'' + x.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></div></div>').join('') : '<p class="hint">Netflix, aidat, internet gibi sabit ödemeleri ekle — ödeme günleri takvimde ve brifingde otomatik görünür.</p>') +
+        '<button class="btn btn-secondary btn-full btn-sm" style="margin-top:8px;" onclick="UI.open(\'subModal\')"><svg class="ic sm"><use href="#i-plus"/></svg> Abonelik Ekle</button></div>';
+    }
+    $('fin-' + kind).innerHTML = subsCard +
+      '<button class="btn ' + (kind === 'income' ? 'btn-success' : 'btn-danger') + ' btn-full" style="margin-bottom:12px;" onclick="Fin.openTx(\'' + kind + '\')"><svg class="ic sm"><use href="#i-plus"/></svg> ' + (kind === 'income' ? 'Gelir' : 'Gider') + ' Ekle</button>' +
+      (list.length ? list.map(x => '<div class="list-item"><div class="li-left"><div class="li-title">' + esc(x.desc) + '</div><div class="li-sub">' + esc(x.cat || '') + ' · ' + trDateShort(x.date) + '</div></div><div class="li-right"><span class="badge ' + (kind === 'income' ? 'badge-green' : 'badge-red') + ' num">' + (kind === 'income' ? '+' : '−') + para(x.amount) + '</span><button class="icon-btn del" onclick="Fin.delTx(\'' + kind + '\',\'' + x.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></div></div>').join('') : '<div class="empty"><svg class="ic"><use href="#i-wallet"/></svg><div class="empty-text">Henüz kayıt yok</div></div>');
+  },
+  saveSub() { const n = $('subName').value.trim(), a = Number($('subAmount').value), d = Math.min(28, Math.max(1, Number($('subDay').value) || 1)); if (!n || !a) { toast('Ad ve tutar zorunlu'); return; } S().subs.push({ id: uid(), name: n, amount: a, day: d }); Store.save(); UI.close('subModal'); $('subName').value = ''; $('subAmount').value = ''; Fin.render(); toast('Abonelik eklendi'); },
+  delSub(id) { S().subs = S().subs.filter(x => x.id !== id); Store.save(); Fin.render(); },
+  debtPreview() { const m = Number($('debtMonthly').value), c = Number($('debtCount').value), st = $('debtStart').value; let t = ''; if (m && c) { t = c + ' taksit × ' + para(m) + ' = ' + para(m * c); if (st) t += ' · Son taksit: ' + trDateShort(addMonths(st, c - 1)); } $('debtPreviewTxt').textContent = t; },
+  saveDebt() {
+    const desc = $('debtDesc').value.trim(), total = Number($('debtTotal').value);
+    if (!desc || !total) { toast('Açıklama ve toplam zorunlu'); return; }
+    S().debts.push({ id: uid(), desc, type: $('debtType').value, total, monthly: Number($('debtMonthly').value) || 0, instCount: Number($('debtCount').value) || 0, startDate: $('debtStart').value || '' });
+    Store.save(); UI.close('debtModal'); ['debtDesc', 'debtTotal', 'debtMonthly', 'debtCount', 'debtStart'].forEach(i => $(i).value = ''); Fin.render(); toast('Kaydedildi');
+  },
+  delDebt(id) { if (!UI.confirm('Silinsin mi?')) return; S().debts = S().debts.filter(x => x.id !== id); Store.save(); Fin.render(); },
+  renderDebts() {
+    const s = S();
+    const row = (d) => { let paid = 0; if (d.startDate && d.monthly && d.instCount) { for (let k = 0; k < d.instCount; k++) if (addMonths(d.startDate, k) <= todayStr()) paid++; } const rem = d.instCount ? d.instCount - paid : 0; return '<div class="list-item"><div class="li-left"><div class="li-title">' + esc(d.desc) + '</div><div class="li-sub">' + (d.monthly ? para(d.monthly) + '/ay' : '') + (d.instCount ? ' · kalan ' + rem + '/' + d.instCount + ' taksit' : '') + '</div></div><div class="li-right"><span class="badge ' + (d.type === 'borrow' ? 'badge-red' : 'badge-green') + ' num">' + para(d.total) + '</span><button class="icon-btn del" onclick="Fin.delDebt(\'' + d.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></div></div>'; };
+    const borrows = s.debts.filter(d => d.type === 'borrow'), lends = s.debts.filter(d => d.type === 'lend');
+    $('fin-debt').innerHTML =
+      '<button class="btn btn-gold btn-full" style="margin-bottom:12px;" onclick="$(\'debtStart\').value=todayStr();UI.open(\'debtModal\')"><svg class="ic sm"><use href="#i-plus"/></svg> Borç / Alacak Ekle</button>' +
+      (borrows.length ? '<div class="card-title" style="margin-bottom:8px;">Borçlarım — kalan ' + para(Fin.openDebt()) + '</div>' + borrows.map(row).join('') : '') +
+      (lends.length ? '<div class="card-title" style="margin:14px 0 8px;">Alacaklarım</div>' + lends.map(row).join('') : '') +
+      (!s.debts.length ? '<div class="empty"><svg class="ic"><use href="#i-wallet"/></svg><div class="empty-text">Borç kaydı yok 🎉<br>Taksitli borçlar takvim ve brifingde otomatik izlenir.</div></div>' : '');
+  },
+  saveGold() { S().goldAmount = Number($('goldAmount').value) || 0; S().goldPriceTry = Number($('goldPrice').value) || 0; Store.save(); UI.close('goldModal'); Fin.render(); toast('Altın güncellendi'); if (Router.current === 'sec-home') Home.render(); },
+  saveStock() {
+    const sym = $('stockSymbol').value.trim().toUpperCase(), qty = Number($('stockQty').value), cur = Number($('stockCur').value);
+    if (!sym || !qty || !cur) { toast('Sembol, adet ve güncel fiyat zorunlu'); return; }
+    S().stocks.push({ id: uid(), symbol: sym, qty, buyPrice: Number($('stockBuy').value) || cur, currentPrice: cur });
+    Store.save(); UI.close('stockModal'); ['stockSymbol', 'stockQty', 'stockBuy', 'stockCur'].forEach(i => $(i).value = ''); Fin.render(); toast('Hisse eklendi');
+  },
+  editStock(id) { const st = S().stocks.find(x => x.id === id); if (!st) return; const v = prompt(st.symbol + ' güncel fiyat (₺):', st.currentPrice); if (v === null) return; st.currentPrice = Number(v) || st.currentPrice; Store.save(); Fin.render(); },
+  delStock(id) { if (!UI.confirm('Hisse silinsin mi?')) return; S().stocks = S().stocks.filter(x => x.id !== id); Store.save(); Fin.render(); },
+  renderAssets() {
+    const s = S(), goldVal = (Number(s.goldAmount) || 0) * (Number(s.goldPriceTry) || 0);
+    $('fin-assets').innerHTML =
+      '<div class="card"><div class="card-title"><svg class="ic" style="color:var(--gold)"><use href="#i-coins"/></svg> Altın</div>' +
+      (s.goldAmount ? '<div style="display:flex;justify-content:space-between;align-items:center;"><div><div class="li-title num">' + s.goldAmount + ' gram</div><div class="li-sub num">Gram: ' + para2(s.goldPriceTry) + '</div></div><div class="badge badge-gold num" style="font-size:15px;padding:8px 14px;">' + para(goldVal) + '</div></div>' : '<p class="hint">Gram miktarını ve güncel gram fiyatını gir.</p>') +
+      '<button class="btn btn-secondary btn-full btn-sm" style="margin-top:10px;" onclick="$(\'goldAmount\').value=S().goldAmount||\'\';$(\'goldPrice\').value=S().goldPriceTry||\'\';UI.open(\'goldModal\')">Düzenle</button></div>' +
+      '<div class="card"><div class="card-title"><svg class="ic" style="color:var(--green)"><use href="#i-trend"/></svg> Hisseler</div>' +
+      (s.stocks.length ? s.stocks.map(st => { const val = st.qty * st.currentPrice, cost = st.qty * st.buyPrice, diff = val - cost; return '<div class="list-item"><div class="li-left"><div class="li-title">' + esc(st.symbol) + '</div><div class="li-sub num">' + st.qty + ' adet · güncel ' + para2(st.currentPrice) + '</div></div><div class="li-right" style="flex-direction:column;align-items:flex-end;gap:3px;"><span class="badge badge-blue num">' + para(val) + '</span>' + (st.buyPrice !== st.currentPrice ? '<span class="num" style="font-size:11px;font-weight:700;color:' + (diff >= 0 ? 'var(--green)' : 'var(--rose)') + '">' + (diff >= 0 ? '+' : '') + para(diff) + '</span>' : '') + '<span style="display:flex;"><button class="icon-btn" style="min-width:32px;min-height:32px;" onclick="Fin.editStock(\'' + st.id + '\')"><svg class="ic sm"><use href="#i-edit"/></svg></button><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="Fin.delStock(\'' + st.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></span></div></div>'; }).join('') : '<p class="hint">Hisselerini ekle; fiyatı dilediğinde kalem ikonuyla güncellersin.</p>') +
+      '<button class="btn btn-secondary btn-full btn-sm" style="margin-top:8px;" onclick="UI.open(\'stockModal\')"><svg class="ic sm"><use href="#i-plus"/></svg> Hisse Ekle</button></div>' +
+      '<div class="card"><div class="big-center"><div class="hint">TOPLAM VARLIK</div><div class="big-num num" style="font-size:36px;color:var(--gold)">' + para(Fin.assetsTotal()) + '</div></div></div>';
+  }
+};
+
+/* ═══ Sağlık ═══ */
+const CAL_CHIPS = [['Mercimek Çorbası',120],['Ezogelin',110],['Pilav',250],['Bulgur',180],['Makarna',320],['Tavuk Döner',420],['Et Döner',500],['Köfte',350],['Tavuk Izgara',200],['Balık',180],['Kuru Fasulye',280],['Nohut',320],['Sarma',280],['Salata',50],['Menemen',200],['Omlet',180],['Yumurta',78],['Peynir 50g',140],['Ekmek dilim',80],['Simit',250],['Poğaça',280],['Börek',320],['Gözleme',350],['Baklava',350],['Künefe',400],['Sütlaç',200],['Çay',5],['Türk Kahvesi',10],['Ayran',60],['Süt',120],['Kola',140],['Elma',80],['Muz',90],['Pizza dilim',280],['Hamburger',500],['Patates Kız.',320],['Çikolata 30g',160]];
+const Health = {
+  tab: 'water',
+  setTab(t, el) { Health.tab = t; document.querySelectorAll('#sec-health .tab').forEach(x => x.classList.remove('active')); if (el) el.classList.add('active'); ['water','weight','meds','bp','sleep','calorie','smoke','alcohol'].forEach(x => $('ht-' + x).style.display = x === t ? 'block' : 'none'); Health.render(); },
+  goTab(t) { Router.go('sec-health', null, 'Sağlık'); const idx = { water:0, weight:1, meds:2, bp:3, sleep:4, calorie:5, smoke:6, alcohol:7 }[t] || 0; Health.setTab(t, document.querySelectorAll('#sec-health .tab')[idx]); },
+  render() { ({ water: Health.rWater, weight: Health.rWeight, meds: Health.rMeds, bp: Health.rBP, sleep: Health.rSleep, calorie: Health.rCal, smoke: Health.rSmoke, alcohol: Health.rAlc }[Health.tab])(); },
+  addWater(ml) { const s = S(); s.water.today += ml; Store.save(); haptic(); if (s.water.today >= s.water.goal && s.water.today - ml < s.water.goal) toast('Su hedefi tamam! 💧🎉'); if (Router.current === 'sec-health') Health.rWater(); if (Router.current === 'sec-home') Home.render(); },
+  rWater() {
+    const w = S().water, pct = Math.min(100, Math.round(w.today / w.goal * 100));
+    $('ht-water').innerHTML = '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-drop"/></svg> Günlük Su</div><div class="big-center"><div class="big-num num" style="color:var(--accent)">' + w.today + '<span style="font-size:16px;color:var(--text3)"> ml</span></div><div class="hint" style="margin-top:5px;">Hedef: ' + w.goal + ' ml · %' + pct + '</div></div><div class="progress-track" style="margin:8px 0 14px;"><div class="progress-fill" style="width:' + pct + '%"></div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;"><button class="btn btn-secondary" onclick="Health.addWater(200)">+200</button><button class="btn btn-primary" onclick="Health.addWater(250)">+1 Bardak</button><button class="btn btn-secondary" onclick="Health.addWater(500)">+500</button></div><hr><div class="form-grid"><div><label class="form-label">Günlük Hedef (ml)</label><input type="number" value="' + w.goal + '" inputmode="numeric" onchange="S().water.goal=Number(this.value)||2500;Store.save();Health.rWater()"></div><div style="display:flex;align-items:flex-end;"><button class="btn btn-danger btn-full" onclick="S().water.today=0;Store.save();Health.rWater()">Sıfırla</button></div></div></div>';
+  },
+  quick(title, bodyHTML, onSave) { $('quickTitle').textContent = title; $('quickBody').innerHTML = bodyHTML; $('quickSaveBtn').onclick = onSave; UI.open('quickModal'); },
+  rWeight() {
+    const s = S(), list = [...s.weights].sort((a, b) => a.date.localeCompare(b.date));
+    const last = list[list.length - 1], h = Number(s.profile.heightCm);
+    const bmi = last && h ? (last.kg / ((h / 100) ** 2)).toFixed(1) : null;
+    const min = Math.min(...list.map(x => x.kg), Infinity), max = Math.max(...list.map(x => x.kg), -Infinity);
+    const spark = list.length > 1 ? '<div class="spark">' + list.slice(-14).map(x => '<i style="height:' + (max > min ? 15 + (x.kg - min) / (max - min) * 85 : 55) + '%"></i>').join('') + '</div>' : '';
+    $('ht-weight').innerHTML = '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-scale"/></svg> Kilo Takibi</div>' + (last ? '<div class="big-center"><div class="big-num num" style="font-size:40px;">' + last.kg + '<span style="font-size:15px;color:var(--text3)"> kg</span></div><div class="hint">' + trDateShort(last.date) + (bmi ? ' · BMI ' + bmi : '') + '</div></div>' + spark : '<p class="hint">İlk kilonu ekle; eğilim grafiği burada oluşur.</p>') + '<button class="btn btn-primary btn-full" style="margin-top:12px;" onclick="Health.quick(\'Kilo Ekle\',\'<div class=form-grid><div><label class=form-label>Tarih</label><input type=date id=qDate value=&quot;\'+todayStr()+\'&quot;></div><div><label class=form-label>Kilo (kg)</label><input type=number step=0.1 id=qKg inputmode=decimal></div></div>\',()=>{const kg=Number($(\'qKg\').value);if(!kg)return;S().weights.push({id:uid(),date:$(\'qDate\').value||todayStr(),kg});Store.save();UI.close(\'quickModal\');Health.rWeight();toast(\'Eklendi\')})"><svg class="ic sm"><use href="#i-plus"/></svg> Kilo Ekle</button></div>' +
+    (list.length ? '<div class="card">' + [...list].reverse().slice(0, 10).map(x => '<div class="vaccine-row"><span style="flex:1;" class="num">' + x.kg + ' kg</span><span class="hint">' + trDateShort(x.date) + '</span><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="S().weights=S().weights.filter(w=>w.id!==\'' + x.id + '\');Store.save();Health.rWeight()"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>').join('') + '</div>' : '');
+  },
+  rMeds() {
+    const s = S(), taken = s.medsTaken.ids;
+    $('ht-meds').innerHTML = '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-pill"/></svg> İlaç & Vitamin — Bugün</div>' +
+      (s.meds.length ? s.meds.map(m => { const ok = taken.includes(m.id); return '<div class="check-line ' + (ok ? 'done' : '') + '" onclick="Health.toggleMed(\'' + m.id + '\')"><span class="check-box"><svg class="ic sm"><use href="#i-check"/></svg></span><span style="flex:1;">' + esc(m.name) + (m.dose ? ' <span class="hint">· ' + esc(m.dose) + '</span>' : '') + '</span><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="event.stopPropagation();if(UI.confirm(\'Silinsin mi?\')){S().meds=S().meds.filter(x=>x.id!==\'' + m.id + '\');Store.save();Health.rMeds()}"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>'; }).join('') : '<p class="hint">Düzenli ilaç/vitaminlerini ekle; her gün dokunarak işaretle, durum brifinge düşer.</p>') +
+      '<button class="btn btn-primary btn-full btn-sm" style="margin-top:10px;" onclick="Health.quick(\'İlaç / Vitamin Ekle\',\'<div class=form-grid><div><label class=form-label>Ad *</label><input id=qName></div><div><label class=form-label>Doz</label><input id=qDose placeholder=&quot;1 tablet, sabah&quot;></div></div>\',()=>{const n=$(\'qName\').value.trim();if(!n)return;S().meds.push({id:uid(),name:n,dose:$(\'qDose\').value.trim()});Store.save();UI.close(\'quickModal\');Health.rMeds();toast(\'Eklendi\')})"><svg class="ic sm"><use href="#i-plus"/></svg> Ekle</button></div>';
+  },
+  toggleMed(id) { const t = S().medsTaken; t.ids.includes(id) ? t.ids = t.ids.filter(x => x !== id) : t.ids.push(id); Store.save(); haptic(); Health.rMeds(); },
+  rBP() {
+    const s = S(), list = [...s.bp].sort((a, b) => b.date.localeCompare(a.date));
+    $('ht-bp').innerHTML = '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-pulse"/></svg> Tansiyon & Nabız</div>' +
+      (list.length ? list.slice(0, 12).map(x => '<div class="vaccine-row"><b class="num" style="font-size:15px;">' + x.sys + '/' + x.dia + '</b><span class="hint num">' + (x.pulse ? x.pulse + ' nb' : '') + '</span><span style="flex:1;"></span><span class="hint">' + trDateShort(x.date) + '</span><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="S().bp=S().bp.filter(b=>b.id!==\'' + x.id + '\');Store.save();Health.rBP()"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>').join('') : '<p class="hint">Ölçümlerini kaydet; kendi ve ailenin takibi için son 12 kayıt listelenir.</p>') +
+      '<button class="btn btn-primary btn-full btn-sm" style="margin-top:10px;" onclick="Health.quick(\'Tansiyon Ekle\',\'<div class=form-grid3><div><label class=form-label>Büyük</label><input type=number id=qSys inputmode=numeric placeholder=120></div><div><label class=form-label>Küçük</label><input type=number id=qDia inputmode=numeric placeholder=80></div><div><label class=form-label>Nabız</label><input type=number id=qPulse inputmode=numeric></div></div>\',()=>{const sy=Number($(\'qSys\').value),di=Number($(\'qDia\').value);if(!sy||!di)return;S().bp.push({id:uid(),date:todayStr(),sys:sy,dia:di,pulse:Number($(\'qPulse\').value)||null});Store.save();UI.close(\'quickModal\');Health.rBP();toast(\'Kaydedildi\')})"><svg class="ic sm"><use href="#i-plus"/></svg> Ölçüm Ekle</button></div>';
+  },
+  rSleep() {
+    const s = S(), list = [...s.sleep].sort((a, b) => b.date.localeCompare(a.date));
+    const dur = (x) => { let mins = (new Date('2000-01-02T' + x.wake) - new Date('2000-01-01T' + x.bed)) / 60000; if (mins > 1440) mins -= 1440; return (mins / 60).toFixed(1); };
+    $('ht-sleep').innerHTML = '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-moon"/></svg> Uyku</div>' +
+      (list.length ? list.slice(0, 10).map(x => '<div class="vaccine-row"><b class="num">' + dur(x) + ' saat</b><span class="hint num">' + x.bed + ' → ' + x.wake + '</span><span style="flex:1;"></span><span class="hint">' + trDateShort(x.date) + '</span><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="S().sleep=S().sleep.filter(b=>b.id!==\'' + x.id + '\');Store.save();Health.rSleep()"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>').join('') : '<p class="hint">Yatış-kalkış saatini gir; süre otomatik hesaplanır.</p>') +
+      '<button class="btn btn-primary btn-full btn-sm" style="margin-top:10px;" onclick="Health.quick(\'Uyku Ekle\',\'<div class=form-grid><div><label class=form-label>Yatış</label><input type=time id=qBed value=23:00></div><div><label class=form-label>Kalkış</label><input type=time id=qWake value=07:00></div></div>\',()=>{S().sleep.push({id:uid(),date:todayStr(),bed:$(\'qBed\').value,wake:$(\'qWake\').value});Store.save();UI.close(\'quickModal\');Health.rSleep();toast(\'Kaydedildi\')})"><svg class="ic sm"><use href="#i-plus"/></svg> Kayıt Ekle</button></div>';
+  },
+  rCal() {
+    const s = S(), today = s.calories.filter(c => c.date === todayStr());
+    const total = today.reduce((a, b) => a + b.amount, 0);
+    if (!$('calChips').innerHTML) $('calChips').innerHTML = CAL_CHIPS.map(([n, k]) => '<span class="chip" onclick="$(\'calFood\').value=\'' + n.replace(/'/g, '') + '\';$(\'calAmount\').value=' + k + '">' + n + ' ' + k + '</span>').join('');
+    $('ht-calorie').innerHTML = '<div class="card"><div class="big-center"><div class="big-num num" style="color:var(--gold);font-size:42px;">' + total + '</div><div class="hint">kcal bugün</div></div><button class="btn btn-primary btn-full" onclick="UI.open(\'calorieModal\')"><svg class="ic sm"><use href="#i-plus"/></svg> Yemek Ekle</button></div>' +
+      (today.length ? '<div class="card">' + [...today].reverse().map(c => '<div class="vaccine-row"><span style="flex:1;">' + esc(c.food) + '</span><span class="badge badge-gold num">' + c.amount + '</span><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="S().calories=S().calories.filter(x=>x.id!==\'' + c.id + '\');Store.save();Health.rCal()"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>').join('') + '</div>' : '');
+  },
+  saveCalorie() { const f = $('calFood').value.trim(), a = Number($('calAmount').value); if (!f || !a) { toast('Yemek ve kalori zorunlu'); return; } S().calories.push({ id: uid(), food: f, amount: a, date: todayStr() }); Store.save(); UI.close('calorieModal'); $('calFood').value = ''; $('calAmount').value = ''; Health.rCal(); },
+  rSmoke() {
+    const s = S(); if (!s.smokeCfg) s.smokeCfg = { pack: 1, price: 90 };
+    let inner;
+    if (!s.smokeQuit) inner = '<p class="hint" style="margin-bottom:10px;">Bıraktığın tarihi gir, sayaç başlasın.</p><input type="date" id="smokeDate" value="' + todayStr() + '"><button class="btn btn-success btn-full" style="margin-top:10px;" onclick="S().smokeQuit=$(\'smokeDate\').value;Store.save();Health.rSmoke()">Başlat</button>';
+    else { const days = Math.max(0, Math.floor((new Date(todayStr() + 'T12:00') - new Date(s.smokeQuit + 'T12:00')) / 86400000)); const save = Math.round(days * s.smokeCfg.pack * s.smokeCfg.price); inner = '<div class="big-center"><div class="big-num num" style="color:var(--green);font-size:56px;">' + days + '</div><div class="hint">gündür sigarasız 🎉</div><div class="num" style="font-size:22px;font-weight:800;color:var(--gold);margin-top:8px;">' + para(save) + ' cepte</div></div><hr><div class="form-grid"><div><label class="form-label">Günlük paket</label><input type="number" step="0.5" value="' + s.smokeCfg.pack + '" onchange="S().smokeCfg.pack=Number(this.value)||1;Store.save();Health.rSmoke()"></div><div><label class="form-label">Paket fiyatı (₺)</label><input type="number" value="' + s.smokeCfg.price + '" onchange="S().smokeCfg.price=Number(this.value)||90;Store.save();Health.rSmoke()"></div></div><button class="btn btn-danger btn-sm btn-full" onclick="if(UI.confirm(\'Sayaç sıfırlansın mı?\')){S().smokeQuit=null;Store.save();Health.rSmoke()}">Sıfırla</button>'; }
+    $('ht-smoke').innerHTML = '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-smoke"/></svg> Sigarasız Günler</div>' + inner + '</div>';
+  },
+  rAlc() {
+    const s = S(), list = [...s.alcohol].sort((a, b) => b.date.localeCompare(a.date));
+    $('ht-alcohol').innerHTML = '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-glass"/></svg> Alkol Kaydı</div>' +
+      (list.length ? list.slice(0, 12).map(a => '<div class="vaccine-row"><span style="flex:1;">' + esc(a.type) + '</span><span class="badge badge-violet num">' + a.qty + ' adet</span><span class="hint">' + trDateShort(a.date) + '</span><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="S().alcohol=S().alcohol.filter(x=>x.id!==\'' + a.id + '\');Store.save();Health.rAlc()"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>').join('') : '<p class="hint">Tüketimini kaydet; ölçülü olan bilir.</p>') +
+      '<button class="btn btn-primary btn-full btn-sm" style="margin-top:10px;" onclick="Health.quick(\'Alkol Kaydı\',\'<div class=form-grid><div><label class=form-label>Tür</label><select id=qType><option>Bira</option><option>Şarap</option><option>Rakı</option><option>Viski</option><option>Kokteyl</option><option>Diğer</option></select></div><div><label class=form-label>Adet</label><input type=number id=qQty value=1 inputmode=numeric></div></div>\',()=>{S().alcohol.push({id:uid(),type:$(\'qType\').value,qty:Number($(\'qQty\').value)||1,date:todayStr()});Store.save();UI.close(\'quickModal\');Health.rAlc();toast(\'Kaydedildi\')})"><svg class="ic sm"><use href="#i-plus"/></svg> Kayıt Ekle</button></div>';
+  }
+};
+
+/* ═══ Aile ═══ */
+const Fam = {
+  tab: 'members',
+  setTab(t, el) { Fam.tab = t; document.querySelectorAll('#sec-family .tab').forEach(x => x.classList.remove('active')); if (el) el.classList.add('active'); ['members','children','photos','docs','notes'].forEach(x => $('fam-' + x).style.display = x === t ? 'block' : 'none'); Fam.render(); },
+  goTab(t) { const idx = { members:0, children:1, photos:2, docs:3, notes:4 }[t] || 0; Fam.setTab(t, document.querySelectorAll('#sec-family .tab')[idx]); },
+  render() { ({ members: Fam.rMembers, children: Fam.rChildren, photos: Fam.rPhotos, docs: Fam.rDocs, notes: Fam.rFamNotes }[Fam.tab])(); },
+  initials(n) { return esc((n || '?').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()); },
+  rMembers() {
+    const s = S();
+    $('fam-members').innerHTML = '<button class="btn btn-primary btn-full" style="margin-bottom:12px;" onclick="Fam.openMember()"><svg class="ic sm"><use href="#i-plus"/></svg> Aile Üyesi Ekle</button>' +
+      (s.members.length ? '<div class="family-grid">' + s.members.map(m => '<div class="family-card" onclick="Fam.openMember(\'' + m.id + '\')"><div class="family-avatar" style="font-weight:800;font-size:17px;">' + Fam.initials(m.name) + '</div><div class="family-name">' + esc(m.name) + '</div><div class="family-role">' + esc(m.role || '') + '</div>' + (m.birth ? '<div class="hint" style="margin-top:3px;">' + (ageOf(m.birth) ?? '') + ' yaş · ' + trDateShort(m.birth) + '</div>' : '') + (m.blood ? '<div class="badge badge-red" style="margin-top:7px;">' + esc(m.blood) + '</div>' : '') + '</div>').join('') + '</div><p class="hint" style="margin-top:10px;">Karta dokun: acil durum bilgileri ve düzenleme. Doğum günleri takvime otomatik düşer.</p>' : '<div class="empty"><svg class="ic"><use href="#i-users"/></svg><div class="empty-text">Aileni ekle — doğum günleri ve acil bilgiler tek yerde</div></div>');
+  },
+  openMember(id) {
+    const m = id ? S().members.find(x => x.id === id) : null;
+    $('memberModalTitle').textContent = m ? m.name : 'Aile Üyesi Ekle';
+    $('memberId').value = m ? m.id : '';
+    $('memberName').value = m ? m.name : ''; $('memberRole').value = m ? m.role : 'Eş'; $('memberBirth').value = m ? (m.birth || '') : '';
+    $('memberBlood').value = m ? (m.blood || '') : ''; $('memberAllergy').value = m ? (m.allergy || '') : ''; $('memberMeds').value = m ? (m.meds || '') : '';
+    $('memberDoctor').value = m ? (m.doctor || '') : ''; $('memberDoctorTel').value = m ? (m.doctorTel || '') : ''; $('memberNote').value = m ? (m.note || '') : '';
+    let del = document.getElementById('memberDelBtn');
+    if (!del) { del = document.createElement('button'); del.id = 'memberDelBtn'; del.className = 'btn btn-danger btn-sm btn-full'; del.innerHTML = 'Üyeyi Sil'; document.querySelector('#memberModal .modal-actions').before(del); }
+    del.style.display = m ? 'block' : 'none';
+    del.onclick = () => { if (UI.confirm(m.name + ' silinsin mi?')) { S().members = S().members.filter(x => x.id !== m.id); Store.save(); UI.close('memberModal'); Fam.rMembers(); } };
+    UI.open('memberModal');
+  },
+  saveMember() {
+    const name = $('memberName').value.trim(); if (!name) { toast('İsim zorunlu'); return; }
+    const data = { name, role: $('memberRole').value, birth: $('memberBirth').value, blood: $('memberBlood').value, allergy: $('memberAllergy').value.trim(), meds: $('memberMeds').value.trim(), doctor: $('memberDoctor').value.trim(), doctorTel: $('memberDoctorTel').value.trim(), note: $('memberNote').value.trim() };
+    const id = $('memberId').value;
+    if (id) Object.assign(S().members.find(x => x.id === id), data);
+    else S().members.push({ id: uid(), ...data });
+    Store.save(); UI.close('memberModal'); Fam.rMembers(); toast('Kaydedildi');
+  },
+  rChildren() {
+    const s = S();
+    $('fam-children').innerHTML = '<button class="btn btn-primary btn-full" style="margin-bottom:12px;" onclick="UI.open(\'childModal\')"><svg class="ic sm"><use href="#i-plus"/></svg> Çocuk Profili Ekle</button>' +
+      (s.children.length ? s.children.map(c => {
+        const g = [...(c.growth || [])].sort((a, b) => a.date.localeCompare(b.date)); const lg = g[g.length - 1];
+        const vhtml = (c.vaccines || []).map(v => '<div class="vaccine-row"><span class="badge ' + (v.status === 'done' ? 'badge-green' : 'badge-gold') + '">' + (v.status === 'done' ? '✓' : '◷') + '</span><span style="flex:1;">' + esc(v.name) + '</span><span class="hint">' + (v.date ? trDateShort(v.date) : '') + '</span><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="Fam.delVaccine(\'' + c.id + '\',\'' + v.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>').join('');
+        return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;"><div><div style="font-size:16px;font-weight:800;">' + esc(c.name) + '</div><div class="hint">' + (c.birth ? (ageOf(c.birth) ?? '?') + ' yaşında · ' + trDate(c.birth) : '') + (lg ? ' · ' + lg.h + ' cm / ' + lg.w + ' kg' : '') + '</div></div><button class="icon-btn del" onclick="if(UI.confirm(\'Profil silinsin mi?\')){S().children=S().children.filter(x=>x.id!==\'' + c.id + '\');Store.save();Fam.rChildren()}"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>' +
+          (vhtml ? '<hr>' + vhtml : '') +
+          '<div style="display:flex;gap:8px;margin-top:12px;"><button class="btn btn-secondary btn-sm" style="flex:1;" onclick="$(\'vaccineChildId\').value=\'' + c.id + '\';$(\'vaccineDate\').value=todayStr();UI.open(\'vaccineModal\')"><svg class="ic sm"><use href="#i-syringe"/></svg> Aşı</button><button class="btn btn-secondary btn-sm" style="flex:1;" onclick="$(\'growthChildId\').value=\'' + c.id + '\';$(\'growthDate\').value=todayStr();UI.open(\'growthModal\')"><svg class="ic sm"><use href="#i-scale"/></svg> Boy/Kilo</button></div></div>';
+      }).join('') : '<div class="empty"><svg class="ic"><use href="#i-baby"/></svg><div class="empty-text">Çocuk profili ekle — aşı takvimi ve gelişim takibi</div></div>');
+  },
+  saveChild() { const n = $('childName').value.trim(), b = $('childBirth').value; if (!n || !b) { toast('İsim ve doğum tarihi zorunlu'); return; } S().children.push({ id: uid(), name: n, birth: b, vaccines: [], growth: [] }); Store.save(); UI.close('childModal'); $('childName').value = ''; Fam.rChildren(); toast('Eklendi'); },
+  saveVaccine() { const cid = $('vaccineChildId').value, n = $('vaccineName').value.trim(); if (!n) { toast('Aşı adı zorunlu'); return; } const c = S().children.find(x => x.id === cid); if (!c) return; c.vaccines.push({ id: uid(), name: n, date: $('vaccineDate').value, status: $('vaccineStatus').value }); Store.save(); UI.close('vaccineModal'); $('vaccineName').value = ''; Fam.rChildren(); toast('Aşı eklendi' + ($('vaccineStatus').value === 'upcoming' ? ' — takvim ve brifingde izlenecek' : '')); },
+  delVaccine(cid, vid) { const c = S().children.find(x => x.id === cid); if (!c) return; c.vaccines = c.vaccines.filter(v => v.id !== vid); Store.save(); Fam.rChildren(); },
+  saveGrowth() { const cid = $('growthChildId').value, c = S().children.find(x => x.id === cid); if (!c) return; const h = Number($('growthH').value), w = Number($('growthW').value); if (!h && !w) { toast('Boy veya kilo gir'); return; } c.growth.push({ id: uid(), date: $('growthDate').value || todayStr(), h, w }); Store.save(); UI.close('growthModal'); Fam.rChildren(); toast('Kaydedildi'); },
+  async savePhoto() {
+    const f = $('photoFile').files[0]; if (!f) { toast('Fotoğraf seç'); return; }
+    const id = uid(); await IDB.put('photo-' + id, await fileToDataURL(f));
+    S().photos.push({ id, title: $('photoTitle').value.trim() || 'Fotoğraf', date: $('photoDate').value || todayStr(), idb: true });
+    Store.save(); UI.close('photoModal'); $('photoTitle').value = ''; $('photoFile').value = ''; Fam.rPhotos(); toast('Fotoğraf eklendi');
+  },
+  async rPhotos() {
+    const s = S(), byMonth = {};
+    [...s.photos].sort((a, b) => (b.date || '').localeCompare(a.date || '')).forEach(p => { const k = monthKey(p.date || '') || 'Tarihsiz'; (byMonth[k] = byMonth[k] || []).push(p); });
+    let html = '<button class="btn btn-primary btn-full" style="margin-bottom:12px;" onclick="$(\'photoDate\').value=todayStr();UI.open(\'photoModal\')"><svg class="ic sm"><use href="#i-plus"/></svg> Fotoğraf Ekle</button>';
+    if (!s.photos.length) html += '<div class="empty"><svg class="ic"><use href="#i-camera"/></svg><div class="empty-text">Aile albümün burada, ay ay zaman çizelgesinde birikir</div></div>';
+    for (const [k, arr] of Object.entries(byMonth)) {
+      html += '<div class="agenda-day">' + (k === 'Tarihsiz' ? k : new Date(k + '-15').toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' })) + '</div><div class="photo-grid" style="margin-bottom:6px;">' + arr.map(p => '<div style="position:relative;border-radius:12px;overflow:hidden;aspect-ratio:1;background:var(--surface2);cursor:pointer;" onclick="Fam.viewFile(\'photo-' + p.id + '\',\'' + esc(p.title).replace(/'/g, '') + '\')"><img id="ph-' + p.id + '" style="width:100%;height:100%;object-fit:cover;" alt=""><button class="icon-btn del" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,.55);min-width:30px;min-height:30px;border-radius:50%;color:#fff;" onclick="event.stopPropagation();Fam.delPhoto(\'' + p.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>').join('') + '</div>';
+    }
+    $('fam-photos').innerHTML = html;
+    for (const p of s.photos) { const el = $('ph-' + p.id); if (el) { const src = await IDB.get('photo-' + p.id); if (src) el.src = src; } }
+  },
+  async delPhoto(id) { if (!UI.confirm('Fotoğraf silinsin mi?')) return; await IDB.del('photo-' + id); S().photos = S().photos.filter(p => p.id !== id); Store.save(); Fam.rPhotos(); },
+  async viewFile(key, title) { const src = await IDB.get(key); if (!src) { toast('Dosya bulunamadı'); return; } $('viewerTitle').textContent = title || ''; $('viewerImg').src = src; UI.open('viewerModal'); },
+  async saveDoc() {
+    const f = $('docFile').files[0], t = $('docTitle').value.trim();
+    if (!f || !t) { toast('Ad ve dosya zorunlu'); return; }
+    const id = uid(); await IDB.put('doc-' + id, await fileToDataURL(f));
+    S().docs.push({ id, title: t, memberId: $('docMember').value, date: todayStr() });
+    Store.save(); UI.close('docModal'); $('docTitle').value = ''; $('docFile').value = ''; Fam.rDocs(); toast('Belge eklendi');
+  },
+  rDocs() {
+    const s = S();
+    $('docMember').innerHTML = '<option value="">Genel</option>' + s.members.map(m => '<option value="' + m.id + '">' + esc(m.name) + '</option>').join('');
+    $('fam-docs').innerHTML = '<button class="btn btn-primary btn-full" style="margin-bottom:12px;" onclick="Fam.rDocs();UI.open(\'docModal\')"><svg class="ic sm"><use href="#i-plus"/></svg> Belge Ekle</button>' +
+      (s.docs.length ? s.docs.map(d => { const m = s.members.find(x => x.id === d.memberId); return '<div class="list-item" style="cursor:pointer;" onclick="Fam.viewFile(\'doc-' + d.id + '\',\'' + esc(d.title).replace(/'/g, '') + '\')"><div class="li-left" style="display:flex;align-items:center;gap:10px;"><svg class="ic" style="color:var(--accent)"><use href="#i-doc"/></svg><div><div class="li-title">' + esc(d.title) + '</div><div class="li-sub">' + (m ? esc(m.name) : 'Genel') + ' · ' + trDateShort(d.date) + '</div></div></div><button class="icon-btn del" onclick="event.stopPropagation();Fam.delDoc(\'' + d.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>'; }).join('') : '<div class="empty"><svg class="ic"><use href="#i-doc"/></svg><div class="empty-text">Kimlik, rapor, karne — önemli belgeler elinin altında</div></div>');
+  },
+  async delDoc(id) { if (!UI.confirm('Belge silinsin mi?')) return; await IDB.del('doc-' + id); S().docs = S().docs.filter(d => d.id !== id); Store.save(); Fam.rDocs(); },
+  saveFamNote() { const t = $('famNoteText').value.trim(); if (!t) return; S().familyNotes.push({ id: uid(), text: t, date: todayStr() }); Store.save(); UI.close('famNoteModal'); $('famNoteText').value = ''; Fam.rFamNotes(); },
+  rFamNotes() {
+    const s = S();
+    $('fam-notes').innerHTML = '<button class="btn btn-primary btn-full" style="margin-bottom:12px;" onclick="UI.open(\'famNoteModal\')"><svg class="ic sm"><use href="#i-plus"/></svg> Aile Notu Ekle</button>' +
+      (s.familyNotes.length ? [...s.familyNotes].reverse().map(n => '<div class="note-card"><div class="nc-preview" style="-webkit-line-clamp:5;color:var(--text);">' + esc(n.text) + '</div><div class="nc-footer"><span class="nc-date">' + trDateShort(n.date) + '</span><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="if(UI.confirm(\'Silinsin mi?\')){S().familyNotes=S().familyNotes.filter(x=>x.id!==\'' + n.id + '\');Store.save();Fam.rFamNotes()}"><svg class="ic sm"><use href="#i-trash"/></svg></button></div></div>').join('') : '<div class="empty"><div class="empty-text">Ortak aile notları burada</div></div>');
+  }
+};
+
+/* ═══ Notlar ═══ */
+const Notes = {
+  activeTag: 'all',
+  openAdd() { Router.current !== 'sec-notes' && Router.go('sec-notes', null, 'Notlar'); $('noteModalTitle').textContent = 'Yeni Not'; $('noteId').value = ''; $('noteTitle').value = ''; $('noteContent').value = ''; $('noteTag').value = 'Genel'; $('noteType').value = 'text'; $('noteReminder').value = ''; Notes.typeHint(); UI.open('noteModal'); },
+  openEdit(id) { const n = S().notes.find(x => x.id === id); if (!n) return; $('noteModalTitle').textContent = 'Notu Düzenle'; $('noteId').value = n.id; $('noteTitle').value = n.title; $('noteContent').value = n.content || ''; $('noteTag').value = n.tag || 'Genel'; $('noteType').value = n.type || 'text'; $('noteReminder').value = n.reminder || ''; Notes.typeHint(); UI.open('noteModal'); },
+  typeHint() { $('noteTypeHint').style.display = $('noteType').value === 'check' ? 'block' : 'none'; },
+  save() {
+    const title = $('noteTitle').value.trim(); if (!title) { toast('Başlık zorunlu'); return; }
+    const data = { title, content: $('noteContent').value, tag: $('noteTag').value, type: $('noteType').value, reminder: $('noteReminder').value, };
+    const id = $('noteId').value;
+    if (id) { const n = S().notes.find(x => x.id === id); Object.assign(n, data); if (data.reminder) n.reminderFired = false; }
+    else S().notes.push({ id: uid(), ...data, date: todayStr(), pinned: false, reminderFired: false });
+    Store.save(); UI.close('noteModal'); Notes.render(); toast('Kaydedildi');
+  },
+  togglePin(id) { const n = S().notes.find(x => x.id === id); n.pinned = !n.pinned; Store.save(); haptic(); Notes.render(); },
+  toggleCheck(id, idx) {
+    const n = S().notes.find(x => x.id === id); if (!n) return;
+    const lines = (n.content || '').split('\n');
+    if (lines[idx] === undefined) return;
+    lines[idx] = lines[idx].startsWith('[x] ') ? lines[idx].slice(4) : '[x] ' + lines[idx];
+    n.content = lines.join('\n'); Store.save(); haptic(); Notes.render();
+  },
+  del(id) { if (!UI.confirm('Not silinsin mi?')) return; S().notes = S().notes.filter(n => n.id !== id); Store.save(); Notes.render(); },
+  render() {
+    const s = S(), q = ($('noteSearch').value || '').toLowerCase();
+    const tags = ['all', ...new Set(s.notes.map(n => n.tag || 'Genel'))];
+    $('noteTabs').innerHTML = tags.map(t => '<div class="tab ' + (t === Notes.activeTag ? 'active' : '') + '" onclick="Notes.activeTag=\'' + t + '\';Notes.render()">' + (t === 'all' ? 'Tümü' : esc(t)) + '</div>').join('');
+    let list = s.notes.filter(n => (Notes.activeTag === 'all' || (n.tag || 'Genel') === Notes.activeTag) && (!q || n.title.toLowerCase().includes(q) || (n.content || '').toLowerCase().includes(q)));
+    list = [...list].sort((a, b) => (b.pinned - a.pinned) || (b.date || '').localeCompare(a.date || ''));
+    $('notesList').innerHTML = list.length ? list.map(n => {
+      let body;
+      if (n.type === 'check') {
+        body = (n.content || '').split('\n').filter(l => l.trim()).map((l, i) => { const done = l.startsWith('[x] '); return '<div class="check-line ' + (done ? 'done' : '') + '" onclick="Notes.toggleCheck(\'' + n.id + '\',' + i + ')"><span class="check-box"><svg class="ic sm"><use href="#i-check"/></svg></span><span>' + esc(done ? l.slice(4) : l) + '</span></div>'; }).join('');
+      } else body = n.content ? '<div class="nc-preview">' + esc(n.content) + '</div>' : '';
+      return '<div class="note-card' + (n.pinned ? ' pinned' : '') + '"><div class="nc-title">' + (n.pinned ? '<svg class="ic sm" style="color:var(--gold)"><use href="#i-pin"/></svg>' : '') + esc(n.title) + '</div>' + body +
+        '<div class="nc-footer"><span class="badge badge-blue">' + esc(n.tag || 'Genel') + '</span>' + (n.reminder ? '<span class="badge badge-violet">⏰ ' + n.reminder.slice(5, 16).replace('T', ' ') + '</span>' : '') + '<span class="nc-date">' + (n.date ? trDateShort(n.date) : '') + '</span>' +
+        '<button class="icon-btn" style="min-width:32px;min-height:32px;" onclick="Notes.togglePin(\'' + n.id + '\')"><svg class="ic sm"><use href="#i-pin"/></svg></button><button class="icon-btn" style="min-width:32px;min-height:32px;" onclick="Notes.openEdit(\'' + n.id + '\')"><svg class="ic sm"><use href="#i-edit"/></svg></button><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="Notes.del(\'' + n.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></div></div>';
+    }).join('') : '<div class="empty"><svg class="ic"><use href="#i-note"/></svg><div class="empty-text">' + (q ? 'Sonuç yok' : 'İlk notunu ekle') + '</div></div>';
+  },
+  scheduleReminders() {
+    if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+    setInterval(() => {
+      const now = new Date();
+      for (const n of S().notes) {
+        if (!n.reminder || n.reminderFired) continue;
+        if (new Date(n.reminder) <= now) { n.reminderFired = true; Store.save(); toast('⏰ ' + n.title); if ('Notification' in window && Notification.permission === 'granted') new Notification('NTRK Hatırlatıcı', { body: n.title }); }
+      }
+    }, 60000);
+  }
+};
+
+/* ═══ Yedekleme ═══ */
+const Backup = {
+  async export() {
+    const files = {};
+    for (const k of await IDB.keys()) files[k] = await IDB.get(k);
+    const data = { app: 'ntrk', backupVersion: 2, exportedAt: new Date().toISOString(), name: localStorage.getItem('ntrk_name') || '', theme: localStorage.getItem('ntrk_theme') || 'dark', state: S(), files };
+    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'ntrk-yedek-' + todayStr() + '.json'; a.click(); URL.revokeObjectURL(a.href);
+    toast('Yedek indirildi — güvenli bir yere kopyala');
+  },
+  async import(file) {
+    if (!file) return;
+    try {
+      const data = JSON.parse(await file.text());
+      if (data.app !== 'ntrk' || !data.state) { toast('Bu bir NTRK yedeği değil'); return; }
+      if (!UI.confirm('Yedek geri yüklenecek ve mevcut verilerin yedektekiyle DEĞİŞTİRİLECEK. Devam edilsin mi?')) return;
+      Store.state = data.state; Store.save();
+      if (data.name) localStorage.setItem('ntrk_name', data.name);
+      if (data.theme) localStorage.setItem('ntrk_theme', data.theme);
+      for (const [k, v] of Object.entries(data.files || {})) await IDB.put(k, v);
+      toast('Geri yüklendi — yenileniyor…'); setTimeout(() => location.reload(), 900);
+    } catch (e) { toast('Dosya okunamadı: geçerli bir yedek değil'); }
+  }
+};
+
+/* ═══ AI (Cloudflare Worker proxy üzerinden — isteğe bağlı) ═══ */
+const AI = {
+  url() { return localStorage.getItem('ntrk_ai_url') || ''; },
+  code() { return localStorage.getItem('ntrk_ai_code') || ''; },
+  async weekly() {
+    if (!AI.url()) { toast('Önce AI proxy adresini kaydet (kurulum: pakietteki worker-ai-proxy.js)'); return; }
+    const s = S(), mk = monthKey(todayStr());
+    const summary = {
+      ay: mk,
+      gelir: s.incomes.filter(x => monthKey(x.date) === mk).reduce((a, b) => a + Number(b.amount), 0),
+      gider: s.expenses.filter(x => monthKey(x.date) === mk).reduce((a, b) => a + Number(b.amount), 0),
+      kategoriler: Object.fromEntries(EXP_CATS.map(c => [c, s.expenses.filter(x => monthKey(x.date) === mk && x.cat === c).reduce((a, b) => a + Number(b.amount), 0)]).filter(([, v]) => v > 0)),
+      borc_toplam: Fin.openDebt(), varlik: Fin.assetsTotal(),
+      su_bugun: s.water.today + '/' + s.water.goal + ' ml',
+      son_kilo: s.weights.length ? [...s.weights].sort((a, b) => a.date.localeCompare(b.date)).slice(-1)[0].kg + ' kg' : null,
+      sigarasiz_gun: s.smokeQuit ? Math.floor((Date.now() - new Date(s.smokeQuit)) / 86400000) : null
+    };
+    $('aiBody').textContent = 'Değerlendiriliyor…'; UI.open('aiModal');
+    try {
+      const r = await fetch(AI.url(), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: AI.code(), prompt: 'Sen kişisel bir yaşam asistanısın. Aşağıdaki aylık veriyi Türkçe, samimi, 5-6 cümlede değerlendir; bir tebrik, bir uyarı, bir öneri ver. Tanı koyma. Veri: ' + JSON.stringify(summary) }) });
+      const d = await r.json();
+      $('aiBody').textContent = d.text || d.error || 'Yanıt alınamadı.';
+    } catch (e) { $('aiBody').textContent = 'Bağlantı hatası: proxy adresini ve internetini kontrol et.'; }
+  }
+};
+
+/* ═══ Ayarlar ═══ */
+const Settings = {
+  render() {
+    const theme = localStorage.getItem('ntrk_theme') || 'dark';
+    const tbtn = (id, name) => '<button class="btn ' + (theme === id ? 'btn-primary' : 'btn-secondary') + '" onclick="localStorage.setItem(\'ntrk_theme\',\'' + id + '\');document.body.className=\'theme-' + id + '\';Settings.render()">' + name + '</button>';
+    $('sec-settings').innerHTML =
+      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-spark"/></svg> Tema</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">' + tbtn('dark', 'Koyu Mor') + tbtn('navy', 'Gece Mavisi') + tbtn('slate', 'Antrasit') + tbtn('light', 'Açık') + '</div></div>' +
+      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-users"/></svg> Profil</div><div class="form-grid"><div><label class="form-label">Adın</label><input id="setName" value="' + esc(localStorage.getItem('ntrk_name') || '') + '"></div><div><label class="form-label">Boy (cm) — BMI için</label><input type="number" id="setHeight" inputmode="numeric" value="' + (S().profile.heightCm || '') + '"></div></div><button class="btn btn-primary btn-full btn-sm" onclick="localStorage.setItem(\'ntrk_name\',$(\'setName\').value.trim());S().profile.heightCm=Number($(\'setHeight\').value)||0;Store.save();toast(\'Kaydedildi\')">Kaydet</button></div>' +
+      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-download"/></svg> Yedekleme</div><p class="hint" style="margin-bottom:10px;">Tüm veriler yalnızca bu cihazda. Düzenli yedek al; yeni cihazda geri yükle, kaldığın yerden devam et. Fotoğraf ve belgeler yedeğe dahildir.</p><button class="btn btn-primary btn-full" onclick="Backup.export()"><svg class="ic sm"><use href="#i-download"/></svg> Yedek Al (JSON)</button><div class="form-row" style="margin-top:10px;"><label class="form-label">Yedeği Geri Yükle</label><input type="file" accept="application/json,.json" onchange="Backup.import(this.files[0])"></div></div>' +
+      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-shield"/></svg> Şifre</div><div class="form-grid"><div><label class="form-label">Mevcut</label><input type="password" id="oldPass"></div><div><label class="form-label">Yeni (min 4)</label><input type="password" id="newPass"></div></div><button class="btn btn-secondary btn-full btn-sm" onclick="Auth.changePass($(\'oldPass\').value,$(\'newPass\').value).then(ok=>{if(ok){$(\'oldPass\').value=\'\';$(\'newPass\').value=\'\'}})">Şifreyi Değiştir</button></div>' +
+      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-spark"/></svg> AI Asistan (isteğe bağlı)</div><p class="hint" style="margin-bottom:10px;">Kendi Cloudflare Worker proxy\'n ile çalışır (paketteki worker-ai-proxy.js dosyasında adım adım kurulum var). Adres boşsa AI kapalıdır; uygulamanın geri kalanı AI\'sız tam çalışır.</p><div class="form-row"><label class="form-label">Worker Adresi</label><input id="aiUrl" placeholder="https://ntrk-ai.hesabin.workers.dev" value="' + esc(AI.url()) + '"></div><div class="form-row"><label class="form-label">Erişim Kodu</label><input id="aiCode" value="' + esc(AI.code()) + '"></div><div style="display:flex;gap:8px;"><button class="btn btn-secondary btn-sm" style="flex:1;" onclick="localStorage.setItem(\'ntrk_ai_url\',$(\'aiUrl\').value.trim());localStorage.setItem(\'ntrk_ai_code\',$(\'aiCode\').value.trim());toast(\'AI ayarları kaydedildi\')">Kaydet</button><button class="btn btn-primary btn-sm" style="flex:1;" onclick="AI.weekly()"><svg class="ic sm"><use href="#i-spark"/></svg> Aylık Özet Al</button></div></div>' +
+      '<div class="card"><div class="card-title" style="color:var(--rose)"><svg class="ic" style="color:var(--rose)"><use href="#i-trash"/></svg> Tehlikeli Alan</div><button class="btn btn-danger btn-full" onclick="if(UI.confirm(\'TÜM veriler kalıcı olarak silinecek. Yedeğin var mı? Emin misin?\')&&UI.confirm(\'Son kez: geri dönüş YOK. Silinsin mi?\')){localStorage.clear();indexedDB.deleteDatabase(\'ntrk-files\');location.reload()}">Tüm Verileri Sil</button></div>' +
+      '<p style="text-align:center;font-size:11.5px;color:var(--text3);margin:14px 0;">' + APP_VERSION + '</p>';
+  }
+};
+
+/* ═══ Başlatma + Service Worker ═══ */
+window.addEventListener('load', () => {
+  document.body.className = 'theme-' + (localStorage.getItem('ntrk_theme') || 'dark');
+  Auth.init();
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').then(reg => {
+      reg.addEventListener('updatefound', () => {
+        const nw = reg.installing;
+        nw && nw.addEventListener('statechange', () => { if (nw.state === 'installed' && navigator.serviceWorker.controller) $('updateBanner').style.display = 'flex'; });
+      });
+    }).catch(() => {});
+  }
+});
+document.addEventListener('change', e => { if (e.target.id === 'noteType') Notes.typeHint(); });
+</script>
+</body>
+</html>
