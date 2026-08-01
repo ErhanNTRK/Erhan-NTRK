@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#06080f">
+<meta name="theme-color" content="#050b16">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="NTRK">
@@ -17,19 +17,21 @@
    Tipografi skalası: 11/13/15/17/22/28. Boşluk: 8pt ızgara.
    Tek vurgu rengi + nötr yüzeyler (Linear/Things ilkesi). */
 :root{
-  --accent:#818cf8;--accent-dim:rgba(129,140,248,.13);
+  --accent:#2dd4bf;--accent-dim:rgba(45,212,191,.14);
   --green:#34d399;--green-dim:rgba(52,211,153,.12);
   --gold:#f59e0b;--gold-dim:rgba(245,158,11,.13);
   --rose:#f87171;--rose-dim:rgba(248,113,113,.12);
-  --violet:#c084fc;--violet-dim:rgba(192,132,252,.12);
+  --violet:#3b82f6;--violet-dim:rgba(59,130,246,.13);
   --cyan:#22d3ee;
   --radius:18px;--radius-sm:12px;--radius-xs:9px;
   --nav-h:60px;
 }
+/* Varsayılan tema — Lacivert / Petrol Mavisi / Turkuaz premium palet */
+body.theme-premium{--bg:#050b16;--surface:#0c1524;--surface2:#101d30;--surface3:#16253c;--border:#182742;--border2:#22375a;--text:#f4f8fc;--text2:#8fa4bc;--text3:#4d6180;--bar:rgba(7,13,24,.92);}
 body.theme-dark{--bg:#06080f;--surface:#0e1521;--surface2:#131d2e;--surface3:#182438;--border:#1a2640;--border2:#243354;--text:#f1f5f9;--text2:#8899aa;--text3:#4a5a72;--bar:rgba(10,15,26,.92);}
 body.theme-navy{--bg:#070b14;--surface:#0f1929;--surface2:#152035;--surface3:#1a2840;--border:#1c2d44;--border2:#26395a;--text:#e8f0fe;--text2:#7a90aa;--text3:#41556e;--bar:rgba(11,18,32,.92);}
 body.theme-slate{--bg:#0f1117;--surface:#1a1f2e;--surface2:#20263a;--surface3:#272e44;--border:#2a334a;--border2:#344060;--text:#e2e8f0;--text2:#8896aa;--text3:#4a5870;--bar:rgba(20,24,32,.92);}
-body.theme-light{--bg:#f2f5f9;--surface:#ffffff;--surface2:#f0f4f8;--surface3:#e6ecf3;--border:#d8e0ea;--border2:#c2cedb;--text:#17202c;--text2:#51606f;--text3:#94a3b3;--bar:rgba(255,255,255,.92);--accent:#5b64e8;--accent-dim:rgba(91,100,232,.10);}
+body.theme-light{--bg:#f2f5f9;--surface:#ffffff;--surface2:#f0f4f8;--surface3:#e6ecf3;--border:#d8e0ea;--border2:#c2cedb;--text:#17202c;--text2:#51606f;--text3:#94a3b3;--bar:rgba(255,255,255,.92);--accent:#0e7490;--accent-dim:rgba(14,116,144,.10);}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html{scroll-behavior:smooth;}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
@@ -37,15 +39,6 @@ button{font-family:inherit;}
 svg.ic{width:20px;height:20px;stroke:currentColor;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
 svg.ic.sm{width:16px;height:16px;}svg.ic.lg{width:24px;height:24px;}
 .num{font-variant-numeric:tabular-nums;}
-
-/* ── Giriş ── */
-#loginScreen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000;flex-direction:column;gap:24px;padding:24px;background-image:radial-gradient(ellipse 70% 45% at 50% -8%,var(--accent-dim) 0%,transparent 70%);}
-.login-logo{font-size:56px;font-weight:900;letter-spacing:-3px;color:var(--accent);line-height:1;}
-.login-tagline{font-family:'Fraunces',serif;font-style:italic;font-size:14px;color:var(--text3);margin-top:6px;text-align:center;}
-.login-box{background:var(--surface);border:1.5px solid var(--border2);border-radius:22px;padding:24px;width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px;box-shadow:0 24px 60px rgba(0,0,0,.35);}
-.login-box h2{font-size:17px;font-weight:700;}
-.login-box p{color:var(--text2);font-size:13px;}
-#loginError{color:var(--rose);font-size:13px;text-align:center;display:none;}
 
 /* ── Form ── */
 input,textarea,select{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:11px 14px;font-family:inherit;font-size:15px;outline:none;transition:border-color .18s,box-shadow .18s;-webkit-appearance:none;}
@@ -77,7 +70,7 @@ input[type="file"]{background:none;border:1.5px dashed var(--border2);padding:14
 .del:hover{color:var(--rose);background:var(--rose-dim);}
 
 /* ── Kabuk ── */
-#app{display:none;padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 12px);}
+#app{display:block;padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 12px);}
 .topbar{position:sticky;top:0;z-index:100;background:var(--bar);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;}
 .topbar-logo{font-size:19px;font-weight:900;letter-spacing:-1px;color:var(--accent);}
 .topbar-title{font-size:15px;font-weight:700;flex:1;text-align:center;color:var(--text2);}
@@ -144,6 +137,18 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0;}
 .stat-lbl .ic{width:14px;height:14px;}
 .stat-val{font-size:21px;font-weight:800;letter-spacing:-.5px;line-height:1;}
 .quote-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:12px;}
+
+/* ── Ana Sayfa: Modül Kartları ── */
+.module-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+.module-card{background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:18px 16px;display:flex;flex-direction:column;gap:12px;cursor:pointer;transition:transform .16s cubic-bezier(.32,.72,0,1),border-color .16s,box-shadow .16s;min-height:118px;}
+.module-card:active{transform:scale(.96);border-color:var(--border2);}
+.module-card.wide{grid-column:1 / -1;flex-direction:row;align-items:center;min-height:auto;}
+.module-icon{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.module-body{display:flex;flex-direction:column;gap:2px;}
+.module-title{font-size:15px;font-weight:700;letter-spacing:-.2px;}
+.module-sub{font-size:12px;color:var(--text2);line-height:1.35;}
+.module-card.soon .module-title{color:var(--text2);}
+.module-badge-soon{font-size:9.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--accent);background:var(--accent-dim);padding:3px 7px;border-radius:99px;align-self:flex-start;}
 .quote-text{font-family:'Fraunces',serif;font-style:italic;font-size:14.5px;font-weight:300;line-height:1.55;}
 .quote-author{font-size:12px;color:var(--accent);font-weight:700;margin-top:8px;}
 
@@ -225,19 +230,7 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0;}
 ::-webkit-scrollbar{width:3px;height:3px;}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;}
 </style>
 </head>
-<body class="theme-dark">
-
-<div id="loginScreen">
-  <div style="text-align:center;"><div class="login-logo">NTRK</div><div class="login-tagline">Kişisel Yaşam Asistanın</div></div>
-  <div class="login-box">
-    <h2 id="loginTitle">Giriş Yap</h2><p id="loginDesc">Şifreni gir</p>
-    <div id="nameFieldWrap" style="display:none;"><label class="form-label">Adın nedir?</label><input type="text" id="nameInput" placeholder="Adınız..."></div>
-    <input type="password" id="loginInput" placeholder="Şifre..." onkeydown="if(event.key==='Enter')Auth.login()">
-    <div id="loginError"></div>
-    <button class="btn btn-primary btn-full" onclick="Auth.login()">Giriş</button>
-    <p id="setupHint" class="hint" style="text-align:center;"></p>
-  </div>
-</div>
+<body class="theme-premium">
 
 <div id="app">
   <div class="topbar">
@@ -309,6 +302,7 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0;}
     <div id="notesList"></div>
   </div>
   <div class="section" id="sec-settings"></div>
+  <div class="section" id="sec-ai"></div>
 
   <div class="bottom-nav">
     <button class="nav-item active" data-nav="sec-home" onclick="Router.go('sec-home',this,'Ana Sayfa')"><svg class="ic"><use href="#i-home"/></svg><span>Ana Sayfa</span></button>
@@ -376,6 +370,7 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0;}
   <div class="more-list">
     <div class="list-item" onclick="UI.close('moreSheet');Router.go('sec-notes',null,'Notlar')"><div class="li-left" style="display:flex;align-items:center;gap:11px;"><svg class="ic" style="color:var(--gold)"><use href="#i-note"/></svg><div><div class="li-title">Notlar</div><div class="li-sub">Notlar, hatırlatıcılar, listeler</div></div></div><span style="color:var(--text3)">›</span></div>
     <div class="list-item" onclick="UI.close('moreSheet');Router.go('sec-family',null,'Aile')"><div class="li-left" style="display:flex;align-items:center;gap:11px;"><svg class="ic" style="color:var(--violet)"><use href="#i-users"/></svg><div><div class="li-title">Aile</div><div class="li-sub">Üyeler, çocuklar, aşılar, belgeler</div></div></div><span style="color:var(--text3)">›</span></div>
+    <div class="list-item" onclick="UI.close('moreSheet');Router.go('sec-ai',null,'Yapay Zeka')"><div class="li-left" style="display:flex;align-items:center;gap:11px;"><svg class="ic" style="color:var(--cyan)"><use href="#i-spark"/></svg><div><div class="li-title">Yapay Zeka</div><div class="li-sub">Kişisel asistan — yakında</div></div></div><span style="color:var(--text3)">›</span></div>
     <div class="list-item" onclick="UI.close('moreSheet');Router.go('sec-settings',null,'Ayarlar')"><div class="li-left" style="display:flex;align-items:center;gap:11px;"><svg class="ic" style="color:var(--text2)"><use href="#i-settings"/></svg><div><div class="li-title">Ayarlar</div><div class="li-sub">Tema, yedekleme, güvenlik, AI</div></div></div><span style="color:var(--text3)">›</span></div>
   </div>
 </div></div>
@@ -536,7 +531,6 @@ const trDate = (dateStr) => new Date(dateStr + 'T12:00:00').toLocaleDateString('
 const trDateShort = (dateStr) => new Date(dateStr + 'T12:00:00').toLocaleDateString('tr-TR', { day:'numeric', month:'short' });
 const monthKey = (dateStr) => (dateStr || '').slice(0, 7);
 const ageOf = (birth) => { if (!birth) return null; const b = new Date(birth + 'T12:00:00'), n = new Date(); let a = n.getFullYear() - b.getFullYear(); const m = n.getMonth() - b.getMonth(); if (m < 0 || (m === 0 && n.getDate() < b.getDate())) a--; return a; };
-async function sha256(text) { const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)); return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join(''); }
 function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2200); }
 function haptic() { try { navigator.vibrate && navigator.vibrate(10); } catch (e) {} }
 function fileToDataURL(file) { return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file); }); }
@@ -605,51 +599,21 @@ const Router = {
     Router.current = id;
     $('topbarTitle').textContent = title || '';
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    const navMap = { 'sec-home': 'sec-home', 'sec-calendar': 'sec-calendar', 'sec-finance': 'sec-finance', 'sec-health': 'sec-health', 'sec-notes': 'more', 'sec-family': 'more', 'sec-settings': 'more' };
+    const navMap = { 'sec-home': 'sec-home', 'sec-calendar': 'sec-calendar', 'sec-finance': 'sec-finance', 'sec-health': 'sec-health', 'sec-notes': 'more', 'sec-family': 'more', 'sec-settings': 'more', 'sec-ai': 'more' };
     const nav = document.querySelector('.nav-item[data-nav="' + navMap[id] + '"]');
     if (nav) nav.classList.add('active');
     window.scrollTo({ top: 0 });
-    const R = { 'sec-home': () => Home.render(), 'sec-calendar': () => Cal.render(), 'sec-finance': () => Fin.render(), 'sec-health': () => Health.render(), 'sec-family': () => Fam.render(), 'sec-notes': () => Notes.render(), 'sec-settings': () => Settings.render() };
+    const R = { 'sec-home': () => Home.render(), 'sec-calendar': () => Cal.render(), 'sec-finance': () => Fin.render(), 'sec-health': () => Health.render(), 'sec-family': () => Fam.render(), 'sec-notes': () => Notes.render(), 'sec-settings': () => Settings.render(), 'sec-ai': () => AI.renderHome() };
     if (R[id]) R[id]();
   }
 };
 
-/* ── Auth: düz metin şifreden hash'e otomatik geçiş ── */
-const Auth = {
-  init() {
-    const hasHash = !!localStorage.getItem('ntrk_pass_hash');
-    const hasOld = !!localStorage.getItem('ntrk_pass');
-    if (!hasHash && !hasOld) { $('loginTitle').textContent = 'Hoş Geldin!'; $('loginDesc').textContent = 'Kendine bir şifre belirle'; $('nameFieldWrap').style.display = 'block'; $('setupHint').textContent = 'Şifren yalnızca bu cihazda, özetlenmiş (hash) olarak saklanır.'; Auth.mode = 'setup'; }
-    else Auth.mode = 'login';
-  },
-  async login() {
-    const val = $('loginInput').value;
-    if (!val) return;
-    if (Auth.mode === 'setup') {
-      if (val.length < 4) { Auth.err('Şifre en az 4 karakter olmalı.'); return; }
-      localStorage.setItem('ntrk_pass_hash', await sha256(val));
-      const name = $('nameInput').value.trim(); if (name) localStorage.setItem('ntrk_name', name);
-      Auth.enter(); return;
-    }
-    const hash = localStorage.getItem('ntrk_pass_hash');
-    if (hash) { if (await sha256(val) === hash) Auth.enter(); else Auth.err('Şifre hatalı.'); return; }
-    /* v1 göçü: eski düz metin şifre doğrulanır, hash'lenir, düz metin silinir */
-    const old = localStorage.getItem('ntrk_pass');
-    if (val === old) { localStorage.setItem('ntrk_pass_hash', await sha256(val)); localStorage.removeItem('ntrk_pass'); Auth.enter(); }
-    else Auth.err('Şifre hatalı.');
-  },
-  err(m) { const e = $('loginError'); e.textContent = m; e.style.display = 'block'; },
+/* ── Boot: uygulama doğrudan açılır, telefon güvenliği yeterlidir ── */
+const Boot = {
   async enter() {
-    $('loginScreen').style.display = 'none'; $('app').style.display = 'block';
     Store.load(); await Store.migrate();
-    document.body.className = 'theme-' + (localStorage.getItem('ntrk_theme') || 'dark');
+    document.body.className = 'theme-' + (localStorage.getItem('ntrk_theme') || 'premium');
     Home.render(); Notes.scheduleReminders();
-  },
-  async changePass(oldP, newP) {
-    const hash = localStorage.getItem('ntrk_pass_hash');
-    if (await sha256(oldP) !== hash) { toast('Mevcut şifre hatalı'); return false; }
-    if (newP.length < 4) { toast('Yeni şifre en az 4 karakter'); return false; }
-    localStorage.setItem('ntrk_pass_hash', await sha256(newP)); toast('Şifre değiştirildi'); return true;
   }
 };
 
@@ -710,49 +674,33 @@ const QUOTES = [
 const Home = {
   render() {
     const s = S(), h = new Date().getHours();
-    const name = localStorage.getItem('ntrk_name') || 'Merhaba';
+    const name = localStorage.getItem('ntrk_name') || '';
     const greet = h < 6 ? 'İyi geceler' : h < 12 ? 'Günaydın' : h < 18 ? 'İyi günler' : 'İyi akşamlar';
     const today = todayStr();
     const q = QUOTES[new Date().getDate() % QUOTES.length];
 
-    /* Brifing maddeleri (kural bazlı asistan — AI'sız akıl) */
-    const brief = [];
+    /* Modül altyazıları için hızlı özet veriler (kural bazlı, AI'sız) */
     const todayEvents = collectEvents(today);
-    if (todayEvents.length) brief.push({ icon: 'i-cal', c: 'accent', txt: '<b>Bugün ' + todayEvents.length + ' kayıt var:</b> ' + esc(todayEvents.slice(0, 3).map(e => e.title).join(', ')) + (todayEvents.length > 3 ? '…' : ''), go: "Router.go('sec-calendar',null,'Takvim')" });
-    for (let i = 1; i <= 7; i++) { const d = addDays(today, i); for (const e of collectEvents(d)) if (e.kind === 'bday') brief.push({ icon: 'i-cake', c: 'violet', txt: '<b>' + esc(e.title.replace(' — Doğum Günü 🎈', '')) + '</b>\'in doğum günü ' + (i === 1 ? 'yarın' : i + ' gün sonra') + ' 🎈', go: "Router.go('sec-calendar',null,'Takvim')" }); }
-    for (let i = 0; i <= 7; i++) { const d = addDays(today, i); for (const e of collectEvents(d)) { if (e.kind === 'debt') brief.push({ icon: 'i-wallet', c: 'rose', txt: '<b>' + esc(e.title.replace('Taksit: ', '')) + '</b> taksiti ' + (i === 0 ? 'bugün' : i === 1 ? 'yarın' : i + ' gün sonra') + ' — ' + esc(e.sub.split(' · ')[0]), go: "Fin.goTab('debt')" }); if (e.kind === 'sub' && i > 0) brief.push({ icon: 'i-repeat', c: 'accent', txt: '<b>' + esc(e.title) + '</b> ödemesi ' + (i === 1 ? 'yarın' : i + ' gün sonra'), go: "Fin.goTab('expense')" }); if (e.kind === 'vaccine' && i > 0) brief.push({ icon: 'i-syringe', c: 'green', txt: esc(e.title) + ' aşısı ' + i + ' gün sonra', go: "Router.go('sec-family',null,'Aile')" }); } }
-    const mNow = monthKey(today), mPrev = monthKey(addMonths(today, -1));
-    const sumM = (arr, mk) => arr.filter(x => monthKey(x.date) === mk).reduce((a, b) => a + Number(b.amount || 0), 0);
-    const expNow = sumM(s.expenses, mNow), expPrev = sumM(s.expenses, mPrev);
-    if (expPrev > 0 && expNow > 0) { const pct = Math.round((expNow - expPrev) / expPrev * 100); if (Math.abs(pct) >= 5) brief.push({ icon: 'i-trend', c: pct > 0 ? 'rose' : 'green', txt: 'Bu ay harcaman geçen aya göre <b>%' + Math.abs(pct) + (pct > 0 ? ' arttı' : ' azaldı') + '</b> (' + para(expNow) + ')', go: "Fin.goTab('overview')" }); }
-    for (const cat of Object.keys(s.budgets)) { const lim = Number(s.budgets[cat]); if (!lim) continue; const spent = s.expenses.filter(x => monthKey(x.date) === mNow && x.cat === cat).reduce((a, b) => a + Number(b.amount), 0); if (spent > lim) brief.push({ icon: 'i-wallet', c: 'rose', txt: '<b>' + esc(cat) + '</b> bütçesi aşıldı: ' + para(spent) + ' / ' + para(lim), go: "Fin.goTab('overview')" }); }
-    if (s.meds.length) { const taken = s.medsTaken.ids.length; brief.push({ icon: 'i-pill', c: taken >= s.meds.length ? 'green' : 'gold', txt: taken >= s.meds.length ? 'Bugünün tüm ilaçları alındı ✓' : '<b>İlaç:</b> bugün ' + taken + '/' + s.meds.length + ' alındı', go: "Health.goTab('meds')" }); }
-    const wPct = Math.round(s.water.today / s.water.goal * 100);
-    if (h >= 14 && wPct < 50) brief.push({ icon: 'i-drop', c: 'accent', txt: 'Su hedefinin sadece <b>%' + wPct + '</b>\'ındasın — bir bardak iyi gider 💧', go: "Health.goTab('water')" });
-    if (!brief.length) brief.push({ icon: 'i-check', c: 'green', txt: 'Her şey yolunda görünüyor. Sakin bir gün ✨', go: '' });
-
-    const colorVar = { accent: 'var(--accent)', green: 'var(--green)', gold: 'var(--gold)', rose: 'var(--rose)', violet: 'var(--violet)' };
-    const dimVar = { accent: 'var(--accent-dim)', green: 'var(--green-dim)', gold: 'var(--gold-dim)', rose: 'var(--rose-dim)', violet: 'var(--violet-dim)' };
-    const briefHTML = brief.slice(0, 6).map(b => '<div class="brief-item" ' + (b.go ? 'style="cursor:pointer" onclick="' + b.go + '"' : '') + '><div class="brief-ic" style="background:' + dimVar[b.c] + ';color:' + colorVar[b.c] + '"><svg class="ic sm"><use href="#' + b.icon + '"/></svg></div><div class="brief-txt">' + b.txt + '</div></div>').join('');
-
+    let nextBday = null;
+    for (let i = 0; i <= 30 && !nextBday; i++) { const d = addDays(today, i); for (const e of collectEvents(d)) if (e.kind === 'bday') { nextBday = { i, e }; break; } }
     const assets = Fin.assetsTotal(), debtOpen = Fin.openDebt();
-    const incNow = sumM(s.incomes, mNow);
+    const netWorth = assets - debtOpen;
+    const wPct = Math.min(100, Math.round((s.water.today / s.water.goal) * 100) || 0);
+
+    const cards = [
+      { id: 'health', emoji: '❤️', color: 'var(--rose)', dim: 'var(--rose-dim)', title: 'Sağlık', sub: 'Su %' + wPct + ' · ' + s.water.today + '/' + s.water.goal + ' ml', go: "Router.go('sec-health',null,'Sağlık')" },
+      { id: 'finance', emoji: '💰', color: 'var(--green)', dim: 'var(--green-dim)', title: 'Finans', sub: 'Net servet ' + para(netWorth), go: "Router.go('sec-finance',null,'Finans')" },
+      { id: 'family', emoji: '👨‍👩‍👧‍👦', color: 'var(--violet)', dim: 'var(--violet-dim)', title: 'Aile', sub: nextBday ? esc(nextBday.e.title.replace(' — Doğum Günü 🎈', '')) + ' doğum günü ' + (nextBday.i === 0 ? 'bugün' : nextBday.i === 1 ? 'yarın' : nextBday.i + ' gün sonra') : (s.members.length ? s.members.length + ' aile üyesi' : 'Üyeler, çocuklar, aşılar'), go: "Router.go('sec-family',null,'Aile')" },
+      { id: 'agenda', emoji: '📅', color: 'var(--accent)', dim: 'var(--accent-dim)', title: 'Ajanda', sub: todayEvents.length ? 'Bugün ' + todayEvents.length + ' kayıt var' : 'Bugün için kayıt yok', go: "Router.go('sec-calendar',null,'Takvim')" },
+      { id: 'docs', emoji: '📂', color: 'var(--gold)', dim: 'var(--gold-dim)', title: 'Belgeler', sub: s.docs.length ? s.docs.length + ' belge kayıtlı' : 'Kimlik, rapor, karne...', go: "Router.go('sec-family',null,'Aile');Fam.goTab('docs')" },
+      { id: 'ai', emoji: '🤖', color: 'var(--cyan)', dim: 'rgba(34,211,238,.13)', title: 'Yapay Zeka', sub: 'Kişisel asistanın — çok yakında', go: "Router.go('sec-ai',null,'Yapay Zeka')" },
+    ];
+    const cardsHTML = cards.map(c => '<div class="module-card" onclick="' + c.go + '"><div class="module-icon" style="background:' + c.dim + '">' + c.emoji + '</div><div class="module-body"><div class="module-title">' + c.title + '</div><div class="module-sub">' + c.sub + '</div></div></div>').join('');
+
     $('sec-home').innerHTML =
-      '<div class="stagger"><div class="hello"><div class="greeting">' + greet + ', <span>' + esc(name) + '</span></div><div class="hello-date">' + new Date().toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long' }) + '</div></div>' +
-      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-spark"/></svg> Günün Brifingi</div>' + briefHTML + '</div>' +
-      '<div class="stats-grid">' +
-        '<div class="stat-card" onclick="Fin.goTab(\'overview\')"><div class="stat-lbl"><svg class="ic" style="color:var(--green)"><use href="#i-trend"/></svg> NET SERVET</div><div class="stat-val num">' + para(assets - debtOpen) + '</div></div>' +
-        '<div class="stat-card" onclick="Fin.goTab(\'overview\')"><div class="stat-lbl"><svg class="ic" style="color:var(--rose)"><use href="#i-wallet"/></svg> BU AY G/G</div><div class="stat-val num" style="font-size:16px;padding-top:4px;"><span style="color:var(--green)">+' + para(incNow) + '</span><br><span style="color:var(--rose)">−' + para(expNow) + '</span></div></div>' +
-        '<div class="stat-card" onclick="Health.goTab(\'water\')"><div class="stat-lbl"><svg class="ic" style="color:var(--accent)"><use href="#i-drop"/></svg> SU</div><div class="stat-val num">' + s.water.today + '<span style="font-size:13px;color:var(--text3)">/' + s.water.goal + '</span></div><div class="progress-track" style="margin-top:8px;"><div class="progress-fill" style="width:' + Math.min(100, wPct) + '%"></div></div></div>' +
-        '<div class="stat-card" onclick="Router.go(\'sec-notes\',null,\'Notlar\')"><div class="stat-lbl"><svg class="ic" style="color:var(--gold)"><use href="#i-note"/></svg> NOTLAR</div><div class="stat-val num">' + s.notes.length + '</div></div>' +
-      '</div>' +
+      '<div class="stagger"><div class="hello"><div class="greeting">' + greet + (name ? ', <span>' + esc(name) + '</span>' : '') + '</div><div class="hello-date">' + new Date().toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long' }) + '</div></div>' +
+      '<div class="module-grid">' + cardsHTML + '</div>' +
       '<div class="quote-card"><div class="quote-text">“' + esc(q.t) + '”</div><div class="quote-author">— ' + esc(q.a) + '</div></div>' +
-      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-plus"/></svg> Hızlı Erişim</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">' +
-        '<button class="btn btn-secondary" onclick="Health.addWater(250)"><svg class="ic sm" style="color:var(--accent)"><use href="#i-drop"/></svg> Su +1 Bardak</button>' +
-        '<button class="btn btn-secondary" onclick="Fin.openTx(\'expense\')"><svg class="ic sm" style="color:var(--rose)"><use href="#i-wallet"/></svg> Gider Ekle</button>' +
-        '<button class="btn btn-secondary" onclick="Notes.openAdd()"><svg class="ic sm" style="color:var(--gold)"><use href="#i-note"/></svg> Not Al</button>' +
-        '<button class="btn btn-secondary" onclick="UI.open(\'addEventModal\')"><svg class="ic sm" style="color:var(--green)"><use href="#i-cal"/></svg> Etkinlik</button>' +
-      '</div></div>' +
       '<p style="text-align:center;font-size:11px;color:var(--text3);margin-top:6px;">' + APP_VERSION + '</p></div>';
   }
 };
@@ -834,7 +782,7 @@ const Search = {
 /* ═══ Finans ═══ */
 const INC_CATS = ['Maaş', 'Kira Geliri', 'Ek İş', 'Yatırım', 'Diğer'];
 const EXP_CATS = ['Market', 'Fatura', 'Yakıt', 'Ulaşım', 'Sağlık', 'Eğitim', 'Giyim', 'Eğlence', 'Restoran', 'Ev', 'Diğer'];
-const PIE_COLORS = ['#818cf8', '#34d399', '#f59e0b', '#f87171', '#c084fc', '#22d3ee', '#fb923c', '#a3e635', '#f472b6', '#94a3b8', '#facc15'];
+const PIE_COLORS = ['#2dd4bf', '#34d399', '#f59e0b', '#f87171', '#3b82f6', '#22d3ee', '#fb923c', '#a3e635', '#f472b6', '#94a3b8', '#facc15'];
 const Fin = {
   tab: 'overview',
   setTab(t, el) { Fin.tab = t; document.querySelectorAll('#sec-finance .tab').forEach(x => x.classList.remove('active')); if (el) el.classList.add('active'); ['overview', 'income', 'expense', 'debt', 'assets'].forEach(x => $('fin-' + x).style.display = x === t ? 'block' : 'none'); Fin.render(); },
@@ -1171,6 +1119,16 @@ const Backup = {
 const AI = {
   url() { return localStorage.getItem('ntrk_ai_url') || ''; },
   code() { return localStorage.getItem('ntrk_ai_code') || ''; },
+  renderHome() {
+    $('sec-ai').innerHTML =
+      '<div class="card" style="text-align:center;padding:32px 20px;">' +
+        '<div style="font-size:40px;margin-bottom:10px;">🤖</div>' +
+        '<div class="card-title" style="justify-content:center;">Yapay Zeka Asistanı</div>' +
+        '<p class="hint" style="margin-top:8px;">Bu modül geliştirme aşamasında. Yakında tüm hayatını (finans, sağlık, aile, ajanda) tek yerden analiz eden, sana özel öneriler sunan bir AI asistan burada olacak.</p>' +
+        '<span class="module-badge-soon" style="margin:14px auto 0;">Çok Yakında</span>' +
+      '</div>' +
+      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-spark"/></svg> Şimdiden Deneyebilirsin</div><p class="hint" style="margin-bottom:10px;">Kendi Cloudflare Worker proxy\'ni bağlayarak aylık finans/sağlık özetini AI ile değerlendirebilirsin.</p><button class="btn btn-primary btn-full" onclick="AI.weekly()"><svg class="ic sm"><use href="#i-spark"/></svg> Aylık Özet Al</button><button class="btn btn-secondary btn-full" style="margin-top:8px;" onclick="Router.go(\'sec-settings\',null,\'Ayarlar\')">AI Bağlantısını Ayarla</button></div>';
+  },
   async weekly() {
     if (!AI.url()) { toast('Önce AI proxy adresini kaydet (kurulum: pakietteki worker-ai-proxy.js)'); return; }
     const s = S(), mk = monthKey(todayStr());
@@ -1196,13 +1154,13 @@ const AI = {
 /* ═══ Ayarlar ═══ */
 const Settings = {
   render() {
-    const theme = localStorage.getItem('ntrk_theme') || 'dark';
+    const theme = localStorage.getItem('ntrk_theme') || 'premium';
     const tbtn = (id, name) => '<button class="btn ' + (theme === id ? 'btn-primary' : 'btn-secondary') + '" onclick="localStorage.setItem(\'ntrk_theme\',\'' + id + '\');document.body.className=\'theme-' + id + '\';Settings.render()">' + name + '</button>';
     $('sec-settings').innerHTML =
-      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-spark"/></svg> Tema</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">' + tbtn('dark', 'Koyu Mor') + tbtn('navy', 'Gece Mavisi') + tbtn('slate', 'Antrasit') + tbtn('light', 'Açık') + '</div></div>' +
+      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-spark"/></svg> Tema</div><p class="hint" style="margin-bottom:10px;">Uygulama teması istediğin zaman değiştirilebilir.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">' + tbtn('premium', 'Lacivert (Premium)') + tbtn('slate', 'Antrasit') + tbtn('navy', 'Gece Mavisi') + tbtn('light', 'Açık') + '</div></div>' +
       '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-users"/></svg> Profil</div><div class="form-grid"><div><label class="form-label">Adın</label><input id="setName" value="' + esc(localStorage.getItem('ntrk_name') || '') + '"></div><div><label class="form-label">Boy (cm) — BMI için</label><input type="number" id="setHeight" inputmode="numeric" value="' + (S().profile.heightCm || '') + '"></div></div><button class="btn btn-primary btn-full btn-sm" onclick="localStorage.setItem(\'ntrk_name\',$(\'setName\').value.trim());S().profile.heightCm=Number($(\'setHeight\').value)||0;Store.save();toast(\'Kaydedildi\')">Kaydet</button></div>' +
       '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-download"/></svg> Yedekleme</div><p class="hint" style="margin-bottom:10px;">Tüm veriler yalnızca bu cihazda. Düzenli yedek al; yeni cihazda geri yükle, kaldığın yerden devam et. Fotoğraf ve belgeler yedeğe dahildir.</p><button class="btn btn-primary btn-full" onclick="Backup.export()"><svg class="ic sm"><use href="#i-download"/></svg> Yedek Al (JSON)</button><div class="form-row" style="margin-top:10px;"><label class="form-label">Yedeği Geri Yükle</label><input type="file" accept="application/json,.json" onchange="Backup.import(this.files[0])"></div></div>' +
-      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-shield"/></svg> Şifre</div><div class="form-grid"><div><label class="form-label">Mevcut</label><input type="password" id="oldPass"></div><div><label class="form-label">Yeni (min 4)</label><input type="password" id="newPass"></div></div><button class="btn btn-secondary btn-full btn-sm" onclick="Auth.changePass($(\'oldPass\').value,$(\'newPass\').value).then(ok=>{if(ok){$(\'oldPass\').value=\'\';$(\'newPass\').value=\'\'}})">Şifreyi Değiştir</button></div>' +
+      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-shield"/></svg> Gizlilik</div><p class="hint">Uygulamada ayrı bir giriş şifresi yok — cihazının kendi kilidi (PIN, Face ID, parmak izi) yeterli güvenliği sağlar. Tüm veriler yalnızca bu cihazda saklanır.</p></div>' +
       '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-spark"/></svg> AI Asistan (isteğe bağlı)</div><p class="hint" style="margin-bottom:10px;">Kendi Cloudflare Worker proxy\'n ile çalışır (paketteki worker-ai-proxy.js dosyasında adım adım kurulum var). Adres boşsa AI kapalıdır; uygulamanın geri kalanı AI\'sız tam çalışır.</p><div class="form-row"><label class="form-label">Worker Adresi</label><input id="aiUrl" placeholder="https://ntrk-ai.hesabin.workers.dev" value="' + esc(AI.url()) + '"></div><div class="form-row"><label class="form-label">Erişim Kodu</label><input id="aiCode" value="' + esc(AI.code()) + '"></div><div style="display:flex;gap:8px;"><button class="btn btn-secondary btn-sm" style="flex:1;" onclick="localStorage.setItem(\'ntrk_ai_url\',$(\'aiUrl\').value.trim());localStorage.setItem(\'ntrk_ai_code\',$(\'aiCode\').value.trim());toast(\'AI ayarları kaydedildi\')">Kaydet</button><button class="btn btn-primary btn-sm" style="flex:1;" onclick="AI.weekly()"><svg class="ic sm"><use href="#i-spark"/></svg> Aylık Özet Al</button></div></div>' +
       '<div class="card"><div class="card-title" style="color:var(--rose)"><svg class="ic" style="color:var(--rose)"><use href="#i-trash"/></svg> Tehlikeli Alan</div><button class="btn btn-danger btn-full" onclick="if(UI.confirm(\'TÜM veriler kalıcı olarak silinecek. Yedeğin var mı? Emin misin?\')&&UI.confirm(\'Son kez: geri dönüş YOK. Silinsin mi?\')){localStorage.clear();indexedDB.deleteDatabase(\'ntrk-files\');location.reload()}">Tüm Verileri Sil</button></div>' +
       '<p style="text-align:center;font-size:11.5px;color:var(--text3);margin:14px 0;">' + APP_VERSION + '</p>';
@@ -1211,8 +1169,8 @@ const Settings = {
 
 /* ═══ Başlatma + Service Worker ═══ */
 window.addEventListener('load', () => {
-  document.body.className = 'theme-' + (localStorage.getItem('ntrk_theme') || 'dark');
-  Auth.init();
+  document.body.className = 'theme-' + (localStorage.getItem('ntrk_theme') || 'premium');
+  Boot.enter();
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').then(reg => {
       reg.addEventListener('updatefound', () => {
