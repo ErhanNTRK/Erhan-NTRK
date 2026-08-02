@@ -256,16 +256,18 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0;}
   <div class="section" id="sec-finance">
     <div class="tabs">
       <div class="tab active" onclick="Fin.setTab('overview',this)">Genel</div>
-      <div class="tab" onclick="Fin.setTab('income',this)">Gelir</div>
-      <div class="tab" onclick="Fin.setTab('expense',this)">Gider</div>
-      <div class="tab" onclick="Fin.setTab('debt',this)">Borç</div>
-      <div class="tab" onclick="Fin.setTab('assets',this)">Varlık</div>
+      <div class="tab" onclick="Fin.setTab('assets',this)">Varlıklar</div>
+      <div class="tab" onclick="Fin.setTab('debt',this)">Borçlar</div>
+      <div class="tab" onclick="Fin.setTab('income',this)">Gelirler</div>
+      <div class="tab" onclick="Fin.setTab('expense',this)">Giderler</div>
+      <div class="tab" onclick="Fin.setTab('payments',this)">Ödemeler</div>
     </div>
     <div id="fin-overview"></div>
+    <div id="fin-assets" style="display:none;"></div>
+    <div id="fin-debt" style="display:none;"></div>
     <div id="fin-income" style="display:none;"></div>
     <div id="fin-expense" style="display:none;"></div>
-    <div id="fin-debt" style="display:none;"></div>
-    <div id="fin-assets" style="display:none;"></div>
+    <div id="fin-payments" style="display:none;"></div>
   </div>
   <div class="section" id="sec-health">
     <div class="tabs">
@@ -446,32 +448,33 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0;}
 <div class="modal-overlay" id="debtModal" onclick="UI.overlayClose(event,'debtModal')"><div class="modal"><div class="modal-handle"></div>
   <div class="modal-title">Borç / Alacak</div>
   <div class="form-row"><label class="form-label">Açıklama *</label><input id="debtDesc" placeholder="Konut kredisi, Ali'ye borç..."></div>
-  <div class="form-grid"><div><label class="form-label">Tür</label><select id="debtType"><option value="borrow">Borcum var</option><option value="lend">Alacağım var</option></select></div><div><label class="form-label">Toplam (₺) *</label><input type="number" id="debtTotal" inputmode="decimal"></div></div>
+  <div class="form-grid"><div><label class="form-label">Tür</label><select id="debtType"><option value="borrow">Borcum var</option><option value="lend">Alacağım var</option></select></div><div><label class="form-label">Kategori</label><select id="debtCat"></select></div></div>
+  <div class="form-row"><label class="form-label">Toplam (₺) *</label><input type="number" id="debtTotal" inputmode="decimal"></div>
   <div class="form-grid3"><div><label class="form-label">Aylık Taksit</label><input type="number" id="debtMonthly" inputmode="decimal" oninput="Fin.debtPreview()"></div><div><label class="form-label">Taksit Sayısı</label><input type="number" id="debtCount" inputmode="numeric" oninput="Fin.debtPreview()"></div><div><label class="form-label">İlk Taksit</label><input type="date" id="debtStart" oninput="Fin.debtPreview()"></div></div>
   <p class="hint" id="debtPreviewTxt"></p>
   <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('debtModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fin.saveDebt()">Kaydet</button></div>
 </div></div>
 
-<div class="modal-overlay" id="subModal" onclick="UI.overlayClose(event,'subModal')"><div class="modal"><div class="modal-handle"></div>
-  <div class="modal-title"><svg class="ic" style="color:var(--accent)"><use href="#i-repeat"/></svg> Abonelik / Düzenli Ödeme</div>
-  <div class="form-row"><label class="form-label">Ad *</label><input id="subName" placeholder="Netflix, aidat, internet..."></div>
-  <div class="form-grid"><div><label class="form-label">Aylık Tutar (₺) *</label><input type="number" step="0.01" id="subAmount" inputmode="decimal"></div><div><label class="form-label">Ödeme Günü (1-28)</label><input type="number" min="1" max="28" id="subDay" inputmode="numeric" value="1"></div></div>
-  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('subModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fin.saveSub()">Kaydet</button></div>
+<div class="modal-overlay" id="assetModal" onclick="UI.overlayClose(event,'assetModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title" id="assetModalTitle"><svg class="ic" style="color:var(--gold)"><use href="#i-coins"/></svg> Varlık</div>
+  <div class="form-grid"><div><label class="form-label">Kategori *</label><select id="assetCat"></select></div><div><label class="form-label">Ad *</label><input id="assetName" placeholder="Vadesiz TL, THYAO, Merkez Daire..."></div></div>
+  <div class="form-grid"><div><label class="form-label">Platform / Banka</label><select id="assetPlatform" onchange="Fin.platformChange()"></select></div><div><label class="form-label">Adet</label><input type="number" step="0.01" id="assetQty" inputmode="decimal" placeholder="Opsiyonel"></div></div>
+  <div class="form-grid"><div><label class="form-label">Tutar (Toplam Değer) *</label><input type="number" step="0.01" id="assetAmount" inputmode="decimal"></div><div><label class="form-label">Para Birimi</label><select id="assetCurrency"></select></div></div>
+  <div class="form-row"><label class="form-label">Not</label><input id="assetNote" placeholder="Opsiyonel"></div>
+  <p class="hint">Tutar alanına güncel toplam değeri (TL karşılığı önerilir) gir; fiyat değiştikçe kalem ikonuyla güncellersin.</p>
+  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('assetModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fin.saveAsset()">Kaydet</button></div>
 </div></div>
 
-<div class="modal-overlay" id="stockModal" onclick="UI.overlayClose(event,'stockModal')"><div class="modal"><div class="modal-handle"></div>
-  <div class="modal-title"><svg class="ic" style="color:var(--green)"><use href="#i-trend"/></svg> Hisse Ekle</div>
-  <div class="form-grid"><div><label class="form-label">Sembol *</label><input id="stockSymbol" placeholder="THYAO" style="text-transform:uppercase"></div><div><label class="form-label">Adet *</label><input type="number" id="stockQty" inputmode="decimal"></div></div>
-  <div class="form-grid"><div><label class="form-label">Alış Fiyatı (₺)</label><input type="number" step="0.01" id="stockBuy" inputmode="decimal"></div><div><label class="form-label">Güncel Fiyat (₺) *</label><input type="number" step="0.01" id="stockCur" inputmode="decimal"></div></div>
-  <p class="hint">Fiyatı elle güncellersin; kart üzerindeki düzenle ile her an değiştirilebilir.</p>
-  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('stockModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fin.saveStock()">Kaydet</button></div>
-</div></div>
-
-<div class="modal-overlay" id="goldModal" onclick="UI.overlayClose(event,'goldModal')"><div class="modal"><div class="modal-handle"></div>
-  <div class="modal-title"><svg class="ic" style="color:var(--gold)"><use href="#i-coins"/></svg> Altın</div>
-  <div class="form-grid"><div><label class="form-label">Miktar (gram)</label><input type="number" step="0.01" id="goldAmount" inputmode="decimal"></div><div><label class="form-label">Gram Fiyatı (₺)</label><input type="number" step="0.01" id="goldPrice" inputmode="decimal"></div></div>
-  <p class="hint">Gram fiyatını güncel değerle elle girersin; toplam otomatik hesaplanır.</p>
-  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('goldModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fin.saveGold()">Kaydet</button></div>
+<div class="modal-overlay" id="paymentModal" onclick="UI.overlayClose(event,'paymentModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title" id="paymentModalTitle"><svg class="ic" style="color:var(--gold)"><use href="#i-repeat"/></svg> Ödeme</div>
+  <div class="form-grid"><div><label class="form-label">Kategori *</label><select id="paymentCat"></select></div><div><label class="form-label">Ad *</label><input id="paymentName" placeholder="Elektrik, Netflix, Aidat..."></div></div>
+  <div class="form-grid"><div><label class="form-label">Tutar (₺) *</label><input type="number" step="0.01" id="paymentAmount" inputmode="decimal"></div><div><label class="form-label">Son Ödeme Tarihi *</label><input type="date" id="paymentDue"></div></div>
+  <div class="form-row"><label class="form-label">Tekrarlama</label><select id="paymentRepeat"><option value="none">Tek seferlik</option><option value="weekly">Haftalık</option><option value="monthly" selected>Aylık</option><option value="yearly">Yıllık</option></select></div>
+  <div class="form-grid">
+    <label style="display:flex;align-items:center;gap:8px;font-size:13.5px;cursor:pointer;"><input type="checkbox" id="paymentAutopay" style="width:18px;height:18px;"> Otomatik Ödeme</label>
+    <label style="display:flex;align-items:center;gap:8px;font-size:13.5px;cursor:pointer;"><input type="checkbox" id="paymentNotify" style="width:18px;height:18px;" checked> Bildirim</label>
+  </div>
+  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('paymentModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fin.savePayment()">Kaydet</button></div>
 </div></div>
 
 <div class="modal-overlay" id="noteModal" onclick="UI.overlayClose(event,'noteModal')"><div class="modal"><div class="modal-handle"></div>
@@ -553,7 +556,9 @@ const Store = {
     incomes: [], expenses: [], debts: [], notes: [],
     water: { today: 0, goal: 2500, date: todayStr() }, calories: [], alcohol: [], children: [], smokeQuit: null, events: [],
     subs: [], budgets: {}, weights: [], meds: [], medsTaken: { date: todayStr(), ids: [] }, bp: [], sleep: [], docs: [],
-    profile: { heightCm: 0 }
+    profile: { heightCm: 0 },
+    /* Finans v2: genel varlık defteri, düzenli ödemeler, platform listesi, net servet geçmişi */
+    assets: [], payments: [], platforms: [...DEFAULT_PLATFORMS], netWorthHistory: [], finV2: false
   }; },
   load() {
     let raw = {};
@@ -565,6 +570,12 @@ const Store = {
     if (!raw.medsTaken || raw.medsTaken.date !== todayStr()) raw.medsTaken = { date: todayStr(), ids: [] };
     (raw.notes || []).forEach(n => { if (n.pinned === undefined) n.pinned = false; if (!n.type) n.type = 'text'; });
     (raw.children || []).forEach(c => { if (!c.growth) c.growth = []; if (!c.vaccines) c.vaccines = []; });
+    if (!raw.finV2) {
+      if ((Number(raw.goldAmount) || 0) > 0) raw.assets.push({ id: uid(), cat: 'Altın', name: 'Altın', platform: '', qty: raw.goldAmount, currency: 'TRY', amount: (Number(raw.goldAmount) || 0) * (Number(raw.goldPriceTry) || 0), note: '' });
+      for (const st of (raw.stocks || [])) raw.assets.push({ id: uid(), cat: 'BIST', name: st.symbol, platform: '', qty: st.qty, currency: 'TRY', amount: st.qty * (st.currentPrice || st.buyPrice || 0), note: st.buyPrice ? ('Alış: ' + st.buyPrice) : '' });
+      for (const sb of (raw.subs || [])) raw.payments.push({ id: uid(), cat: 'Diğer', name: sb.name, amount: sb.amount, dueDate: todayStr().slice(0, 8) + String(sb.day).padStart(2, '0'), repeat: 'monthly', autopay: false, notify: true, paidPeriods: [] });
+      raw.subs = []; raw.finV2 = true;
+    }
     Store.state = raw;
   },
   save() {
@@ -629,6 +640,7 @@ const EV_STYLE = {
   vaccine: { color: 'var(--green)',  dim: 'var(--green-dim)',  icon: 'i-syringe' },
   debt:    { color: 'var(--rose)',   dim: 'var(--rose-dim)',   icon: 'i-wallet' },
   sub:     { color: 'var(--accent)', dim: 'var(--accent-dim)', icon: 'i-repeat' },
+  payment: { color: 'var(--gold)',   dim: 'var(--gold-dim)',   icon: 'i-repeat' },
   note:    { color: 'var(--gold)',   dim: 'var(--gold-dim)',   icon: 'i-bell' }
 };
 function isRecurringOnDate(ev, dateStr) {
@@ -653,6 +665,10 @@ function collectEvents(dateStr) {
     for (let k = 0; k < dbt.instCount; k++) { const due = addMonths(dbt.startDate, k); if (due === dateStr) out.push({ kind: 'debt', title: 'Taksit: ' + dbt.desc, sub: para(dbt.monthly) + ' · ' + (k + 1) + '/' + dbt.instCount }); if (due > dateStr) break; }
   }
   for (const sub of s.subs) if (Number(sub.day) === Number(dd)) out.push({ kind: 'sub', title: sub.name, sub: 'Abonelik ödemesi · ' + para(sub.amount) });
+  for (const p of s.payments) {
+    if (!p.repeat || p.repeat === 'none') { if (p.dueDate === dateStr && !p.paid) out.push({ kind: 'payment', title: p.name, sub: para(p.amount) + (p.autopay ? ' · Otomatik' : '') }); }
+    else if (isRecurringOnDate({ date: p.dueDate, repeat: p.repeat }, dateStr) && !(p.paidPeriods || []).includes(Fin.paymentPeriodKey(p, dateStr))) out.push({ kind: 'payment', title: p.name, sub: para(p.amount) + (p.autopay ? ' · Otomatik' : '') });
+  }
   return out;
 }
 function evItemHTML(e) {
@@ -700,6 +716,7 @@ const Home = {
     $('sec-home').innerHTML =
       '<div class="stagger"><div class="hello"><div class="greeting">' + greet + (name ? ', <span>' + esc(name) + '</span>' : '') + '</div><div class="hello-date">' + new Date().toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long' }) + '</div></div>' +
       '<div class="module-grid">' + cardsHTML + '</div>' +
+      Fin.upcomingPaymentsHTML() +
       '<div class="quote-card"><div class="quote-text">“' + esc(q.t) + '”</div><div class="quote-author">— ' + esc(q.a) + '</div></div>' +
       '<p style="text-align:center;font-size:11px;color:var(--text3);margin-top:6px;">' + APP_VERSION + '</p></div>';
   }
@@ -769,7 +786,8 @@ const Search = {
     for (const x of s.expenses) if (hit(x.desc) || hit(x.cat)) add('Giderler', x.desc, para(x.amount) + ' · ' + trDateShort(x.date), "Fin.goTab('expense')");
     for (const x of s.incomes) if (hit(x.desc)) add('Gelirler', x.desc, para(x.amount), "Fin.goTab('income')");
     for (const d of s.debts) if (hit(d.desc)) add('Borçlar', d.desc, para(d.total), "Fin.goTab('debt')");
-    for (const st of s.stocks) if (hit(st.symbol)) add('Varlıklar', st.symbol, st.qty + ' adet', "Fin.goTab('assets')");
+    for (const a of s.assets) if (hit(a.name) || hit(a.cat)) add('Varlıklar', a.name, para(a.amount), "Fin.goTab('assets')");
+    for (const p of s.payments) if (hit(p.name) || hit(p.cat)) add('Ödemeler', p.name, para(p.amount), "Fin.goTab('payments')");
     for (const p of s.photos) if (hit(p.title)) add('Fotoğraflar', p.title || 'Fotoğraf', p.date ? trDateShort(p.date) : '', "Router.go('sec-family',null,'Aile');Fam.goTab('photos')");
     for (const dc of s.docs) if (hit(dc.title)) add('Belgeler', dc.title, '', "Router.go('sec-family',null,'Aile');Fam.goTab('docs')");
     for (const md of s.meds) if (hit(md.name)) add('İlaçlar', md.name, md.dose || '', "Health.goTab('meds')");
@@ -780,28 +798,47 @@ const Search = {
 };
 
 /* ═══ Finans ═══ */
-const INC_CATS = ['Maaş', 'Kira Geliri', 'Ek İş', 'Yatırım', 'Diğer'];
+const INC_CATS = ['Maaş', 'Kira', 'Şirket', 'Faiz', 'Temettü', 'Serbest Çalışma', 'Diğer'];
 const EXP_CATS = ['Market', 'Fatura', 'Yakıt', 'Ulaşım', 'Sağlık', 'Eğitim', 'Giyim', 'Eğlence', 'Restoran', 'Ev', 'Diğer'];
 const PIE_COLORS = ['#2dd4bf', '#34d399', '#f59e0b', '#f87171', '#3b82f6', '#22d3ee', '#fb923c', '#a3e635', '#f472b6', '#94a3b8', '#facc15'];
+/* Finans v2 sabitleri */
+const ASSET_CATS = ['Nakit', 'Banka Hesapları', 'Döviz', 'Altın', 'Gümüş', 'Kripto', 'BIST', 'ABD Hisseleri', 'Fonlar', 'BES', 'Gayrimenkuller', 'Araçlar', 'Diğer'];
+const DEBT_CATS = ['Kredi Kartı', 'Konut Kredisi', 'Taşıt Kredisi', 'İhtiyaç Kredisi', 'Borç', 'Vergi', 'Diğer'];
+const PAY_CATS = ['Elektrik', 'Su', 'Doğalgaz', 'İnternet', 'Telefon', 'Netflix', 'Spotify', 'Aidat', 'Kredi', 'Kredi Kartı', 'Vergiler', 'Sigortalar', 'Diğer'];
+const CURRENCIES = ['TRY', 'USD', 'EUR', 'GBP', 'Diğer'];
+const DEFAULT_PLATFORMS = ['İş Bankası', 'Garanti BBVA', 'Akbank', 'Yapı Kredi', 'Ziraat Bankası', 'Kuveyt Türk', 'Midas', 'Binance', 'Paribu', 'Diğer'];
+const REPEAT_LABELS = { none: 'Tek seferlik', weekly: 'Haftalık', monthly: 'Aylık', yearly: 'Yıllık' };
 const Fin = {
   tab: 'overview',
-  setTab(t, el) { Fin.tab = t; document.querySelectorAll('#sec-finance .tab').forEach(x => x.classList.remove('active')); if (el) el.classList.add('active'); ['overview', 'income', 'expense', 'debt', 'assets'].forEach(x => $('fin-' + x).style.display = x === t ? 'block' : 'none'); Fin.render(); },
-  goTab(t) { Router.go('sec-finance', null, 'Finans'); const tabs = document.querySelectorAll('#sec-finance .tab'); const idx = { overview: 0, income: 1, expense: 2, debt: 3, assets: 4 }[t] || 0; Fin.setTab(t, tabs[idx]); },
-  assetsTotal() { const s = S(); return (Number(s.goldAmount) || 0) * (Number(s.goldPriceTry) || 0) + s.stocks.reduce((a, st) => a + st.qty * (st.currentPrice || st.buyPrice || 0), 0); },
+  _editAssetId: null, _editPaymentId: null,
+  setTab(t, el) { Fin.tab = t; document.querySelectorAll('#sec-finance .tab').forEach(x => x.classList.remove('active')); if (el) el.classList.add('active'); ['overview', 'assets', 'debt', 'income', 'expense', 'payments'].forEach(x => $('fin-' + x).style.display = x === t ? 'block' : 'none'); Fin.render(); },
+  goTab(t) { Router.go('sec-finance', null, 'Finans'); const tabs = document.querySelectorAll('#sec-finance .tab'); const idx = { overview: 0, assets: 1, debt: 2, income: 3, expense: 4, payments: 5 }[t] || 0; Fin.setTab(t, tabs[idx]); },
+  /* Not: canlı kur/borsa/altın API'si yok — döviz tutarları TL karşılığı olarak girilmelidir (altyapı v1). */
+  assetsTotal() { return S().assets.reduce((a, x) => a + Number(x.amount || 0), 0); },
   /* Acik borc = odenmemis taksitlerin toplami (odenenler net servetten dusulmez). */
   openDebt() { return S().debts.filter(d => d.type === 'borrow').reduce((a, d) => {
     if (d.startDate && d.monthly && d.instCount) { let paid = 0; for (let k = 0; k < d.instCount; k++) if (addMonths(d.startDate, k) <= todayStr()) paid++; return a + Math.max(0, (d.instCount - paid) * Number(d.monthly)); }
     return a + Number(d.total || 0); }, 0); },
+  netWorth() { return Fin.assetsTotal() - Fin.openDebt(); },
+  /* Net servet geçmişi: günde bir kez anlık değer kaydedilir, değişim istatistikleri buradan türetilir. */
+  recordSnapshot() {
+    const s = S(), today = todayStr(), h = s.netWorthHistory;
+    if (!h.length || h[h.length - 1].date !== today) { h.push({ date: today, value: Fin.netWorth() }); if (h.length > 400) s.netWorthHistory = h.slice(-400); Store.save(); }
+  },
+  snapshotBefore(dateStr) { const h = S().netWorthHistory.filter(x => x.date < dateStr); return h.length ? h[h.length - 1].value : null; },
   render() {
-    const fn = { overview: Fin.renderOverview, income: () => Fin.renderTx('income'), expense: () => Fin.renderTx('expense'), debt: Fin.renderDebts, assets: Fin.renderAssets }[Fin.tab];
+    Fin.recordSnapshot();
+    const fn = { overview: Fin.renderOverview, income: () => Fin.renderTx('income'), expense: () => Fin.renderTx('expense'), debt: Fin.renderDebts, assets: Fin.renderAssets, payments: Fin.renderPayments }[Fin.tab];
     if (fn) fn();
   },
   renderOverview() {
     const s = S(), mk = monthKey(todayStr());
     const inc = s.incomes.filter(x => monthKey(x.date) === mk).reduce((a, b) => a + Number(b.amount), 0);
     const exp = s.expenses.filter(x => monthKey(x.date) === mk).reduce((a, b) => a + Number(b.amount), 0);
-    const subsTotal = s.subs.reduce((a, b) => a + Number(b.amount), 0);
     const net = inc - exp, save = inc > 0 ? Math.max(0, Math.round(net / inc * 100)) : 0;
+    const nw = Fin.netWorth(), assets = Fin.assetsTotal(), debt = Fin.openDebt();
+    const dayChg = Fin.snapshotBefore(todayStr()), monthChg = Fin.snapshotBefore(mk + '-01'), yearChg = Fin.snapshotBefore(todayStr().slice(0, 4) + '-01-01');
+    const chip = (lbl, base) => { const v = base === null ? null : nw - base; return '<div><div class="hint" style="font-size:10px;">' + lbl + '</div><div class="num" style="font-size:14px;font-weight:800;color:' + (v === null ? 'var(--text3)' : v >= 0 ? 'var(--green)' : 'var(--rose)') + '">' + (v === null ? '—' : (v >= 0 ? '+' : '') + para(v)) + '</div></div>'; };
     /* 6 aylık trend */
     let bars = '', maxV = 1;
     const months = []; for (let i = 5; i >= 0; i--) { const k = monthKey(addMonths(todayStr(), -i)); const iv = s.incomes.filter(x => monthKey(x.date) === k).reduce((a, b) => a + Number(b.amount), 0); const ev = s.expenses.filter(x => monthKey(x.date) === k).reduce((a, b) => a + Number(b.amount), 0); months.push({ k, iv, ev }); maxV = Math.max(maxV, iv, ev); }
@@ -814,8 +851,9 @@ const Fin = {
     /* Bütçeler */
     const budgetRows = EXP_CATS.map(c => { const lim = Number(s.budgets[c] || 0); const spent = catSums[c] || 0; const pct = lim ? Math.min(100, spent / lim * 100) : 0; return '<div style="margin-bottom:11px;"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:5px;"><span style="font-size:13px;font-weight:600;">' + esc(c) + '</span><span style="display:flex;align-items:center;gap:6px;"><span class="num hint">' + (lim ? para(spent) + ' /' : (spent ? para(spent) : '')) + '</span><input type="number" inputmode="numeric" value="' + (lim || '') + '" placeholder="limit" style="width:86px;padding:5px 8px;font-size:12.5px;" onchange="Fin.setBudget(\'' + c + '\',this.value)"></span></div>' + (lim ? '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%;background:' + (spent > lim ? 'var(--rose)' : 'var(--accent)') + '"></div></div>' : '') + '</div>'; }).join('');
     $('fin-overview').innerHTML =
-      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-trend"/></svg> Net Servet</div><div class="big-center"><div class="big-num num" style="color:var(--green)">' + para(Fin.assetsTotal() - Fin.openDebt()) + '</div><div class="hint" style="margin-top:6px;">Varlıklar ' + para(Fin.assetsTotal()) + ' − Borçlar ' + para(Fin.openDebt()) + '</div></div></div>' +
-      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-wallet"/></svg> Bu Ay</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center;"><div><div class="hint">GELİR</div><div class="num" style="font-size:17px;font-weight:800;color:var(--green)">' + para(inc) + '</div></div><div><div class="hint">GİDER</div><div class="num" style="font-size:17px;font-weight:800;color:var(--rose)">' + para(exp) + '</div></div><div><div class="hint">NET</div><div class="num" style="font-size:17px;font-weight:800;color:' + (net >= 0 ? 'var(--green)' : 'var(--rose)') + '">' + para(net) + '</div></div></div>' + (inc > 0 ? '<hr><div style="display:flex;justify-content:space-between;font-size:13px;"><span class="hint">Tasarruf oranı</span><b class="num">%' + save + '</b></div>' : '') + (subsTotal ? '<div style="display:flex;justify-content:space-between;font-size:13px;margin-top:6px;"><span class="hint">Sabit aylık ödemeler (' + s.subs.length + ')</span><b class="num">' + para(subsTotal) + '</b></div>' : '') + '</div>' +
+      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-trend"/></svg> Net Servet</div><div class="big-center"><div class="big-num num" style="color:' + (nw >= 0 ? 'var(--green)' : 'var(--rose)') + '">' + para(nw) + '</div><div class="hint" style="margin-top:6px;">Toplam Varlık ' + para(assets) + ' − Toplam Borç ' + para(debt) + '</div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px;text-align:center;">' + chip('BUGÜN', dayChg) + chip('BU AY', monthChg) + chip('BU YIL', yearChg) + '</div></div>' +
+      Fin.upcomingPaymentsHTML() +
+      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-wallet"/></svg> Bu Ay</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center;"><div><div class="hint">GELİR</div><div class="num" style="font-size:17px;font-weight:800;color:var(--green)">' + para(inc) + '</div></div><div><div class="hint">GİDER</div><div class="num" style="font-size:17px;font-weight:800;color:var(--rose)">' + para(exp) + '</div></div><div><div class="hint">NET</div><div class="num" style="font-size:17px;font-weight:800;color:' + (net >= 0 ? 'var(--green)' : 'var(--rose)') + '">' + para(net) + '</div></div></div>' + (inc > 0 ? '<hr><div style="display:flex;justify-content:space-between;font-size:13px;"><span class="hint">Tasarruf oranı</span><b class="num">%' + save + '</b></div>' : '') + '</div>' +
       '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-trend"/></svg> 6 Aylık Akış</div><div class="bars">' + bars + '</div><div style="display:flex;gap:14px;justify-content:center;margin-top:10px;font-size:11.5px;color:var(--text2);"><span style="display:flex;align-items:center;gap:5px;"><span class="leg-dot" style="background:var(--green)"></span>Gelir</span><span style="display:flex;align-items:center;gap:5px;"><span class="leg-dot" style="background:var(--rose)"></span>Gider</span></div></div>' +
       (pie ? '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-wallet"/></svg> Harcama Dağılımı</div><div style="display:flex;gap:16px;align-items:center;">' + pie + '<div class="legend">' + legend + '</div></div></div>' : '') +
       '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-shield"/></svg> Kategori Bütçeleri</div>' + budgetRows + '<p class="hint">Limit girilen kategoriler izlenir; aşım brifinge düşer.</p></div>';
@@ -832,55 +870,131 @@ const Fin = {
   renderTx(kind) {
     const s = S(), key = kind === 'income' ? 'incomes' : 'expenses';
     const list = [...s[key]].sort((a, b) => b.date.localeCompare(a.date));
-    let subsCard = '';
-    if (kind === 'expense') {
-      subsCard = '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-repeat"/></svg> Abonelikler & Düzenli Ödemeler</div>' +
-        (s.subs.length ? s.subs.map(x => '<div class="list-item"><div class="li-left"><div class="li-title">' + esc(x.name) + '</div><div class="li-sub">Her ayın ' + x.day + '. günü</div></div><div class="li-right"><span class="badge badge-blue num">' + para(x.amount) + '/ay</span><button class="icon-btn del" onclick="Fin.delSub(\'' + x.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></div></div>').join('') : '<p class="hint">Netflix, aidat, internet gibi sabit ödemeleri ekle — ödeme günleri takvimde ve brifingde otomatik görünür.</p>') +
-        '<button class="btn btn-secondary btn-full btn-sm" style="margin-top:8px;" onclick="UI.open(\'subModal\')"><svg class="ic sm"><use href="#i-plus"/></svg> Abonelik Ekle</button></div>';
-    }
-    $('fin-' + kind).innerHTML = subsCard +
+    $('fin-' + kind).innerHTML =
       '<button class="btn ' + (kind === 'income' ? 'btn-success' : 'btn-danger') + ' btn-full" style="margin-bottom:12px;" onclick="Fin.openTx(\'' + kind + '\')"><svg class="ic sm"><use href="#i-plus"/></svg> ' + (kind === 'income' ? 'Gelir' : 'Gider') + ' Ekle</button>' +
       (list.length ? list.map(x => '<div class="list-item"><div class="li-left"><div class="li-title">' + esc(x.desc) + '</div><div class="li-sub">' + esc(x.cat || '') + ' · ' + trDateShort(x.date) + '</div></div><div class="li-right"><span class="badge ' + (kind === 'income' ? 'badge-green' : 'badge-red') + ' num">' + (kind === 'income' ? '+' : '−') + para(x.amount) + '</span><button class="icon-btn del" onclick="Fin.delTx(\'' + kind + '\',\'' + x.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></div></div>').join('') : '<div class="empty"><svg class="ic"><use href="#i-wallet"/></svg><div class="empty-text">Henüz kayıt yok</div></div>');
   },
-  saveSub() { const n = $('subName').value.trim(), a = Number($('subAmount').value), d = Math.min(28, Math.max(1, Number($('subDay').value) || 1)); if (!n || !a) { toast('Ad ve tutar zorunlu'); return; } S().subs.push({ id: uid(), name: n, amount: a, day: d }); Store.save(); UI.close('subModal'); $('subName').value = ''; $('subAmount').value = ''; Fin.render(); toast('Abonelik eklendi'); },
-  delSub(id) { S().subs = S().subs.filter(x => x.id !== id); Store.save(); Fin.render(); },
   debtPreview() { const m = Number($('debtMonthly').value), c = Number($('debtCount').value), st = $('debtStart').value; let t = ''; if (m && c) { t = c + ' taksit × ' + para(m) + ' = ' + para(m * c); if (st) t += ' · Son taksit: ' + trDateShort(addMonths(st, c - 1)); } $('debtPreviewTxt').textContent = t; },
+  openDebtModal() { $('debtCat').innerHTML = DEBT_CATS.map(c => '<option>' + c + '</option>').join(''); $('debtStart').value = todayStr(); UI.open('debtModal'); },
   saveDebt() {
     const desc = $('debtDesc').value.trim(), total = Number($('debtTotal').value);
     if (!desc || !total) { toast('Açıklama ve toplam zorunlu'); return; }
-    S().debts.push({ id: uid(), desc, type: $('debtType').value, total, monthly: Number($('debtMonthly').value) || 0, instCount: Number($('debtCount').value) || 0, startDate: $('debtStart').value || '' });
-    Store.save(); UI.close('debtModal'); ['debtDesc', 'debtTotal', 'debtMonthly', 'debtCount', 'debtStart'].forEach(i => $(i).value = ''); Fin.render(); toast('Kaydedildi');
+    S().debts.push({ id: uid(), desc, cat: $('debtCat').value, type: $('debtType').value, total, monthly: Number($('debtMonthly').value) || 0, instCount: Number($('debtCount').value) || 0, startDate: $('debtStart').value || '' });
+    Store.save(); UI.close('debtModal'); ['debtDesc', 'debtTotal', 'debtMonthly', 'debtCount', 'debtStart'].forEach(i => $(i).value = ''); Fin.render(); toast('Kaydedildi'); if (Router.current === 'sec-home') Home.render();
   },
-  delDebt(id) { if (!UI.confirm('Silinsin mi?')) return; S().debts = S().debts.filter(x => x.id !== id); Store.save(); Fin.render(); },
+  delDebt(id) { if (!UI.confirm('Silinsin mi?')) return; S().debts = S().debts.filter(x => x.id !== id); Store.save(); Fin.render(); if (Router.current === 'sec-home') Home.render(); },
   renderDebts() {
     const s = S();
-    const row = (d) => { let paid = 0; if (d.startDate && d.monthly && d.instCount) { for (let k = 0; k < d.instCount; k++) if (addMonths(d.startDate, k) <= todayStr()) paid++; } const rem = d.instCount ? d.instCount - paid : 0; return '<div class="list-item"><div class="li-left"><div class="li-title">' + esc(d.desc) + '</div><div class="li-sub">' + (d.monthly ? para(d.monthly) + '/ay' : '') + (d.instCount ? ' · kalan ' + rem + '/' + d.instCount + ' taksit' : '') + '</div></div><div class="li-right"><span class="badge ' + (d.type === 'borrow' ? 'badge-red' : 'badge-green') + ' num">' + para(d.total) + '</span><button class="icon-btn del" onclick="Fin.delDebt(\'' + d.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></div></div>'; };
+    const row = (d) => { let paid = 0; if (d.startDate && d.monthly && d.instCount) { for (let k = 0; k < d.instCount; k++) if (addMonths(d.startDate, k) <= todayStr()) paid++; } const rem = d.instCount ? d.instCount - paid : 0; return '<div class="list-item"><div class="li-left"><div class="li-title">' + esc(d.desc) + '</div><div class="li-sub">' + esc(d.cat || 'Diğer') + (d.monthly ? ' · ' + para(d.monthly) + '/ay' : '') + (d.instCount ? ' · kalan ' + rem + '/' + d.instCount + ' taksit' : '') + '</div></div><div class="li-right"><span class="badge ' + (d.type === 'borrow' ? 'badge-red' : 'badge-green') + ' num">' + para(d.total) + '</span><button class="icon-btn del" onclick="Fin.delDebt(\'' + d.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></div></div>'; };
     const borrows = s.debts.filter(d => d.type === 'borrow'), lends = s.debts.filter(d => d.type === 'lend');
     $('fin-debt').innerHTML =
-      '<button class="btn btn-gold btn-full" style="margin-bottom:12px;" onclick="$(\'debtStart\').value=todayStr();UI.open(\'debtModal\')"><svg class="ic sm"><use href="#i-plus"/></svg> Borç / Alacak Ekle</button>' +
+      '<button class="btn btn-gold btn-full" style="margin-bottom:12px;" onclick="Fin.openDebtModal()"><svg class="ic sm"><use href="#i-plus"/></svg> Borç / Alacak Ekle</button>' +
       (borrows.length ? '<div class="card-title" style="margin-bottom:8px;">Borçlarım — kalan ' + para(Fin.openDebt()) + '</div>' + borrows.map(row).join('') : '') +
       (lends.length ? '<div class="card-title" style="margin:14px 0 8px;">Alacaklarım</div>' + lends.map(row).join('') : '') +
       (!s.debts.length ? '<div class="empty"><svg class="ic"><use href="#i-wallet"/></svg><div class="empty-text">Borç kaydı yok 🎉<br>Taksitli borçlar takvim ve brifingde otomatik izlenir.</div></div>' : '');
   },
-  saveGold() { S().goldAmount = Number($('goldAmount').value) || 0; S().goldPriceTry = Number($('goldPrice').value) || 0; Store.save(); UI.close('goldModal'); Fin.render(); toast('Altın güncellendi'); if (Router.current === 'sec-home') Home.render(); },
-  saveStock() {
-    const sym = $('stockSymbol').value.trim().toUpperCase(), qty = Number($('stockQty').value), cur = Number($('stockCur').value);
-    if (!sym || !qty || !cur) { toast('Sembol, adet ve güncel fiyat zorunlu'); return; }
-    S().stocks.push({ id: uid(), symbol: sym, qty, buyPrice: Number($('stockBuy').value) || cur, currentPrice: cur });
-    Store.save(); UI.close('stockModal'); ['stockSymbol', 'stockQty', 'stockBuy', 'stockCur'].forEach(i => $(i).value = ''); Fin.render(); toast('Hisse eklendi');
+  /* ── Varlıklar: tek tip genel varlık defteri (nakit, banka, döviz, altın, hisse, gayrimenkul...) ── */
+  renderPlatformSelect(selected) { const s = S(); $('assetPlatform').innerHTML = '<option value="">—</option>' + s.platforms.map(p => '<option' + (p === selected ? ' selected' : '') + '>' + esc(p) + '</option>').join('') + '<option value="__new__">+ Yeni Platform Ekle</option>'; },
+  platformChange() {
+    const sel = $('assetPlatform');
+    if (sel.value === '__new__') { const name = (prompt('Yeni platform adı:') || '').trim(); if (name) { if (!S().platforms.includes(name)) { S().platforms.push(name); Store.save(); } Fin.renderPlatformSelect(name); } else Fin.renderPlatformSelect(''); }
   },
-  editStock(id) { const st = S().stocks.find(x => x.id === id); if (!st) return; const v = prompt(st.symbol + ' güncel fiyat (₺):', st.currentPrice); if (v === null) return; st.currentPrice = Number(v) || st.currentPrice; Store.save(); Fin.render(); },
-  delStock(id) { if (!UI.confirm('Hisse silinsin mi?')) return; S().stocks = S().stocks.filter(x => x.id !== id); Store.save(); Fin.render(); },
+  openAsset(id) {
+    const a = id ? S().assets.find(x => x.id === id) : null;
+    Fin._editAssetId = id || null;
+    $('assetModalTitle').textContent = a ? 'Varlığı Düzenle' : 'Varlık Ekle';
+    $('assetCat').innerHTML = ASSET_CATS.map(c => '<option' + (a && a.cat === c ? ' selected' : '') + '>' + c + '</option>').join('');
+    $('assetName').value = a ? a.name : '';
+    Fin.renderPlatformSelect(a ? a.platform : '');
+    $('assetQty').value = a && a.qty ? a.qty : '';
+    $('assetAmount').value = a ? a.amount : '';
+    $('assetCurrency').innerHTML = CURRENCIES.map(c => '<option' + (a ? (a.currency === c ? ' selected' : '') : (c === 'TRY' ? ' selected' : '')) + '>' + c + '</option>').join('');
+    $('assetNote').value = a ? (a.note || '') : '';
+    UI.open('assetModal');
+  },
+  saveAsset() {
+    const cat = $('assetCat').value, name = $('assetName').value.trim(), amount = Number($('assetAmount').value);
+    if (!name || !amount) { toast('Ad ve tutar zorunlu'); return; }
+    const plat = $('assetPlatform').value === '__new__' ? '' : $('assetPlatform').value;
+    const data = { cat, name, platform: plat, qty: Number($('assetQty').value) || 0, currency: $('assetCurrency').value, amount, note: $('assetNote').value.trim() };
+    if (Fin._editAssetId) { const a = S().assets.find(x => x.id === Fin._editAssetId); Object.assign(a, data); }
+    else S().assets.push({ id: uid(), ...data });
+    Store.save(); UI.close('assetModal'); Fin.render(); toast('Kaydedildi'); if (Router.current === 'sec-home') Home.render();
+  },
+  editAsset(id) { Fin.openAsset(id); },
+  delAsset(id) { if (!UI.confirm('Varlık silinsin mi?')) return; S().assets = S().assets.filter(x => x.id !== id); Store.save(); Fin.render(); if (Router.current === 'sec-home') Home.render(); },
   renderAssets() {
-    const s = S(), goldVal = (Number(s.goldAmount) || 0) * (Number(s.goldPriceTry) || 0);
+    const s = S(), byCat = {};
+    for (const a of s.assets) (byCat[a.cat] = byCat[a.cat] || []).push(a);
+    const catOrder = ASSET_CATS.filter(c => byCat[c] && byCat[c].length);
+    const catBlock = (cat) => { const items = byCat[cat], catTotal = items.reduce((a, x) => a + Number(x.amount || 0), 0);
+      return '<div class="card"><div class="card-title" style="justify-content:space-between;"><span>' + esc(cat) + '</span><span class="num" style="font-size:13px;color:var(--text2);font-weight:700;">' + para(catTotal) + '</span></div>' +
+        items.map(a => '<div class="list-item"><div class="li-left"><div class="li-title">' + esc(a.name) + '</div><div class="li-sub">' + [a.platform ? esc(a.platform) : '', a.qty ? a.qty + ' adet' : '', a.currency && a.currency !== 'TRY' ? a.currency : '', a.note ? esc(a.note) : ''].filter(Boolean).join(' · ') + '</div></div><div class="li-right"><span class="badge badge-gold num">' + para(a.amount) + '</span><button class="icon-btn" style="min-width:32px;min-height:32px;" onclick="Fin.editAsset(\'' + a.id + '\')"><svg class="ic sm"><use href="#i-edit"/></svg></button><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="Fin.delAsset(\'' + a.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></div></div>').join('') + '</div>'; };
     $('fin-assets').innerHTML =
-      '<div class="card"><div class="card-title"><svg class="ic" style="color:var(--gold)"><use href="#i-coins"/></svg> Altın</div>' +
-      (s.goldAmount ? '<div style="display:flex;justify-content:space-between;align-items:center;"><div><div class="li-title num">' + s.goldAmount + ' gram</div><div class="li-sub num">Gram: ' + para2(s.goldPriceTry) + '</div></div><div class="badge badge-gold num" style="font-size:15px;padding:8px 14px;">' + para(goldVal) + '</div></div>' : '<p class="hint">Gram miktarını ve güncel gram fiyatını gir.</p>') +
-      '<button class="btn btn-secondary btn-full btn-sm" style="margin-top:10px;" onclick="$(\'goldAmount\').value=S().goldAmount||\'\';$(\'goldPrice\').value=S().goldPriceTry||\'\';UI.open(\'goldModal\')">Düzenle</button></div>' +
-      '<div class="card"><div class="card-title"><svg class="ic" style="color:var(--green)"><use href="#i-trend"/></svg> Hisseler</div>' +
-      (s.stocks.length ? s.stocks.map(st => { const val = st.qty * st.currentPrice, cost = st.qty * st.buyPrice, diff = val - cost; return '<div class="list-item"><div class="li-left"><div class="li-title">' + esc(st.symbol) + '</div><div class="li-sub num">' + st.qty + ' adet · güncel ' + para2(st.currentPrice) + '</div></div><div class="li-right" style="flex-direction:column;align-items:flex-end;gap:3px;"><span class="badge badge-blue num">' + para(val) + '</span>' + (st.buyPrice !== st.currentPrice ? '<span class="num" style="font-size:11px;font-weight:700;color:' + (diff >= 0 ? 'var(--green)' : 'var(--rose)') + '">' + (diff >= 0 ? '+' : '') + para(diff) + '</span>' : '') + '<span style="display:flex;"><button class="icon-btn" style="min-width:32px;min-height:32px;" onclick="Fin.editStock(\'' + st.id + '\')"><svg class="ic sm"><use href="#i-edit"/></svg></button><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="Fin.delStock(\'' + st.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></span></div></div>'; }).join('') : '<p class="hint">Hisselerini ekle; fiyatı dilediğinde kalem ikonuyla güncellersin.</p>') +
-      '<button class="btn btn-secondary btn-full btn-sm" style="margin-top:8px;" onclick="UI.open(\'stockModal\')"><svg class="ic sm"><use href="#i-plus"/></svg> Hisse Ekle</button></div>' +
-      '<div class="card"><div class="big-center"><div class="hint">TOPLAM VARLIK</div><div class="big-num num" style="font-size:36px;color:var(--gold)">' + para(Fin.assetsTotal()) + '</div></div></div>';
+      '<button class="btn btn-gold btn-full" style="margin-bottom:12px;" onclick="Fin.openAsset()"><svg class="ic sm"><use href="#i-plus"/></svg> Varlık Ekle</button>' +
+      (catOrder.length ? catOrder.map(catBlock).join('') : '<div class="empty"><svg class="ic"><use href="#i-coins"/></svg><div class="empty-text">Henüz varlık eklenmedi<br>Nakit, banka, altın, hisse, gayrimenkul...</div></div>') +
+      '<div class="card"><div class="big-center"><div class="hint">TOPLAM VARLIK</div><div class="big-num num" style="font-size:36px;color:var(--gold)">' + para(Fin.assetsTotal()) + '</div><p class="hint" style="margin-top:8px;">Döviz tutarları otomatik çevrilmez — TL karşılığını girmen önerilir.</p></div></div>';
+  },
+  /* ── Ödemeler: kategorize, tekrarlayan düzenli ödeme takibi ── */
+  paymentPeriodKey(p, dateStr) {
+    if (p.repeat === 'yearly') return dateStr.slice(0, 4);
+    if (p.repeat === 'weekly') { const dt = new Date(dateStr + 'T12:00:00'); const jan1 = new Date(dt.getFullYear(), 0, 1); const wk = Math.ceil((((dt - jan1) / 86400000) + jan1.getDay() + 1) / 7); return dt.getFullYear() + '-w' + wk; }
+    return monthKey(dateStr);
+  },
+  isPaidNow(p) { return (!p.repeat || p.repeat === 'none') ? !!p.paid : (p.paidPeriods || []).includes(Fin.paymentPeriodKey(p, todayStr())); },
+  nextDue(p) {
+    if (!p.repeat || p.repeat === 'none') return p.paid ? null : p.dueDate;
+    for (let i = 0; i < 400; i++) { const d = addDays(todayStr(), i); if (isRecurringOnDate({ date: p.dueDate, repeat: p.repeat }, d)) { if (!(p.paidPeriods || []).includes(Fin.paymentPeriodKey(p, d))) return d; } }
+    return null;
+  },
+  togglePaid(id) {
+    const p = S().payments.find(x => x.id === id); if (!p) return;
+    if (!p.repeat || p.repeat === 'none') p.paid = !p.paid;
+    else { const pk = Fin.paymentPeriodKey(p, todayStr()); p.paidPeriods = p.paidPeriods || []; const i = p.paidPeriods.indexOf(pk); if (i >= 0) p.paidPeriods.splice(i, 1); else p.paidPeriods.push(pk); }
+    Store.save(); Fin.render(); if (Router.current === 'sec-home') Home.render();
+  },
+  openPayment(id) {
+    const p = id ? S().payments.find(x => x.id === id) : null;
+    Fin._editPaymentId = id || null;
+    $('paymentModalTitle').textContent = p ? 'Ödemeyi Düzenle' : 'Ödeme Ekle';
+    $('paymentCat').innerHTML = PAY_CATS.map(c => '<option' + (p && p.cat === c ? ' selected' : '') + '>' + c + '</option>').join('');
+    $('paymentName').value = p ? p.name : '';
+    $('paymentAmount').value = p ? p.amount : '';
+    $('paymentDue').value = p ? p.dueDate : todayStr();
+    $('paymentRepeat').value = p ? (p.repeat || 'monthly') : 'monthly';
+    $('paymentAutopay').checked = p ? !!p.autopay : false;
+    $('paymentNotify').checked = p ? (p.notify !== false) : true;
+    UI.open('paymentModal');
+  },
+  savePayment() {
+    const cat = $('paymentCat').value, name = $('paymentName').value.trim(), amount = Number($('paymentAmount').value), due = $('paymentDue').value;
+    if (!name || !amount || !due) { toast('Ad, tutar ve tarih zorunlu'); return; }
+    const data = { cat, name, amount, dueDate: due, repeat: $('paymentRepeat').value, autopay: $('paymentAutopay').checked, notify: $('paymentNotify').checked };
+    if (Fin._editPaymentId) { const p = S().payments.find(x => x.id === Fin._editPaymentId); Object.assign(p, data); }
+    else S().payments.push({ id: uid(), paidPeriods: [], paid: false, ...data });
+    Store.save(); UI.close('paymentModal'); Fin.render(); toast('Kaydedildi'); if (Router.current === 'sec-home') Home.render();
+  },
+  editPayment(id) { Fin.openPayment(id); },
+  delPayment(id) { if (!UI.confirm('Ödeme silinsin mi?')) return; S().payments = S().payments.filter(x => x.id !== id); Store.save(); Fin.render(); if (Router.current === 'sec-home') Home.render(); },
+  renderPayments() {
+    const s = S();
+    const row = (p) => { const paidNow = Fin.isPaidNow(p), next = Fin.nextDue(p);
+      return '<div class="list-item"><div class="li-left"><div class="li-title">' + esc(p.name) + '</div><div class="li-sub">' + esc(p.cat) + ' · ' + (REPEAT_LABELS[p.repeat || 'monthly']) + (next ? ' · Sonraki: ' + trDateShort(next) : '') + (p.autopay ? ' · Otomatik' : '') + '</div></div><div class="li-right" style="flex-direction:column;align-items:flex-end;gap:5px;"><span class="badge badge-gold num">' + para(p.amount) + '</span><span style="display:flex;gap:4px;"><button class="btn btn-sm ' + (paidNow ? 'btn-success' : 'btn-secondary') + '" onclick="Fin.togglePaid(\'' + p.id + '\')">' + (paidNow ? 'Ödendi ✓' : 'Öde') + '</button><button class="icon-btn" style="min-width:32px;min-height:32px;" onclick="Fin.editPayment(\'' + p.id + '\')"><svg class="ic sm"><use href="#i-edit"/></svg></button><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="Fin.delPayment(\'' + p.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></span></div></div>'; };
+    const sorted = [...s.payments].sort((a, b) => (Fin.nextDue(a) || '9999').localeCompare(Fin.nextDue(b) || '9999'));
+    const total = s.payments.reduce((a, p) => a + Number(p.amount || 0), 0);
+    $('fin-payments').innerHTML =
+      '<button class="btn btn-gold btn-full" style="margin-bottom:12px;" onclick="Fin.openPayment()"><svg class="ic sm"><use href="#i-plus"/></svg> Ödeme Ekle</button>' +
+      (sorted.length ? sorted.map(row).join('') : '<div class="empty"><svg class="ic"><use href="#i-repeat"/></svg><div class="empty-text">Henüz düzenli ödeme yok<br>Elektrik, su, internet, kredi, sigorta...</div></div>') +
+      (total ? '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;"><span class="hint">Toplam periyodik ödeme</span><b class="num" style="font-size:16px;">' + para(total) + '</b></div></div>' : '');
+  },
+  /* Ana sayfadaki "Yaklaşan Ödemeler" kartı — Fin sahipliğinde, Home sadece çağırır */
+  upcomingPaymentsHTML() {
+    const s = S(), rows = [];
+    for (const p of s.payments) { const d = Fin.nextDue(p); if (d) { const days = Math.round((new Date(d + 'T12:00:00') - new Date(todayStr() + 'T12:00:00')) / 86400000); if (days <= 14) rows.push({ p, d, days }); } }
+    if (!rows.length) return '';
+    rows.sort((a, b) => a.d.localeCompare(b.d));
+    const row = (r) => '<div class="list-item" style="cursor:pointer;" onclick="Fin.goTab(\'payments\')"><div class="li-left"><div class="li-title">' + esc(r.p.name) + '</div><div class="li-sub">' + (r.days === 0 ? 'Bugün' : r.days === 1 ? 'Yarın' : r.days + ' gün sonra') + ' · ' + esc(r.p.cat) + '</div></div><div class="li-right"><span class="badge badge-gold num">' + para(r.p.amount) + '</span></div></div>';
+    return '<div class="card"><div class="card-title"><svg class="ic" style="color:var(--gold)"><use href="#i-bell"/></svg> Yaklaşan Ödemeler</div>' + rows.slice(0, 5).map(row).join('') + '</div>';
   }
 };
 
