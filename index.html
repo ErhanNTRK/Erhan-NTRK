@@ -251,7 +251,7 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0;}
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><div style="font-size:13px;font-weight:700;color:var(--text2);" id="calDayTitle"></div></div>
       <div id="calEventList"></div>
     </div>
-    <button class="btn btn-primary btn-full" style="margin-top:12px;" onclick="UI.open('addEventModal')"><svg class="ic sm"><use href="#i-plus"/></svg> Etkinlik Ekle</button>
+    <button class="btn btn-primary btn-full" style="margin-top:12px;" onclick="Cal.openEvent()"><svg class="ic sm"><use href="#i-plus"/></svg> Etkinlik Ekle</button>
   </div>
   <div class="section" id="sec-finance">
     <div class="tabs">
@@ -271,18 +271,21 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0;}
   </div>
   <div class="section" id="sec-health">
     <div class="tabs">
-      <div class="tab active" onclick="Health.setTab('water',this)">Su</div>
-      <div class="tab" onclick="Health.setTab('weight',this)">Kilo</div>
+      <div class="tab active" onclick="Health.setTab('steps',this)">Adım</div>
+      <div class="tab" onclick="Health.setTab('water',this)">Su</div>
+      <div class="tab" onclick="Health.setTab('weight',this)">Boy / Kilo</div>
       <div class="tab" onclick="Health.setTab('meds',this)">İlaç</div>
       <div class="tab" onclick="Health.setTab('bp',this)">Tansiyon</div>
+      <div class="tab" onclick="Health.setTab('sugar',this)">Kan Şekeri</div>
       <div class="tab" onclick="Health.setTab('sleep',this)">Uyku</div>
       <div class="tab" onclick="Health.setTab('calorie',this)">Kalori</div>
       <div class="tab" onclick="Health.setTab('smoke',this)">Sigara</div>
       <div class="tab" onclick="Health.setTab('alcohol',this)">Alkol</div>
+      <div class="tab" onclick="Health.setTab('notes',this)">Notlar</div>
     </div>
-    <div id="ht-water"></div><div id="ht-weight" style="display:none;"></div><div id="ht-meds" style="display:none;"></div>
-    <div id="ht-bp" style="display:none;"></div><div id="ht-sleep" style="display:none;"></div><div id="ht-calorie" style="display:none;"></div>
-    <div id="ht-smoke" style="display:none;"></div><div id="ht-alcohol" style="display:none;"></div>
+    <div id="ht-steps"></div><div id="ht-water" style="display:none;"></div><div id="ht-weight" style="display:none;"></div><div id="ht-meds" style="display:none;"></div>
+    <div id="ht-bp" style="display:none;"></div><div id="ht-sugar" style="display:none;"></div><div id="ht-sleep" style="display:none;"></div><div id="ht-calorie" style="display:none;"></div>
+    <div id="ht-smoke" style="display:none;"></div><div id="ht-alcohol" style="display:none;"></div><div id="ht-notes" style="display:none;"></div>
   </div>
   <div class="section" id="sec-family">
     <div class="tabs">
@@ -381,13 +384,32 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0;}
 <div class="modal-overlay" id="memberModal" onclick="UI.overlayClose(event,'memberModal')"><div class="modal"><div class="modal-handle"></div>
   <div class="modal-title"><svg class="ic" style="color:var(--violet)"><use href="#i-users"/></svg> <span id="memberModalTitle">Aile Üyesi</span></div>
   <input type="hidden" id="memberId">
+  <div class="form-row" style="display:flex;align-items:center;gap:12px;">
+    <div id="memberPhotoPreview" style="width:56px;height:56px;border-radius:16px;background:var(--surface2);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;font-weight:800;color:var(--text2);">?</div>
+    <div style="flex:1;"><label class="form-label">Fotoğraf</label><input type="file" id="memberPhotoFile" accept="image/*"></div>
+  </div>
   <div class="form-grid"><div><label class="form-label">İsim *</label><input id="memberName"></div><div><label class="form-label">Yakınlık</label><select id="memberRole"><option>Eş</option><option>Anne</option><option>Baba</option><option>Kardeş</option><option>Çocuk</option><option>Dede</option><option>Anneanne</option><option>Babaanne</option><option>Diğer</option></select></div></div>
   <div class="form-grid"><div><label class="form-label">Doğum Tarihi</label><input type="date" id="memberBirth"></div><div><label class="form-label">Kan Grubu</label><select id="memberBlood"><option value="">—</option><option>0 Rh+</option><option>0 Rh-</option><option>A Rh+</option><option>A Rh-</option><option>B Rh+</option><option>B Rh-</option><option>AB Rh+</option><option>AB Rh-</option></select></div></div>
+  <div class="form-grid"><div><label class="form-label">Telefon</label><input id="memberPhone" inputmode="tel"></div><div><label class="form-label">E-posta</label><input id="memberEmail" inputmode="email"></div></div>
+  <div class="form-row"><label class="form-label">Adres</label><input id="memberAddress"></div>
   <div class="form-row"><label class="form-label">Alerjiler</label><input id="memberAllergy" placeholder="Penisilin, polen..."></div>
   <div class="form-row"><label class="form-label">Sürekli Kullandığı İlaçlar</label><input id="memberMeds" placeholder="—"></div>
   <div class="form-grid"><div><label class="form-label">Doktoru</label><input id="memberDoctor"></div><div><label class="form-label">Doktor Tel</label><input id="memberDoctorTel" inputmode="tel"></div></div>
   <div class="form-row"><label class="form-label">Not</label><input id="memberNote"></div>
+  <div class="form-row" id="memberSpecialDaysWrap" style="display:none;"><label class="form-label">Özel Günler</label><div id="memberSpecialDays"></div><button class="btn btn-secondary btn-sm btn-full" style="margin-top:6px;" onclick="Fam.openSpecialDay()">+ Özel Gün Ekle</button></div>
   <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('memberModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fam.saveMember()">Kaydet</button></div>
+</div></div>
+
+<div class="modal-overlay" id="specialDayModal" onclick="UI.overlayClose(event,'specialDayModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title"><svg class="ic" style="color:var(--violet)"><use href="#i-spark"/></svg> Özel Gün</div>
+  <input type="hidden" id="sdId">
+  <div class="form-grid"><div><label class="form-label">Tür</label><select id="sdType" onchange="$('sdTitleWrap').style.display=this.value==='custom'?'block':'none'"><option value="anniversary">Evlilik Yıldönümü</option><option value="meeting">Tanışma Yıldönümü</option><option value="graduation">Mezuniyet</option><option value="custom">Özel Gün</option></select></div><div><label class="form-label">Tarih *</label><input type="date" id="sdDate"></div></div>
+  <div class="form-row" id="sdTitleWrap" style="display:none;"><label class="form-label">Başlık</label><input id="sdTitle" placeholder="Ne kutluyorsun?"></div>
+  <div class="form-grid">
+    <label style="display:flex;align-items:center;gap:8px;font-size:13.5px;cursor:pointer;"><input type="checkbox" id="sdNotify" style="width:18px;height:18px;" onchange="$('sdLeadWrap').style.display=this.checked?'block':'none'"> Bildirim</label>
+    <div id="sdLeadWrap" style="display:none;"><select id="sdLead"><option value="same">Aynı gün</option><option value="1d">1 gün önce</option><option value="3d">3 gün önce</option><option value="7d">7 gün önce</option></select></div>
+  </div>
+  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('specialDayModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fam.saveSpecialDay()">Kaydet</button></div>
 </div></div>
 
 <div class="modal-overlay" id="photoModal" onclick="UI.overlayClose(event,'photoModal')"><div class="modal"><div class="modal-handle"></div>
@@ -419,7 +441,25 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0;}
 <div class="modal-overlay" id="childModal" onclick="UI.overlayClose(event,'childModal')"><div class="modal"><div class="modal-handle"></div>
   <div class="modal-title"><svg class="ic" style="color:var(--violet)"><use href="#i-baby"/></svg> Çocuk Profili</div>
   <div class="form-grid"><div><label class="form-label">İsim *</label><input id="childName"></div><div><label class="form-label">Doğum Tarihi *</label><input type="date" id="childBirth"></div></div>
+  <div class="form-grid"><div><label class="form-label">Kan Grubu</label><select id="childBlood"><option value="">—</option><option>0 Rh+</option><option>0 Rh-</option><option>A Rh+</option><option>A Rh-</option><option>B Rh+</option><option>B Rh-</option><option>AB Rh+</option><option>AB Rh-</option></select></div><div><label class="form-label">Okul</label><input id="childSchool"></div></div>
+  <div class="form-row"><label class="form-label">Doktoru</label><input id="childDoctor"></div>
   <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('childModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fam.saveChild()">Ekle</button></div>
+</div></div>
+
+<div class="modal-overlay" id="apptModal" onclick="UI.overlayClose(event,'apptModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title"><svg class="ic" style="color:var(--rose)"><use href="#i-heart"/></svg> Randevu Ekle</div>
+  <input type="hidden" id="apptChildId">
+  <div class="form-row"><label class="form-label">Başlık *</label><input id="apptTitle" placeholder="Diş kontrolü, göz muayenesi..."></div>
+  <div class="form-grid"><div><label class="form-label">Tarih</label><input type="date" id="apptDate"></div><div><label class="form-label">Saat</label><input type="time" id="apptTime"></div></div>
+  <div class="form-row"><label class="form-label">Not</label><input id="apptNote"></div>
+  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('apptModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fam.saveAppt()">Ekle</button></div>
+</div></div>
+
+<div class="modal-overlay" id="childNoteModal" onclick="UI.overlayClose(event,'childNoteModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title">Çocuk Notu</div>
+  <input type="hidden" id="childNoteChildId">
+  <div class="form-row"><label class="form-label">Not *</label><textarea id="childNoteText"></textarea></div>
+  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('childNoteModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fam.saveChildNote()">Ekle</button></div>
 </div></div>
 
 <div class="modal-overlay" id="vaccineModal" onclick="UI.overlayClose(event,'vaccineModal')"><div class="modal"><div class="modal-handle"></div>
@@ -514,16 +554,32 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0;}
 </div></div>
 
 <div class="modal-overlay" id="addEventModal" onclick="UI.overlayClose(event,'addEventModal')"><div class="modal"><div class="modal-handle"></div>
-  <div class="modal-title"><svg class="ic" style="color:var(--accent)"><use href="#i-cal"/></svg> Etkinlik Ekle</div>
+  <div class="modal-title"><svg class="ic" style="color:var(--accent)"><use href="#i-cal"/></svg> <span id="eventModalTitle">Etkinlik Ekle</span></div>
+  <input type="hidden" id="eventId">
   <div class="form-row"><label class="form-label">Başlık *</label><input id="eventTitle"></div>
+  <div class="form-row"><label class="form-label">Açıklama</label><textarea id="eventDesc" placeholder="Opsiyonel"></textarea></div>
   <div class="form-grid"><div><label class="form-label">Tarih *</label><input type="date" id="eventDate"></div><div><label class="form-label">Saat</label><input type="time" id="eventTime"></div></div>
-  <div class="form-grid"><div><label class="form-label">Tür</label><select id="eventType"><option value="event">Etkinlik</option><option value="health">Sağlık / Randevu</option><option value="work">İş</option><option value="special">Özel Gün</option></select></div><div><label class="form-label">Tekrar</label><select id="eventRepeat"><option value="none">Tek seferlik</option><option value="weekly">Her hafta</option><option value="monthly">Her ay</option><option value="yearly">Her yıl</option></select></div></div>
+  <div class="form-row"><label class="form-label">Konum</label><input id="eventLocation" placeholder="Opsiyonel"></div>
+  <div class="form-grid"><div><label class="form-label">Kategori</label><select id="eventType"></select></div><div><label class="form-label">Tekrar</label><select id="eventRepeat"><option value="none">Tek seferlik</option><option value="weekly">Her hafta</option><option value="monthly">Her ay</option><option value="yearly">Her yıl</option></select></div></div>
+  <div class="form-row"><label class="form-label">Not</label><input id="eventNote" placeholder="Opsiyonel"></div>
+  <div class="form-grid">
+    <label style="display:flex;align-items:center;gap:8px;font-size:13.5px;cursor:pointer;"><input type="checkbox" id="eventNotify" style="width:18px;height:18px;" onchange="$('eventNotifyLeadWrap').style.display=this.checked?'block':'none'"> Bildirim</label>
+    <div id="eventNotifyLeadWrap" style="display:none;"><select id="eventNotifyLead"><option value="same">Aynı gün</option><option value="1d">1 gün önce</option><option value="3d">3 gün önce</option><option value="7d">7 gün önce</option></select></div>
+  </div>
   <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('addEventModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Cal.saveEvent()">Kaydet</button></div>
 </div></div>
 
 <div class="modal-overlay" id="quickModal" onclick="UI.overlayClose(event,'quickModal')"><div class="modal"><div class="modal-handle"></div>
   <div class="modal-title" id="quickTitle"></div><div id="quickBody"></div>
   <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('quickModal')">İptal</button><button class="btn btn-primary btn-full" id="quickSaveBtn">Kaydet</button></div>
+</div></div>
+
+<div class="modal-overlay" id="medModal" onclick="UI.overlayClose(event,'medModal')"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-title"><svg class="ic" style="color:var(--green)"><use href="#i-pill"/></svg> İlaç / Vitamin</div>
+  <div class="form-grid"><div><label class="form-label">Ad *</label><input id="medName"></div><div><label class="form-label">Doz</label><input id="medDose" placeholder="1 tablet"></div></div>
+  <div class="form-grid"><div><label class="form-label">Saat</label><input type="time" id="medTime"></div><div><label class="form-label">Başlangıç</label><input type="date" id="medStart"></div></div>
+  <div class="form-grid"><div><label class="form-label">Bitiş</label><input type="date" id="medEnd"></div><div style="display:flex;align-items:flex-end;"><label style="display:flex;align-items:center;gap:8px;font-size:13.5px;cursor:pointer;"><input type="checkbox" id="medNotify" style="width:18px;height:18px;"> Hatırlatma</label></div></div>
+  <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('medModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Health.saveMed()">Kaydet</button></div>
 </div></div>
 
 <div class="modal-overlay" id="calorieModal" onclick="UI.overlayClose(event,'calorieModal')"><div class="modal"><div class="modal-handle"></div>
@@ -584,7 +640,9 @@ const Store = {
     subs: [], budgets: {}, weights: [], meds: [], medsTaken: { date: todayStr(), ids: [] }, bp: [], sleep: [], docs: [],
     profile: { heightCm: 0 },
     /* Finans v2: genel varlık defteri, düzenli ödemeler, platform listesi, net servet geçmişi */
-    assets: [], payments: [], platforms: [...DEFAULT_PLATFORMS], netWorthHistory: [], finV2: false, finV3: false
+    assets: [], payments: [], platforms: [...DEFAULT_PLATFORMS], netWorthHistory: [], finV2: false, finV3: false,
+    /* Sağlık v2: adım, kan şekeri, sağlık notları, sigara günlüğü */
+    steps: [], stepsGoal: 8000, bloodSugar: [], healthNotes: [], smokeCfg: { pack: 1, dailyCount: 0, price: 90 }, smokeLog: []
   }; },
   load() {
     let raw = {};
@@ -594,8 +652,10 @@ const Store = {
     if (!raw.water || typeof raw.water !== 'object') raw.water = d.water;
     if (raw.water.date !== todayStr()) { raw.water.today = 0; raw.water.date = todayStr(); }
     if (!raw.medsTaken || raw.medsTaken.date !== todayStr()) raw.medsTaken = { date: todayStr(), ids: [] };
+    if (raw.smokeCfg && raw.smokeCfg.dailyCount === undefined) raw.smokeCfg.dailyCount = 0;
     (raw.notes || []).forEach(n => { if (n.pinned === undefined) n.pinned = false; if (!n.type) n.type = 'text'; });
-    (raw.children || []).forEach(c => { if (!c.growth) c.growth = []; if (!c.vaccines) c.vaccines = []; });
+    (raw.events || []).forEach(ev => { if (!ev.cat) { ev.cat = { health: 'Doktor', work: 'İş', special: 'Hatırlatma' }[ev.type] || 'Diğer'; } });
+    (raw.children || []).forEach(c => { if (!c.growth) c.growth = []; if (!c.vaccines) c.vaccines = []; if (!c.appointments) c.appointments = []; if (!c.notes) c.notes = []; });
     if (!raw.finV2) {
       if ((Number(raw.goldAmount) || 0) > 0) raw.assets.push({ id: uid(), type: 'Gram Altın', name: 'Altın', platform: '', qty: raw.goldAmount, avgCost: raw.goldPriceTry || 0, price: raw.goldPriceTry || 0, currency: 'TRY', note: '' });
       for (const st of (raw.stocks || [])) raw.assets.push({ id: uid(), type: 'BIST Hisse', name: st.symbol, platform: '', qty: st.qty, avgCost: st.buyPrice || st.currentPrice || 0, price: st.currentPrice || st.buyPrice || 0, currency: 'TRY', note: '' });
@@ -667,6 +727,12 @@ const Boot = {
 /* ═══ Birleşik Etkinlik Kaynağı — Life OS'un kalbi ═══
    Takvim, doğum günleri, aşılar, taksitler, abonelikler ve not hatırlatıcıları
    TEK fonksiyondan okunur; veri kopyalanmaz, okuma anında türetilir. */
+const EVENT_CATS = ['Toplantı', 'Doktor', 'Hastane', 'İş', 'Seyahat', 'Görev', 'Hatırlatma', 'Ödeme', 'Araç', 'Vergi', 'Diğer'];
+const SPECIAL_DAY_TYPES = { anniversary: 'Evlilik Yıldönümü', meeting: 'Tanışma Yıldönümü', graduation: 'Mezuniyet', custom: 'Özel Gün' };
+/* Bildirim altyapısı (gerçek push yok — sadece hesaplama): kayıt tarihine göre "bugün hatırlatma günü mü" hesaplanır */
+const NOTIFY_LEADS = { same: 0, '1d': 1, '3d': 3, '7d': 7 };
+const NOTIFY_LEAD_LABELS = { same: 'Aynı gün', '1d': '1 gün önce', '3d': '3 gün önce', '7d': '7 gün önce' };
+function isReminderToday(dateStr, notify, lead) { if (!notify || !dateStr) return false; const days = NOTIFY_LEADS[lead] ?? 0; return addDays(dateStr, -days) === todayStr(); }
 const EV_STYLE = {
   event:   { color: 'var(--accent)', dim: 'var(--accent-dim)', icon: 'i-cal' },
   health:  { color: 'var(--green)',  dim: 'var(--green-dim)',  icon: 'i-heart' },
@@ -677,7 +743,8 @@ const EV_STYLE = {
   debt:    { color: 'var(--rose)',   dim: 'var(--rose-dim)',   icon: 'i-wallet' },
   sub:     { color: 'var(--accent)', dim: 'var(--accent-dim)', icon: 'i-repeat' },
   payment: { color: 'var(--gold)',   dim: 'var(--gold-dim)',   icon: 'i-repeat' },
-  note:    { color: 'var(--gold)',   dim: 'var(--gold-dim)',   icon: 'i-bell' }
+  note:    { color: 'var(--gold)',   dim: 'var(--gold-dim)',   icon: 'i-bell' },
+  med:     { color: 'var(--green)',  dim: 'var(--green-dim)',  icon: 'i-pill' }
 };
 function isRecurringOnDate(ev, dateStr) {
   if (ev.date === dateStr) return true;
@@ -690,11 +757,12 @@ function isRecurringOnDate(ev, dateStr) {
 }
 function collectEvents(dateStr) {
   const s = S(), out = [], [y, mo, dd] = dateStr.split('-');
-  for (const ev of s.events) if (isRecurringOnDate(ev, dateStr)) out.push({ kind: ev.type || 'event', title: ev.title, sub: (ev.time ? ev.time + (ev.repeat && ev.repeat !== 'none' ? ' · tekrarlı' : '') : (ev.repeat && ev.repeat !== 'none' ? 'Tekrarlı' : 'Takvim')), delId: ev.id });
-  const bday = (name, birth, extra) => { if (birth && birth.slice(5) === dateStr.slice(5)) { const age = Number(y) - Number(birth.slice(0, 4)); out.push({ kind: 'bday', title: name + ' — Doğum Günü 🎈', sub: age > 0 ? age + ' yaşına giriyor' : '', }); } };
-  for (const m of s.members) bday(m.name, m.birth);
+  for (const ev of s.events) if (isRecurringOnDate(ev, dateStr)) out.push({ kind: ev.type ? 'event' : 'event', cat: ev.cat || 'Diğer', title: ev.title, sub: [ev.time, ev.location, (ev.repeat && ev.repeat !== 'none' ? 'Tekrarlı' : '')].filter(Boolean).join(' · ') || 'Takvim', time: ev.time || '', desc: ev.desc || '', location: ev.location || '', delId: ev.id, editable: true, ring: isReminderToday(ev.date, ev.notify, ev.notifyLead) });
+  const bday = (name, birth, extra) => { if (birth && birth.slice(5) === dateStr.slice(5)) { const age = Number(y) - Number(birth.slice(0, 4)); out.push({ kind: 'bday', title: name + ' — Doğum Günü 🎈', sub: age > 0 ? age + ' yaşına giriyor' : '' }); } };
+  for (const m of s.members) { bday(m.name, m.birth); for (const sd of (m.specialDays || [])) if (sd.date && sd.date.slice(5) === dateStr.slice(5)) out.push({ kind: 'bday', title: m.name + ' — ' + (SPECIAL_DAY_TYPES[sd.type] || sd.title || 'Özel Gün') + (sd.title && sd.type === 'custom' ? ': ' + sd.title : ''), sub: 'Özel gün', ring: isReminderToday(sd.date.slice(0, 4) + '-' + sd.date.slice(5), sd.notify, sd.notifyLead) }); }
   for (const c of s.children) bday(c.name, c.birth);
   for (const c of s.children) for (const v of c.vaccines) if (v.date === dateStr && v.status !== 'done') out.push({ kind: 'vaccine', title: c.name + ': ' + v.name, sub: 'Planlanan aşı' });
+  for (const c of s.children) for (const ap of (c.appointments || [])) if (ap.date === dateStr) out.push({ kind: 'event', cat: 'Doktor', title: c.name + ': ' + ap.title, sub: [ap.time, 'Randevu'].filter(Boolean).join(' · '), time: ap.time || '' });
   for (const n of s.notes) if (n.reminder && n.reminder.slice(0, 10) === dateStr) out.push({ kind: 'note', title: n.title, sub: 'Hatırlatıcı · ' + (n.reminder.slice(11, 16) || '') });
   for (const dbt of s.debts) {
     if (dbt.type !== 'borrow' || !dbt.startDate || !dbt.monthly || !dbt.instCount) continue;
@@ -705,11 +773,25 @@ function collectEvents(dateStr) {
     if (!p.repeat || p.repeat === 'none') { if (p.dueDate === dateStr && !p.paid) out.push({ kind: 'payment', title: p.name, sub: para(p.amount) + (p.autopay ? ' · Otomatik' : '') }); }
     else if (isRecurringOnDate({ date: p.dueDate, repeat: p.repeat }, dateStr) && !(p.paidPeriods || []).includes(Fin.paymentPeriodKey(p, dateStr))) out.push({ kind: 'payment', title: p.name, sub: para(p.amount) + (p.autopay ? ' · Otomatik' : '') });
   }
-  return out;
+  if (dateStr === todayStr()) for (const m of s.meds) { if (!m.time) continue; if (m.startDate && m.startDate > dateStr) continue; if (m.endDate && m.endDate < dateStr) continue; out.push({ kind: 'med', title: m.name + (m.dose ? ' · ' + m.dose : ''), sub: 'İlaç saati', time: m.time }); }
+  return out.sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
 }
+const EVENT_CAT_STYLE = {
+  'Toplantı': { color: 'var(--accent)', dim: 'var(--accent-dim)', icon: 'i-users' },
+  'Doktor': { color: 'var(--rose)', dim: 'var(--rose-dim)', icon: 'i-heart' },
+  'Hastane': { color: 'var(--rose)', dim: 'var(--rose-dim)', icon: 'i-heart' },
+  'İş': { color: 'var(--gold)', dim: 'var(--gold-dim)', icon: 'i-note' },
+  'Seyahat': { color: 'var(--cyan)', dim: 'rgba(34,211,238,.13)', icon: 'i-cal' },
+  'Görev': { color: 'var(--green)', dim: 'var(--green-dim)', icon: 'i-check' },
+  'Hatırlatma': { color: 'var(--gold)', dim: 'var(--gold-dim)', icon: 'i-bell' },
+  'Ödeme': { color: 'var(--rose)', dim: 'var(--rose-dim)', icon: 'i-wallet' },
+  'Araç': { color: 'var(--text2)', dim: 'rgba(148,163,184,.13)', icon: 'i-cal' },
+  'Vergi': { color: 'var(--rose)', dim: 'var(--rose-dim)', icon: 'i-wallet' },
+  'Diğer': { color: 'var(--accent)', dim: 'var(--accent-dim)', icon: 'i-cal' }
+};
 function evItemHTML(e) {
-  const st = EV_STYLE[e.kind] || EV_STYLE.event;
-  return '<div class="ev-item" style="border-left-color:' + st.color + '"><div class="ev-ic" style="background:' + st.dim + ';color:' + st.color + '"><svg class="ic sm"><use href="#' + st.icon + '"/></svg></div><div class="ev-body"><div class="ev-title">' + esc(e.title) + '</div>' + (e.sub ? '<div class="ev-sub">' + esc(e.sub) + '</div>' : '') + '</div>' + (e.delId ? '<button class="icon-btn del" onclick="Cal.delEvent(\'' + e.delId + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button>' : '') + '</div>';
+  const st = e.kind === 'event' ? (EVENT_CAT_STYLE[e.cat] || EVENT_CAT_STYLE['Diğer']) : (EV_STYLE[e.kind] || EV_STYLE.event);
+  return '<div class="ev-item" style="border-left-color:' + st.color + '"><div class="ev-ic" style="background:' + st.dim + ';color:' + st.color + '"><svg class="ic sm"><use href="#' + st.icon + '"/></svg></div><div class="ev-body"><div class="ev-title">' + (e.ring ? '🔔 ' : '') + esc(e.title) + (e.kind === 'event' && e.cat ? ' <span class="hint" style="font-weight:600;">· ' + esc(e.cat) + '</span>' : '') + '</div>' + (e.sub ? '<div class="ev-sub">' + esc(e.sub) + '</div>' : '') + (e.desc ? '<div class="ev-sub">' + esc(e.desc) + '</div>' : '') + '</div>' + (e.editable ? '<button class="icon-btn" onclick="Cal.openEvent(\'' + e.delId + '\')"><svg class="ic sm"><use href="#i-edit"/></svg></button>' : '') + (e.delId ? '<button class="icon-btn del" onclick="Cal.delEvent(\'' + e.delId + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button>' : '') + '</div>';
 }
 
 /* ═══ Ana Sayfa — Asistan Brifingi ═══ */
@@ -724,6 +806,12 @@ const QUOTES = [
   { t: 'Zaman, nereye gittiğini bilmeyenler için hiç yetmez.', a: 'Seneca' }
 ];
 const Home = {
+  timelineHTML(items) {
+    if (!items.length) return '';
+    const row = (e) => { const st = e.kind === 'event' ? (EVENT_CAT_STYLE[e.cat] || EVENT_CAT_STYLE['Diğer']) : (EV_STYLE[e.kind] || EV_STYLE.event);
+      return '<div style="display:flex;gap:10px;align-items:flex-start;padding:7px 0;"><div style="width:42px;flex-shrink:0;font-size:11.5px;font-weight:700;color:var(--text2);padding-top:5px;text-align:right;">' + (e.time || '') + '</div><div class="ev-ic" style="background:' + st.dim + ';color:' + st.color + ';width:30px;height:30px;min-width:30px;"><svg class="ic sm"><use href="#' + st.icon + '"/></svg></div><div style="flex:1;min-width:0;padding-top:2px;"><div style="font-size:13.5px;font-weight:700;">' + (e.ring ? '🔔 ' : '') + esc(e.title) + '</div>' + (e.sub ? '<div class="hint" style="font-size:11.5px;">' + esc(e.sub) + '</div>' : '') + '</div></div>'; };
+    return '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-cal"/></svg> Bugün</div>' + items.map(row).join('') + '</div>';
+  },
   render() {
     const s = S(), h = new Date().getHours();
     const name = localStorage.getItem('ntrk_name') || '';
@@ -731,16 +819,20 @@ const Home = {
     const today = todayStr();
     const q = QUOTES[new Date().getDate() % QUOTES.length];
 
-    /* Modül altyazıları için hızlı özet veriler (kural bazlı, AI'sız) */
+    /* Modül altyazıları — artık gerçek modül verilerinden (kural bazlı, AI'sız) */
     const todayEvents = collectEvents(today);
     let nextBday = null;
     for (let i = 0; i <= 30 && !nextBday; i++) { const d = addDays(today, i); for (const e of collectEvents(d)) if (e.kind === 'bday') { nextBday = { i, e }; break; } }
     const assets = Fin.assetsTotal(), debtOpen = Fin.openDebt();
     const netWorth = assets - debtOpen;
     const wPct = Math.min(100, Math.round((s.water.today / s.water.goal) * 100) || 0);
+    const todayStepsRow = s.steps.find(x => x.date === today);
+    const stepsVal = todayStepsRow ? todayStepsRow.count : 0;
+    const medsPending = s.meds.filter(m => !s.medsTaken.ids.includes(m.id)).length;
+    const healthSub = medsPending > 0 ? '💊 ' + medsPending + ' ilaç bekliyor' : stepsVal.toLocaleString('tr-TR') + ' adım · Su %' + wPct;
 
     const cards = [
-      { id: 'health', emoji: '❤️', color: 'var(--rose)', dim: 'var(--rose-dim)', title: 'Sağlık', sub: 'Su %' + wPct + ' · ' + s.water.today + '/' + s.water.goal + ' ml', go: "Router.go('sec-health',null,'Sağlık')" },
+      { id: 'health', emoji: '❤️', color: 'var(--rose)', dim: 'var(--rose-dim)', title: 'Sağlık', sub: healthSub, go: "Router.go('sec-health',null,'Sağlık')" },
       { id: 'finance', emoji: '💰', color: 'var(--green)', dim: 'var(--green-dim)', title: 'Finans', sub: 'Net servet ' + para(netWorth), go: "Router.go('sec-finance',null,'Finans')" },
       { id: 'family', emoji: '👨‍👩‍👧‍👦', color: 'var(--violet)', dim: 'var(--violet-dim)', title: 'Aile', sub: nextBday ? esc(nextBday.e.title.replace(' — Doğum Günü 🎈', '')) + ' doğum günü ' + (nextBday.i === 0 ? 'bugün' : nextBday.i === 1 ? 'yarın' : nextBday.i + ' gün sonra') : (s.members.length ? s.members.length + ' aile üyesi' : 'Üyeler, çocuklar, aşılar'), go: "Router.go('sec-family',null,'Aile')" },
       { id: 'agenda', emoji: '📅', color: 'var(--accent)', dim: 'var(--accent-dim)', title: 'Ajanda', sub: todayEvents.length ? 'Bugün ' + todayEvents.length + ' kayıt var' : 'Bugün için kayıt yok', go: "Router.go('sec-calendar',null,'Takvim')" },
@@ -752,6 +844,7 @@ const Home = {
     $('sec-home').innerHTML =
       '<div class="stagger"><div class="hello"><div class="greeting">' + greet + (name ? ', <span>' + esc(name) + '</span>' : '') + '</div><div class="hello-date">' + new Date().toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long' }) + '</div></div>' +
       '<div class="module-grid">' + cardsHTML + '</div>' +
+      Home.timelineHTML(todayEvents) +
       Fin.upcomingPaymentsHTML() +
       '<div class="quote-card"><div class="quote-text">“' + esc(q.t) + '”</div><div class="quote-author">— ' + esc(q.a) + '</div></div>' +
       '<p style="text-align:center;font-size:11px;color:var(--text3);margin-top:6px;">' + APP_VERSION + '</p></div>';
@@ -794,13 +887,29 @@ const Cal = {
   selDay(ds) { Cal.sel = ds; Cal.renderMonth(); },
   prev() { Cal.cur.setMonth(Cal.cur.getMonth() - 1); Cal.renderMonth(); },
   next() { Cal.cur.setMonth(Cal.cur.getMonth() + 1); Cal.renderMonth(); },
+  openEvent(id) {
+    const ev = id ? S().events.find(x => x.id === id) : null;
+    $('eventModalTitle').textContent = ev ? 'Etkinliği Düzenle' : 'Etkinlik Ekle';
+    $('eventId').value = id || '';
+    $('eventType').innerHTML = EVENT_CATS.map(c => '<option' + (ev && ev.cat === c ? ' selected' : '') + '>' + c + '</option>').join('');
+    $('eventTitle').value = ev ? ev.title : ''; $('eventDesc').value = ev ? (ev.desc || '') : '';
+    $('eventDate').value = ev ? ev.date : (Cal.sel || todayStr()); $('eventTime').value = ev ? (ev.time || '') : '';
+    $('eventLocation').value = ev ? (ev.location || '') : ''; $('eventNote').value = ev ? (ev.note || '') : '';
+    $('eventRepeat').value = ev ? (ev.repeat || 'none') : 'none';
+    $('eventNotify').checked = ev ? !!ev.notify : false; $('eventNotifyLeadWrap').style.display = ($('eventNotify').checked) ? 'block' : 'none';
+    $('eventNotifyLead').value = ev ? (ev.notifyLead || 'same') : 'same';
+    UI.open('addEventModal');
+  },
   saveEvent() {
     const t = $('eventTitle').value.trim(), d = $('eventDate').value;
     if (!t || !d) { toast('Başlık ve tarih zorunlu'); return; }
-    S().events.push({ id: uid(), title: t, date: d, time: $('eventTime').value, type: $('eventType').value, repeat: $('eventRepeat').value });
-    Store.save(); UI.close('addEventModal'); $('eventTitle').value = ''; $('eventTime').value = ''; Cal.render(); toast('Etkinlik eklendi'); if (Router.current === 'sec-home') Home.render();
+    const data = { title: t, desc: $('eventDesc').value.trim(), date: d, time: $('eventTime').value, location: $('eventLocation').value.trim(), note: $('eventNote').value.trim(), cat: $('eventType').value, repeat: $('eventRepeat').value, notify: $('eventNotify').checked, notifyLead: $('eventNotifyLead').value };
+    const id = $('eventId').value;
+    if (id) Object.assign(S().events.find(x => x.id === id), data);
+    else S().events.push({ id: uid(), ...data });
+    Store.save(); UI.close('addEventModal'); Cal.render(); toast('Kaydedildi'); if (Router.current === 'sec-home') Home.render();
   },
-  delEvent(id) { if (!UI.confirm('Etkinlik silinsin mi?')) return; S().events = S().events.filter(e => e.id !== id); Store.save(); Cal.render(); }
+  delEvent(id) { if (!UI.confirm('Etkinlik silinsin mi?')) return; S().events = S().events.filter(e => e.id !== id); Store.save(); Cal.render(); if (Router.current === 'sec-home') Home.render(); }
 };
 
 /* ═══ Global Arama ═══ */
@@ -1143,10 +1252,18 @@ const Fin = {
 /* ═══ Sağlık ═══ */
 const CAL_CHIPS = [['Mercimek Çorbası',120],['Ezogelin',110],['Pilav',250],['Bulgur',180],['Makarna',320],['Tavuk Döner',420],['Et Döner',500],['Köfte',350],['Tavuk Izgara',200],['Balık',180],['Kuru Fasulye',280],['Nohut',320],['Sarma',280],['Salata',50],['Menemen',200],['Omlet',180],['Yumurta',78],['Peynir 50g',140],['Ekmek dilim',80],['Simit',250],['Poğaça',280],['Börek',320],['Gözleme',350],['Baklava',350],['Künefe',400],['Sütlaç',200],['Çay',5],['Türk Kahvesi',10],['Ayran',60],['Süt',120],['Kola',140],['Elma',80],['Muz',90],['Pizza dilim',280],['Hamburger',500],['Patates Kız.',320],['Çikolata 30g',160]];
 const Health = {
-  tab: 'water',
-  setTab(t, el) { Health.tab = t; document.querySelectorAll('#sec-health .tab').forEach(x => x.classList.remove('active')); if (el) el.classList.add('active'); ['water','weight','meds','bp','sleep','calorie','smoke','alcohol'].forEach(x => $('ht-' + x).style.display = x === t ? 'block' : 'none'); Health.render(); },
-  goTab(t) { Router.go('sec-health', null, 'Sağlık'); const idx = { water:0, weight:1, meds:2, bp:3, sleep:4, calorie:5, smoke:6, alcohol:7 }[t] || 0; Health.setTab(t, document.querySelectorAll('#sec-health .tab')[idx]); },
-  render() { ({ water: Health.rWater, weight: Health.rWeight, meds: Health.rMeds, bp: Health.rBP, sleep: Health.rSleep, calorie: Health.rCal, smoke: Health.rSmoke, alcohol: Health.rAlc }[Health.tab])(); },
+  tab: 'steps',
+  setTab(t, el) { Health.tab = t; document.querySelectorAll('#sec-health .tab').forEach(x => x.classList.remove('active')); if (el) el.classList.add('active'); ['steps','water','weight','meds','bp','sugar','sleep','calorie','smoke','alcohol','notes'].forEach(x => $('ht-' + x).style.display = x === t ? 'block' : 'none'); Health.render(); },
+  goTab(t) { Router.go('sec-health', null, 'Sağlık'); const idx = { steps:0, water:1, weight:2, meds:3, bp:4, sugar:5, sleep:6, calorie:7, smoke:8, alcohol:9, notes:10 }[t] || 0; Health.setTab(t, document.querySelectorAll('#sec-health .tab')[idx]); },
+  render() { ({ steps: Health.rSteps, water: Health.rWater, weight: Health.rWeight, meds: Health.rMeds, bp: Health.rBP, sugar: Health.rSugar, sleep: Health.rSleep, calorie: Health.rCal, smoke: Health.rSmoke, alcohol: Health.rAlc, notes: Health.rNotes }[Health.tab])(); },
+  /* ── Adım ── */
+  rSteps() {
+    const s = S(), today = s.steps.find(x => x.date === todayStr()), val = today ? today.count : 0, pct = Math.min(100, Math.round(val / s.stepsGoal * 100) || 0);
+    const list = [...s.steps].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 7);
+    $('ht-steps').innerHTML = '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-trend"/></svg> Bugünkü Adım</div><div class="big-center"><div class="big-num num" style="color:var(--green)">' + val.toLocaleString('tr-TR') + '</div><div class="hint" style="margin-top:5px;">Hedef: ' + s.stepsGoal.toLocaleString('tr-TR') + ' · %' + pct + '</div></div><div class="progress-track" style="margin:8px 0 14px;"><div class="progress-fill" style="width:' + pct + '%;background:var(--green)"></div></div><div class="form-grid"><div><label class="form-label">Bugünkü Adım</label><input type="number" inputmode="numeric" value="' + (val || '') + '" onchange="Health.setSteps(Number(this.value)||0)"></div><div><label class="form-label">Günlük Hedef</label><input type="number" inputmode="numeric" value="' + s.stepsGoal + '" onchange="S().stepsGoal=Number(this.value)||8000;Store.save();Health.rSteps()"></div></div></div>' +
+      (list.length > 1 ? '<div class="card"><div class="card-title">Son 7 Gün</div><div class="spark">' + list.slice().reverse().map(x => '<i style="height:' + Math.max(8, Math.min(100, x.count / s.stepsGoal * 100)) + '%"></i>').join('') + '</div></div>' : '');
+  },
+  setSteps(count) { const s = S(); let t = s.steps.find(x => x.date === todayStr()); if (!t) { t = { id: uid(), date: todayStr(), count: 0 }; s.steps.push(t); } t.count = count; Store.save(); Health.rSteps(); if (Router.current === 'sec-home') Home.render(); },
   addWater(ml) { const s = S(); s.water.today += ml; Store.save(); haptic(); if (s.water.today >= s.water.goal && s.water.today - ml < s.water.goal) toast('Su hedefi tamam! 💧🎉'); if (Router.current === 'sec-health') Health.rWater(); if (Router.current === 'sec-home') Home.render(); },
   rWater() {
     const w = S().water, pct = Math.min(100, Math.round(w.today / w.goal * 100));
@@ -1159,21 +1276,29 @@ const Health = {
     const bmi = last && h ? (last.kg / ((h / 100) ** 2)).toFixed(1) : null;
     const min = Math.min(...list.map(x => x.kg), Infinity), max = Math.max(...list.map(x => x.kg), -Infinity);
     const spark = list.length > 1 ? '<div class="spark">' + list.slice(-14).map(x => '<i style="height:' + (max > min ? 15 + (x.kg - min) / (max - min) * 85 : 55) + '%"></i>').join('') + '</div>' : '';
-    $('ht-weight').innerHTML = '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-scale"/></svg> Kilo Takibi</div>' + (last ? '<div class="big-center"><div class="big-num num" style="font-size:40px;">' + last.kg + '<span style="font-size:15px;color:var(--text3)"> kg</span></div><div class="hint">' + trDateShort(last.date) + (bmi ? ' · BMI ' + bmi : '') + '</div></div>' + spark : '<p class="hint">İlk kilonu ekle; eğilim grafiği burada oluşur.</p>') + '<button class="btn btn-primary btn-full" style="margin-top:12px;" onclick="Health.quick(\'Kilo Ekle\',\'<div class=form-grid><div><label class=form-label>Tarih</label><input type=date id=qDate value=&quot;\'+todayStr()+\'&quot;></div><div><label class=form-label>Kilo (kg)</label><input type=number step=0.1 id=qKg inputmode=decimal></div></div>\',()=>{const kg=Number($(\'qKg\').value);if(!kg)return;S().weights.push({id:uid(),date:$(\'qDate\').value||todayStr(),kg});Store.save();UI.close(\'quickModal\');Health.rWeight();toast(\'Eklendi\')})"><svg class="ic sm"><use href="#i-plus"/></svg> Kilo Ekle</button></div>' +
-    (list.length ? '<div class="card">' + [...list].reverse().slice(0, 10).map(x => '<div class="vaccine-row"><span style="flex:1;" class="num">' + x.kg + ' kg</span><span class="hint">' + trDateShort(x.date) + '</span><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="S().weights=S().weights.filter(w=>w.id!==\'' + x.id + '\');Store.save();Health.rWeight()"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>').join('') + '</div>' : '');
+    $('ht-weight').innerHTML = '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-scale"/></svg> Boy / Kilo Takibi</div>' + (last ? '<div class="big-center"><div class="big-num num" style="font-size:40px;">' + last.kg + '<span style="font-size:15px;color:var(--text3)"> kg</span></div><div class="hint">' + trDateShort(last.date) + (last.cm ? ' · ' + last.cm + ' cm' : '') + (bmi ? ' · BMI ' + bmi : '') + '</div></div>' + spark : '<p class="hint">İlk kilonu ekle; eğilim grafiği burada oluşur.</p>') + '<button class="btn btn-primary btn-full" style="margin-top:12px;" onclick="Health.quick(\'Boy / Kilo Ekle\',\'<div class=form-grid3><div><label class=form-label>Tarih</label><input type=date id=qDate value=&quot;\'+todayStr()+\'&quot;></div><div><label class=form-label>Boy (cm)</label><input type=number id=qCm inputmode=decimal value=&quot;\'+(S().profile.heightCm||\'\')+\'&quot;></div><div><label class=form-label>Kilo (kg) *</label><input type=number step=0.1 id=qKg inputmode=decimal></div></div>\',()=>{const kg=Number($(\'qKg\').value);if(!kg)return;const cm=Number($(\'qCm\').value)||0;if(cm)S().profile.heightCm=cm;S().weights.push({id:uid(),date:$(\'qDate\').value||todayStr(),kg,cm});Store.save();UI.close(\'quickModal\');Health.rWeight();toast(\'Eklendi\')})"><svg class="ic sm"><use href="#i-plus"/></svg> Kayıt Ekle</button></div>' +
+    (list.length ? '<div class="card">' + [...list].reverse().slice(0, 10).map(x => '<div class="vaccine-row"><span style="flex:1;" class="num">' + x.kg + ' kg' + (x.cm ? ' · ' + x.cm + ' cm' : '') + '</span><span class="hint">' + trDateShort(x.date) + '</span><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="S().weights=S().weights.filter(w=>w.id!==\'' + x.id + '\');Store.save();Health.rWeight()"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>').join('') + '</div>' : '');
   },
   rMeds() {
     const s = S(), taken = s.medsTaken.ids;
     $('ht-meds').innerHTML = '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-pill"/></svg> İlaç & Vitamin — Bugün</div>' +
-      (s.meds.length ? s.meds.map(m => { const ok = taken.includes(m.id); return '<div class="check-line ' + (ok ? 'done' : '') + '" onclick="Health.toggleMed(\'' + m.id + '\')"><span class="check-box"><svg class="ic sm"><use href="#i-check"/></svg></span><span style="flex:1;">' + esc(m.name) + (m.dose ? ' <span class="hint">· ' + esc(m.dose) + '</span>' : '') + '</span><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="event.stopPropagation();if(UI.confirm(\'Silinsin mi?\')){S().meds=S().meds.filter(x=>x.id!==\'' + m.id + '\');Store.save();Health.rMeds()}"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>'; }).join('') : '<p class="hint">Düzenli ilaç/vitaminlerini ekle; her gün dokunarak işaretle, durum brifinge düşer.</p>') +
-      '<button class="btn btn-primary btn-full btn-sm" style="margin-top:10px;" onclick="Health.quick(\'İlaç / Vitamin Ekle\',\'<div class=form-grid><div><label class=form-label>Ad *</label><input id=qName></div><div><label class=form-label>Doz</label><input id=qDose placeholder=&quot;1 tablet, sabah&quot;></div></div>\',()=>{const n=$(\'qName\').value.trim();if(!n)return;S().meds.push({id:uid(),name:n,dose:$(\'qDose\').value.trim()});Store.save();UI.close(\'quickModal\');Health.rMeds();toast(\'Eklendi\')})"><svg class="ic sm"><use href="#i-plus"/></svg> Ekle</button></div>';
+      (s.meds.length ? s.meds.map(m => { const ok = taken.includes(m.id); return '<div class="check-line ' + (ok ? 'done' : '') + '" onclick="Health.toggleMed(\'' + m.id + '\')"><span class="check-box"><svg class="ic sm"><use href="#i-check"/></svg></span><span style="flex:1;">' + esc(m.name) + (m.dose ? ' <span class="hint">· ' + esc(m.dose) + '</span>' : '') + (m.time ? ' <span class="hint">· ' + m.time + '</span>' : '') + (m.notify ? ' 🔔' : '') + '</span><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="event.stopPropagation();if(UI.confirm(\'Silinsin mi?\')){S().meds=S().meds.filter(x=>x.id!==\'' + m.id + '\');Store.save();Health.rMeds()}"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>'; }).join('') : '<p class="hint">Düzenli ilaç/vitaminlerini ekle; her gün dokunarak işaretle, durum brifinge düşer.</p>') +
+      '<button class="btn btn-primary btn-full btn-sm" style="margin-top:10px;" onclick="Health.openMed()"><svg class="ic sm"><use href="#i-plus"/></svg> Ekle</button></div>';
   },
+  openMed() { $('medName').value = ''; $('medDose').value = ''; $('medTime').value = ''; $('medStart').value = ''; $('medEnd').value = ''; $('medNotify').checked = false; UI.open('medModal'); },
+  saveMed() { const n = $('medName').value.trim(); if (!n) { toast('Ad zorunlu'); return; } S().meds.push({ id: uid(), name: n, dose: $('medDose').value.trim(), time: $('medTime').value, startDate: $('medStart').value, endDate: $('medEnd').value, notify: $('medNotify').checked }); Store.save(); UI.close('medModal'); Health.rMeds(); toast('Eklendi'); if (Router.current === 'sec-home') Home.render(); },
   toggleMed(id) { const t = S().medsTaken; t.ids.includes(id) ? t.ids = t.ids.filter(x => x !== id) : t.ids.push(id); Store.save(); haptic(); Health.rMeds(); },
   rBP() {
     const s = S(), list = [...s.bp].sort((a, b) => b.date.localeCompare(a.date));
     $('ht-bp').innerHTML = '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-pulse"/></svg> Tansiyon & Nabız</div>' +
       (list.length ? list.slice(0, 12).map(x => '<div class="vaccine-row"><b class="num" style="font-size:15px;">' + x.sys + '/' + x.dia + '</b><span class="hint num">' + (x.pulse ? x.pulse + ' nb' : '') + '</span><span style="flex:1;"></span><span class="hint">' + trDateShort(x.date) + '</span><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="S().bp=S().bp.filter(b=>b.id!==\'' + x.id + '\');Store.save();Health.rBP()"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>').join('') : '<p class="hint">Ölçümlerini kaydet; kendi ve ailenin takibi için son 12 kayıt listelenir.</p>') +
       '<button class="btn btn-primary btn-full btn-sm" style="margin-top:10px;" onclick="Health.quick(\'Tansiyon Ekle\',\'<div class=form-grid3><div><label class=form-label>Büyük</label><input type=number id=qSys inputmode=numeric placeholder=120></div><div><label class=form-label>Küçük</label><input type=number id=qDia inputmode=numeric placeholder=80></div><div><label class=form-label>Nabız</label><input type=number id=qPulse inputmode=numeric></div></div>\',()=>{const sy=Number($(\'qSys\').value),di=Number($(\'qDia\').value);if(!sy||!di)return;S().bp.push({id:uid(),date:todayStr(),sys:sy,dia:di,pulse:Number($(\'qPulse\').value)||null});Store.save();UI.close(\'quickModal\');Health.rBP();toast(\'Kaydedildi\')})"><svg class="ic sm"><use href="#i-plus"/></svg> Ölçüm Ekle</button></div>';
+  },
+  rSugar() {
+    const s = S(), list = [...s.bloodSugar].sort((a, b) => b.date.localeCompare(a.date));
+    $('ht-sugar').innerHTML = '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-drop"/></svg> Kan Şekeri</div>' +
+      (list.length ? list.slice(0, 12).map(x => '<div class="vaccine-row"><b class="num" style="font-size:15px;">' + x.value + ' mg/dL</b><span class="hint">' + esc(x.type || '') + '</span><span style="flex:1;"></span><span class="hint">' + trDateShort(x.date) + '</span><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="S().bloodSugar=S().bloodSugar.filter(b=>b.id!==\'' + x.id + '\');Store.save();Health.rSugar()"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>').join('') : '<p class="hint">Ölçümlerini kaydet; son 12 kayıt burada listelenir.</p>') +
+      '<button class="btn btn-primary btn-full btn-sm" style="margin-top:10px;" onclick="Health.quick(\'Kan Şekeri Ekle\',\'<div class=form-grid><div><label class=form-label>Değer (mg/dL) *</label><input type=number id=qVal inputmode=numeric></div><div><label class=form-label>Tür</label><select id=qSType><option value=&quot;Aç&quot;>Aç</option><option value=&quot;Tok&quot;>Tok</option><option value=&quot;Diğer&quot;>Diğer</option></select></div></div>\',()=>{const v=Number($(\'qVal\').value);if(!v)return;S().bloodSugar.push({id:uid(),date:todayStr(),value:v,type:$(\'qSType\').value});Store.save();UI.close(\'quickModal\');Health.rSugar();toast(\'Kaydedildi\')})"><svg class="ic sm"><use href="#i-plus"/></svg> Ölçüm Ekle</button></div>';
   },
   rSleep() {
     const s = S(), list = [...s.sleep].sort((a, b) => b.date.localeCompare(a.date));
@@ -1195,13 +1320,30 @@ const Health = {
     let inner;
     if (!s.smokeQuit) inner = '<p class="hint" style="margin-bottom:10px;">Bıraktığın tarihi gir, sayaç başlasın.</p><input type="date" id="smokeDate" value="' + todayStr() + '"><button class="btn btn-success btn-full" style="margin-top:10px;" onclick="S().smokeQuit=$(\'smokeDate\').value;Store.save();Health.rSmoke()">Başlat</button>';
     else { const days = Math.max(0, Math.floor((new Date(todayStr() + 'T12:00') - new Date(s.smokeQuit + 'T12:00')) / 86400000)); const save = Math.round(days * s.smokeCfg.pack * s.smokeCfg.price); inner = '<div class="big-center"><div class="big-num num" style="color:var(--green);font-size:56px;">' + days + '</div><div class="hint">gündür sigarasız 🎉</div><div class="num" style="font-size:22px;font-weight:800;color:var(--gold);margin-top:8px;">' + para(save) + ' cepte</div></div><hr><div class="form-grid"><div><label class="form-label">Günlük paket</label><input type="number" step="0.5" value="' + s.smokeCfg.pack + '" onchange="S().smokeCfg.pack=Number(this.value)||1;Store.save();Health.rSmoke()"></div><div><label class="form-label">Paket fiyatı (₺)</label><input type="number" value="' + s.smokeCfg.price + '" onchange="S().smokeCfg.price=Number(this.value)||90;Store.save();Health.rSmoke()"></div></div><button class="btn btn-danger btn-sm btn-full" onclick="if(UI.confirm(\'Sayaç sıfırlansın mı?\')){S().smokeQuit=null;Store.save();Health.rSmoke()}">Sıfırla</button>'; }
-    $('ht-smoke').innerHTML = '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-smoke"/></svg> Sigarasız Günler</div>' + inner + '</div>';
+    $('ht-smoke').innerHTML = '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-smoke"/></svg> Sigarasız Günler</div>' + inner + '</div>' + (s.smokeQuit ? '' : Health.smokeCostCard());
   },
+  smokeCostCard() {
+    const s = S(), cfg = s.smokeCfg, monthly = Math.round(cfg.dailyCount / 20 * cfg.price * 30), yearly = Math.round(cfg.dailyCount / 20 * cfg.price * 365);
+    const log = [...s.smokeLog].sort((a, b) => a.date.localeCompare(b.date)).slice(-14);
+    const maxC = Math.max(1, ...log.map(x => x.count));
+    return '<div class="card"><div class="card-title"><svg class="ic" style="color:var(--gold)"><use href="#i-flame"/></svg> Sigara Maliyeti</div><div class="form-grid"><div><label class="form-label">Günlük Adet</label><input type="number" inputmode="numeric" value="' + cfg.dailyCount + '" onchange="S().smokeCfg.dailyCount=Number(this.value)||0;Store.save();Health.rSmoke()"></div><div><label class="form-label">Paket Fiyatı (₺)</label><input type="number" inputmode="decimal" value="' + cfg.price + '" onchange="S().smokeCfg.price=Number(this.value)||90;Store.save();Health.rSmoke()"></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;text-align:center;"><div><div class="hint">AYLIK MALİYET</div><div class="num" style="font-size:18px;font-weight:800;color:var(--rose)">' + para(monthly) + '</div></div><div><div class="hint">YILLIK MALİYET</div><div class="num" style="font-size:18px;font-weight:800;color:var(--rose)">' + para(yearly) + '</div></div></div>' +
+      '<button class="btn btn-secondary btn-full btn-sm" style="margin-top:12px;" onclick="Health.logSmokeToday()">Bugünkü Adedi Günlüğe Kaydet</button>' +
+      (log.length > 1 ? '<div class="hint" style="margin-top:12px;">Son 14 Gün</div><div class="spark">' + log.map(x => '<i style="height:' + Math.max(8, x.count / maxC * 100) + '%"></i>').join('') + '</div>' : '') + '</div>';
+  },
+  logSmokeToday() { const s = S(); let t = s.smokeLog.find(x => x.date === todayStr()); if (!t) { t = { date: todayStr(), count: 0 }; s.smokeLog.push(t); } t.count = s.smokeCfg.dailyCount; Store.save(); Health.rSmoke(); toast('Günlüğe kaydedildi'); },
   rAlc() {
     const s = S(), list = [...s.alcohol].sort((a, b) => b.date.localeCompare(a.date));
-    $('ht-alcohol').innerHTML = '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-glass"/></svg> Alkol Kaydı</div>' +
+    const weekAgo = addDays(todayStr(), -7), monthAgo = addDays(todayStr(), -30);
+    const weekTotal = s.alcohol.filter(a => a.date >= weekAgo).reduce((a, b) => a + Number(b.qty || 0), 0);
+    const monthTotal = s.alcohol.filter(a => a.date >= monthAgo).reduce((a, b) => a + Number(b.qty || 0), 0);
+    $('ht-alcohol').innerHTML = '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-glass"/></svg> Alkol Kaydı</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;"><div style="text-align:center;"><div class="hint">HAFTALIK TOPLAM</div><div class="num" style="font-size:20px;font-weight:800;">' + weekTotal + '</div></div><div style="text-align:center;"><div class="hint">AYLIK TOPLAM</div><div class="num" style="font-size:20px;font-weight:800;">' + monthTotal + '</div></div></div>' +
       (list.length ? list.slice(0, 12).map(a => '<div class="vaccine-row"><span style="flex:1;">' + esc(a.type) + '</span><span class="badge badge-violet num">' + a.qty + ' adet</span><span class="hint">' + trDateShort(a.date) + '</span><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="S().alcohol=S().alcohol.filter(x=>x.id!==\'' + a.id + '\');Store.save();Health.rAlc()"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>').join('') : '<p class="hint">Tüketimini kaydet; ölçülü olan bilir.</p>') +
       '<button class="btn btn-primary btn-full btn-sm" style="margin-top:10px;" onclick="Health.quick(\'Alkol Kaydı\',\'<div class=form-grid><div><label class=form-label>Tür</label><select id=qType><option>Bira</option><option>Şarap</option><option>Rakı</option><option>Viski</option><option>Kokteyl</option><option>Diğer</option></select></div><div><label class=form-label>Adet</label><input type=number id=qQty value=1 inputmode=numeric></div></div>\',()=>{S().alcohol.push({id:uid(),type:$(\'qType\').value,qty:Number($(\'qQty\').value)||1,date:todayStr()});Store.save();UI.close(\'quickModal\');Health.rAlc();toast(\'Kaydedildi\')})"><svg class="ic sm"><use href="#i-plus"/></svg> Kayıt Ekle</button></div>';
+  },
+  rNotes() {
+    const s = S();
+    $('ht-notes').innerHTML = '<button class="btn btn-primary btn-full" style="margin-bottom:12px;" onclick="Health.quick(\'Sağlık Notu\',\'<div class=form-row><label class=form-label>Not *</label><textarea id=qNoteText></textarea></div>\',()=>{const t=$(\'qNoteText\').value.trim();if(!t)return;S().healthNotes.push({id:uid(),text:t,date:todayStr()});Store.save();UI.close(\'quickModal\');Health.rNotes();toast(\'Eklendi\')})"><svg class="ic sm"><use href="#i-plus"/></svg> Not Ekle</button>' +
+      (s.healthNotes.length ? [...s.healthNotes].reverse().map(n => '<div class="note-card"><div class="nc-preview" style="-webkit-line-clamp:5;color:var(--text);">' + esc(n.text) + '</div><div class="nc-footer"><span class="nc-date">' + trDateShort(n.date) + '</span><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="if(UI.confirm(\'Silinsin mi?\')){S().healthNotes=S().healthNotes.filter(x=>x.id!==\'' + n.id + '\');Store.save();Health.rNotes()}"><svg class="ic sm"><use href="#i-trash"/></svg></button></div></div>').join('') : '<div class="empty"><div class="empty-text">Doktor tavsiyeleri, semptomlar, gözlemler burada</div></div>');
   }
 };
 
@@ -1215,7 +1357,8 @@ const Fam = {
   rMembers() {
     const s = S();
     $('fam-members').innerHTML = '<button class="btn btn-primary btn-full" style="margin-bottom:12px;" onclick="Fam.openMember()"><svg class="ic sm"><use href="#i-plus"/></svg> Aile Üyesi Ekle</button>' +
-      (s.members.length ? '<div class="family-grid">' + s.members.map(m => '<div class="family-card" onclick="Fam.openMember(\'' + m.id + '\')"><div class="family-avatar" style="font-weight:800;font-size:17px;">' + Fam.initials(m.name) + '</div><div class="family-name">' + esc(m.name) + '</div><div class="family-role">' + esc(m.role || '') + '</div>' + (m.birth ? '<div class="hint" style="margin-top:3px;">' + (ageOf(m.birth) ?? '') + ' yaş · ' + trDateShort(m.birth) + '</div>' : '') + (m.blood ? '<div class="badge badge-red" style="margin-top:7px;">' + esc(m.blood) + '</div>' : '') + '</div>').join('') + '</div><p class="hint" style="margin-top:10px;">Karta dokun: acil durum bilgileri ve düzenleme. Doğum günleri takvime otomatik düşer.</p>' : '<div class="empty"><svg class="ic"><use href="#i-users"/></svg><div class="empty-text">Aileni ekle — doğum günleri ve acil bilgiler tek yerde</div></div>');
+      (s.members.length ? '<div class="family-grid">' + s.members.map(m => '<div class="family-card" onclick="Fam.openMember(\'' + m.id + '\')"><div class="family-avatar" id="mav-' + m.id + '" style="font-weight:800;font-size:17px;overflow:hidden;">' + Fam.initials(m.name) + '</div><div class="family-name">' + esc(m.name) + '</div><div class="family-role">' + esc(m.role || '') + '</div>' + (m.birth ? '<div class="hint" style="margin-top:3px;">' + (ageOf(m.birth) ?? '') + ' yaş · ' + trDateShort(m.birth) + '</div>' : '') + (m.blood ? '<div class="badge badge-red" style="margin-top:7px;">' + esc(m.blood) + '</div>' : '') + '</div>').join('') + '</div><p class="hint" style="margin-top:10px;">Karta dokun: acil durum bilgileri ve düzenleme. Doğum günleri ve özel günler takvime otomatik düşer.</p>' : '<div class="empty"><svg class="ic"><use href="#i-users"/></svg><div class="empty-text">Aileni ekle — doğum günleri ve acil bilgiler tek yerde</div></div>');
+    s.members.filter(m => m.photo).forEach(async m => { const el = $('mav-' + m.id); if (!el) return; const src = await IDB.get('member-' + m.id); if (src) el.innerHTML = '<img src="' + src + '" style="width:100%;height:100%;object-fit:cover;" alt="">'; });
   },
   openMember(id) {
     const m = id ? S().members.find(x => x.id === id) : null;
@@ -1223,33 +1366,69 @@ const Fam = {
     $('memberId').value = m ? m.id : '';
     $('memberName').value = m ? m.name : ''; $('memberRole').value = m ? m.role : 'Eş'; $('memberBirth').value = m ? (m.birth || '') : '';
     $('memberBlood').value = m ? (m.blood || '') : ''; $('memberAllergy').value = m ? (m.allergy || '') : ''; $('memberMeds').value = m ? (m.meds || '') : '';
+    $('memberPhone').value = m ? (m.phone || '') : ''; $('memberEmail').value = m ? (m.email || '') : ''; $('memberAddress').value = m ? (m.address || '') : '';
     $('memberDoctor').value = m ? (m.doctor || '') : ''; $('memberDoctorTel').value = m ? (m.doctorTel || '') : ''; $('memberNote').value = m ? (m.note || '') : '';
+    $('memberPhotoFile').value = '';
+    $('memberPhotoPreview').innerHTML = Fam.initials(m ? m.name : '');
+    if (m && m.photo) IDB.get('member-' + m.id).then(src => { if (src) $('memberPhotoPreview').innerHTML = '<img src="' + src + '" style="width:100%;height:100%;object-fit:cover;" alt="">'; });
+    $('memberSpecialDaysWrap').style.display = m ? 'block' : 'none';
+    if (m) Fam.renderMemberSpecialDays(m.id);
     let del = document.getElementById('memberDelBtn');
     if (!del) { del = document.createElement('button'); del.id = 'memberDelBtn'; del.className = 'btn btn-danger btn-sm btn-full'; del.innerHTML = 'Üyeyi Sil'; document.querySelector('#memberModal .modal-actions').before(del); }
     del.style.display = m ? 'block' : 'none';
     del.onclick = () => { if (UI.confirm(m.name + ' silinsin mi?')) { S().members = S().members.filter(x => x.id !== m.id); Store.save(); UI.close('memberModal'); Fam.rMembers(); } };
     UI.open('memberModal');
   },
-  saveMember() {
+  async saveMember() {
     const name = $('memberName').value.trim(); if (!name) { toast('İsim zorunlu'); return; }
-    const data = { name, role: $('memberRole').value, birth: $('memberBirth').value, blood: $('memberBlood').value, allergy: $('memberAllergy').value.trim(), meds: $('memberMeds').value.trim(), doctor: $('memberDoctor').value.trim(), doctorTel: $('memberDoctorTel').value.trim(), note: $('memberNote').value.trim() };
-    const id = $('memberId').value;
+    const data = { name, role: $('memberRole').value, birth: $('memberBirth').value, blood: $('memberBlood').value, allergy: $('memberAllergy').value.trim(), meds: $('memberMeds').value.trim(), phone: $('memberPhone').value.trim(), email: $('memberEmail').value.trim(), address: $('memberAddress').value.trim(), doctor: $('memberDoctor').value.trim(), doctorTel: $('memberDoctorTel').value.trim(), note: $('memberNote').value.trim() };
+    let id = $('memberId').value;
     if (id) Object.assign(S().members.find(x => x.id === id), data);
-    else S().members.push({ id: uid(), ...data });
+    else { id = uid(); S().members.push({ id, specialDays: [], ...data }); }
+    const f = $('memberPhotoFile').files[0];
+    if (f) { await IDB.put('member-' + id, await fileToDataURL(f)); const mm = S().members.find(x => x.id === id); mm.photo = true; }
     Store.save(); UI.close('memberModal'); Fam.rMembers(); toast('Kaydedildi');
   },
+  /* ── Özel Günler (doğum günü hariç — o zaten üyenin doğum tarihinden otomatik gelir) ── */
+  renderMemberSpecialDays(memberId) {
+    const m = S().members.find(x => x.id === memberId); if (!m) return;
+    const days = m.specialDays || [];
+    $('memberSpecialDays').innerHTML = days.length ? days.map(sd => '<div class="vaccine-row"><span style="flex:1;">' + (sd.notify ? '🔔 ' : '') + esc(SPECIAL_DAY_TYPES[sd.type] || 'Özel Gün') + (sd.title ? ': ' + esc(sd.title) : '') + '</span><span class="hint">' + trDateShort(sd.date) + '</span><button class="icon-btn del" style="min-width:30px;min-height:30px;" onclick="Fam.delSpecialDay(\'' + memberId + '\',\'' + sd.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>').join('') : '<p class="hint">Evlilik/tanışma yıldönümü, mezuniyet gibi özel günler ekleyebilirsin.</p>';
+  },
+  openSpecialDay() {
+    $('sdId').value = ''; $('sdType').value = 'anniversary'; $('sdTitleWrap').style.display = 'none'; $('sdTitle').value = '';
+    $('sdDate').value = todayStr(); $('sdNotify').checked = false; $('sdLeadWrap').style.display = 'none'; $('sdLead').value = 'same';
+    UI.open('specialDayModal');
+  },
+  saveSpecialDay() {
+    const memberId = $('memberId').value, m = S().members.find(x => x.id === memberId); if (!m) { toast('Önce üyeyi kaydet'); return; }
+    const date = $('sdDate').value; if (!date) { toast('Tarih zorunlu'); return; }
+    if (!m.specialDays) m.specialDays = [];
+    m.specialDays.push({ id: uid(), type: $('sdType').value, title: $('sdTitle').value.trim(), date, notify: $('sdNotify').checked, notifyLead: $('sdLead').value });
+    Store.save(); UI.close('specialDayModal'); Fam.renderMemberSpecialDays(memberId); toast('Özel gün eklendi');
+  },
+  delSpecialDay(memberId, sdId) { const m = S().members.find(x => x.id === memberId); if (!m) return; m.specialDays = (m.specialDays || []).filter(x => x.id !== sdId); Store.save(); Fam.renderMemberSpecialDays(memberId); },
   rChildren() {
     const s = S();
     $('fam-children').innerHTML = '<button class="btn btn-primary btn-full" style="margin-bottom:12px;" onclick="UI.open(\'childModal\')"><svg class="ic sm"><use href="#i-plus"/></svg> Çocuk Profili Ekle</button>' +
       (s.children.length ? s.children.map(c => {
         const g = [...(c.growth || [])].sort((a, b) => a.date.localeCompare(b.date)); const lg = g[g.length - 1];
         const vhtml = (c.vaccines || []).map(v => '<div class="vaccine-row"><span class="badge ' + (v.status === 'done' ? 'badge-green' : 'badge-gold') + '">' + (v.status === 'done' ? '✓' : '◷') + '</span><span style="flex:1;">' + esc(v.name) + '</span><span class="hint">' + (v.date ? trDateShort(v.date) : '') + '</span><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="Fam.delVaccine(\'' + c.id + '\',\'' + v.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>').join('');
-        return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;"><div><div style="font-size:16px;font-weight:800;">' + esc(c.name) + '</div><div class="hint">' + (c.birth ? (ageOf(c.birth) ?? '?') + ' yaşında · ' + trDate(c.birth) : '') + (lg ? ' · ' + lg.h + ' cm / ' + lg.w + ' kg' : '') + '</div></div><button class="icon-btn del" onclick="if(UI.confirm(\'Profil silinsin mi?\')){S().children=S().children.filter(x=>x.id!==\'' + c.id + '\');Store.save();Fam.rChildren()}"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>' +
-          (vhtml ? '<hr>' + vhtml : '') +
-          '<div style="display:flex;gap:8px;margin-top:12px;"><button class="btn btn-secondary btn-sm" style="flex:1;" onclick="$(\'vaccineChildId\').value=\'' + c.id + '\';$(\'vaccineDate\').value=todayStr();UI.open(\'vaccineModal\')"><svg class="ic sm"><use href="#i-syringe"/></svg> Aşı</button><button class="btn btn-secondary btn-sm" style="flex:1;" onclick="$(\'growthChildId\').value=\'' + c.id + '\';$(\'growthDate\').value=todayStr();UI.open(\'growthModal\')"><svg class="ic sm"><use href="#i-scale"/></svg> Boy/Kilo</button></div></div>';
+        const ahtml = (c.appointments || []).slice().sort((a, b) => (a.date || '').localeCompare(b.date || '')).map(ap => '<div class="vaccine-row"><span style="flex:1;">' + esc(ap.title) + (ap.note ? ' <span class="hint">· ' + esc(ap.note) + '</span>' : '') + '</span><span class="hint">' + (ap.date ? trDateShort(ap.date) : '') + (ap.time ? ' ' + ap.time : '') + '</span><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="Fam.delAppt(\'' + c.id + '\',\'' + ap.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>').join('');
+        const nhtml = (c.notes || []).slice().reverse().map(n => '<div class="vaccine-row"><span style="flex:1;">' + esc(n.text) + '</span><span class="hint">' + trDateShort(n.date) + '</span><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="Fam.delChildNote(\'' + c.id + '\',\'' + n.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>').join('');
+        const meta = [c.blood ? esc(c.blood) : '', c.school ? 'Okul: ' + esc(c.school) : '', c.doctor ? 'Dr. ' + esc(c.doctor) : ''].filter(Boolean).join(' · ');
+        return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;"><div><div style="font-size:16px;font-weight:800;">' + esc(c.name) + '</div><div class="hint">' + (c.birth ? (ageOf(c.birth) ?? '?') + ' yaşında · ' + trDate(c.birth) : '') + (lg ? ' · ' + lg.h + ' cm / ' + lg.w + ' kg' : '') + '</div>' + (meta ? '<div class="hint" style="margin-top:2px;">' + meta + '</div>' : '') + '</div><button class="icon-btn del" onclick="if(UI.confirm(\'Profil silinsin mi?\')){S().children=S().children.filter(x=>x.id!==\'' + c.id + '\');Store.save();Fam.rChildren()}"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>' +
+          (vhtml ? '<div class="hint" style="margin:10px 0 3px;font-weight:700;">AŞI TAKVİMİ</div>' + vhtml : '') +
+          (ahtml ? '<div class="hint" style="margin:10px 0 3px;font-weight:700;">RANDEVULAR</div>' + ahtml : '') +
+          (nhtml ? '<div class="hint" style="margin:10px 0 3px;font-weight:700;">NOTLAR</div>' + nhtml : '') +
+          '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;"><button class="btn btn-secondary btn-sm" onclick="$(\'vaccineChildId\').value=\'' + c.id + '\';$(\'vaccineDate\').value=todayStr();UI.open(\'vaccineModal\')"><svg class="ic sm"><use href="#i-syringe"/></svg> Aşı</button><button class="btn btn-secondary btn-sm" onclick="$(\'growthChildId\').value=\'' + c.id + '\';$(\'growthDate\').value=todayStr();UI.open(\'growthModal\')"><svg class="ic sm"><use href="#i-scale"/></svg> Boy/Kilo</button><button class="btn btn-secondary btn-sm" onclick="$(\'apptChildId\').value=\'' + c.id + '\';$(\'apptDate\').value=todayStr();UI.open(\'apptModal\')"><svg class="ic sm"><use href="#i-heart"/></svg> Randevu</button><button class="btn btn-secondary btn-sm" onclick="$(\'childNoteChildId\').value=\'' + c.id + '\';UI.open(\'childNoteModal\')"><svg class="ic sm"><use href="#i-note"/></svg> Not</button></div></div>';
       }).join('') : '<div class="empty"><svg class="ic"><use href="#i-baby"/></svg><div class="empty-text">Çocuk profili ekle — aşı takvimi ve gelişim takibi</div></div>');
   },
-  saveChild() { const n = $('childName').value.trim(), b = $('childBirth').value; if (!n || !b) { toast('İsim ve doğum tarihi zorunlu'); return; } S().children.push({ id: uid(), name: n, birth: b, vaccines: [], growth: [] }); Store.save(); UI.close('childModal'); $('childName').value = ''; Fam.rChildren(); toast('Eklendi'); },
+  saveChild() { const n = $('childName').value.trim(), b = $('childBirth').value; if (!n || !b) { toast('İsim ve doğum tarihi zorunlu'); return; } S().children.push({ id: uid(), name: n, birth: b, blood: $('childBlood').value, school: $('childSchool').value.trim(), doctor: $('childDoctor').value.trim(), vaccines: [], growth: [], appointments: [], notes: [] }); Store.save(); UI.close('childModal'); $('childName').value = ''; $('childSchool').value = ''; $('childDoctor').value = ''; Fam.rChildren(); toast('Eklendi'); },
+  saveAppt() { const cid = $('apptChildId').value, t = $('apptTitle').value.trim(); if (!t) { toast('Başlık zorunlu'); return; } const c = S().children.find(x => x.id === cid); if (!c) return; if (!c.appointments) c.appointments = []; c.appointments.push({ id: uid(), title: t, date: $('apptDate').value || todayStr(), time: $('apptTime').value, note: $('apptNote').value.trim() }); Store.save(); UI.close('apptModal'); $('apptTitle').value = ''; $('apptNote').value = ''; Fam.rChildren(); toast('Randevu eklendi'); if (Router.current === 'sec-home') Home.render(); },
+  delAppt(cid, id) { const c = S().children.find(x => x.id === cid); if (!c) return; c.appointments = (c.appointments || []).filter(a => a.id !== id); Store.save(); Fam.rChildren(); },
+  saveChildNote() { const cid = $('childNoteChildId').value, t = $('childNoteText').value.trim(); if (!t) return; const c = S().children.find(x => x.id === cid); if (!c) return; if (!c.notes) c.notes = []; c.notes.push({ id: uid(), text: t, date: todayStr() }); Store.save(); UI.close('childNoteModal'); $('childNoteText').value = ''; Fam.rChildren(); toast('Not eklendi'); },
+  delChildNote(cid, id) { const c = S().children.find(x => x.id === cid); if (!c) return; c.notes = (c.notes || []).filter(n => n.id !== id); Store.save(); Fam.rChildren(); },
   saveVaccine() { const cid = $('vaccineChildId').value, n = $('vaccineName').value.trim(); if (!n) { toast('Aşı adı zorunlu'); return; } const c = S().children.find(x => x.id === cid); if (!c) return; c.vaccines.push({ id: uid(), name: n, date: $('vaccineDate').value, status: $('vaccineStatus').value }); Store.save(); UI.close('vaccineModal'); $('vaccineName').value = ''; Fam.rChildren(); toast('Aşı eklendi' + ($('vaccineStatus').value === 'upcoming' ? ' — takvim ve brifingde izlenecek' : '')); },
   delVaccine(cid, vid) { const c = S().children.find(x => x.id === cid); if (!c) return; c.vaccines = c.vaccines.filter(v => v.id !== vid); Store.save(); Fam.rChildren(); },
   saveGrowth() { const cid = $('growthChildId').value, c = S().children.find(x => x.id === cid); if (!c) return; const h = Number($('growthH').value), w = Number($('growthW').value); if (!h && !w) { toast('Boy veya kilo gir'); return; } c.growth.push({ id: uid(), date: $('growthDate').value || todayStr(), h, w }); Store.save(); UI.close('growthModal'); Fam.rChildren(); toast('Kaydedildi'); },
