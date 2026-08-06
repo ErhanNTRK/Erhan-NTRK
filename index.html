@@ -168,6 +168,12 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0;}
 .ai-input-row input{flex:1;background:var(--surface);border:1.5px solid var(--border2);border-radius:16px;padding:13px 16px;font-size:14.5px;color:var(--text);}
 .ai-input-row button{width:46px;height:46px;border-radius:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;}
 .ai-empty{text-align:center;padding:40px 20px;color:var(--text2);}
+.doc-thumb{width:38px;height:38px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;color:var(--accent);}
+.doc-thumb img{width:100%;height:100%;object-fit:cover;}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.skeleton{background:linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 37%,var(--surface2) 63%);background-size:400% 100%;animation:skel 1.4s ease infinite;border-radius:10px;}
+@keyframes skel{0%{background-position:100% 50%;}100%{background-position:0 50%;}}
 .quote-text{font-family:'Fraunces',serif;font-style:italic;font-size:14.5px;font-weight:300;line-height:1.55;}
 .quote-author{font-size:12px;color:var(--accent);font-weight:700;margin-top:8px;}
 
@@ -343,6 +349,13 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0;}
     <div class="ai-quick-row" id="aiQuickRow"></div>
     <div class="ai-input-row"><input type="text" id="aiInput" placeholder="Bir şey sor..." onkeydown="if(event.key==='Enter')AI.send()"><button class="btn btn-primary" onclick="AI.send()"><svg class="ic sm"><use href="#i-plus"/></svg></button></div>
   </div>
+  <div class="section" id="sec-trash">
+    <p class="hint" style="margin-bottom:12px;">Silinen kayıtlar 30 gün burada tutulur, sonra kalıcı olarak silinir.</p>
+    <div id="trashList"></div>
+  </div>
+  <div class="section" id="sec-stats">
+    <div id="statsBody"></div>
+  </div>
 
   <div class="bottom-nav">
     <button class="nav-item active" data-nav="sec-home" onclick="Router.go('sec-home',this,'Ana Sayfa')"><svg class="ic"><use href="#i-home"/></svg><span>Ana Sayfa</span></button>
@@ -412,7 +425,9 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0;}
     <div class="list-item" onclick="UI.close('moreSheet');Router.go('sec-notes',null,'Notlar')"><div class="li-left" style="display:flex;align-items:center;gap:11px;"><svg class="ic" style="color:var(--gold)"><use href="#i-note"/></svg><div><div class="li-title">Notlar</div><div class="li-sub">Notlar, hatırlatıcılar, listeler</div></div></div><span style="color:var(--text3)">›</span></div>
     <div class="list-item" onclick="UI.close('moreSheet');Router.go('sec-family',null,'Aile')"><div class="li-left" style="display:flex;align-items:center;gap:11px;"><svg class="ic" style="color:var(--violet)"><use href="#i-users"/></svg><div><div class="li-title">Aile</div><div class="li-sub">Üyeler, çocuklar, aşılar</div></div></div><span style="color:var(--text3)">›</span></div>
     <div class="list-item" onclick="UI.close('moreSheet');Router.go('sec-documents',null,'Belgeler')"><div class="li-left" style="display:flex;align-items:center;gap:11px;"><svg class="ic" style="color:var(--gold)"><use href="#i-doc"/></svg><div><div class="li-title">Belgeler</div><div class="li-sub">Kimlik, tapu, poliçe, faturalar</div></div></div><span style="color:var(--text3)">›</span></div>
-    <div class="list-item" onclick="UI.close('moreSheet');Router.go('sec-ai',null,'Yapay Zeka')"><div class="li-left" style="display:flex;align-items:center;gap:11px;"><svg class="ic" style="color:var(--cyan)"><use href="#i-spark"/></svg><div><div class="li-title">Yapay Zeka</div><div class="li-sub">Kişisel asistan — yakında</div></div></div><span style="color:var(--text3)">›</span></div>
+    <div class="list-item" onclick="UI.close('moreSheet');Router.go('sec-ai',null,'Yapay Zeka')"><div class="li-left" style="display:flex;align-items:center;gap:11px;"><svg class="ic" style="color:var(--cyan)"><use href="#i-spark"/></svg><div><div class="li-title">Yapay Zeka</div><div class="li-sub">Sohbet asistanı</div></div></div><span style="color:var(--text3)">›</span></div>
+    <div class="list-item" onclick="UI.close('moreSheet');Router.go('sec-stats',null,'İstatistikler')"><div class="li-left" style="display:flex;align-items:center;gap:11px;"><svg class="ic" style="color:var(--green)"><use href="#i-trend"/></svg><div><div class="li-title">İstatistikler</div><div class="li-sub">Finans, sağlık grafikleri</div></div></div><span style="color:var(--text3)">›</span></div>
+    <div class="list-item" onclick="UI.close('moreSheet');Router.go('sec-trash',null,'Çöp Kutusu')"><div class="li-left" style="display:flex;align-items:center;gap:11px;"><svg class="ic" style="color:var(--text2)"><use href="#i-trash"/></svg><div><div class="li-title">Çöp Kutusu</div><div class="li-sub">30 gün geri yükleme</div></div></div><span style="color:var(--text3)">›</span></div>
     <div class="list-item" onclick="UI.close('moreSheet');Router.go('sec-settings',null,'Ayarlar')"><div class="li-left" style="display:flex;align-items:center;gap:11px;"><svg class="ic" style="color:var(--text2)"><use href="#i-settings"/></svg><div><div class="li-title">Ayarlar</div><div class="li-sub">Tema, yedekleme, güvenlik, AI</div></div></div><span style="color:var(--text3)">›</span></div>
   </div>
 </div></div>
@@ -634,9 +649,10 @@ hr{border:none;border-top:1px solid var(--border);margin:14px 0;}
 
 <div class="modal-overlay" id="goalModal" onclick="UI.overlayClose(event,'goalModal')"><div class="modal"><div class="modal-handle"></div>
   <div class="modal-title"><svg class="ic" style="color:var(--accent)"><use href="#i-check"/></svg> <span id="goalModalTitle">Hedef</span></div>
-  <div class="form-row"><label class="form-label">Başlık *</label><input id="goalTitle" placeholder="83 kg, sigarayı bırakmak, 10.000 adım..."></div>
+  <div class="form-grid"><div><label class="form-label">Başlık *</label><input id="goalTitle" placeholder="83 kg, sigarayı bırakmak..."></div><div><label class="form-label">Kategori</label><select id="goalCat" onchange="Goals.autofillHint()"></select></div></div>
   <div class="form-grid"><div><label class="form-label">Hedef Değer</label><input type="number" step="0.01" id="goalTarget" inputmode="decimal"></div><div><label class="form-label">Mevcut Değer</label><input type="number" step="0.01" id="goalCurrent" inputmode="decimal"></div></div>
   <div class="form-row"><label class="form-label">Birim</label><input id="goalUnit" placeholder="kg, TL, adım, litre... (opsiyonel)"></div>
+  <button class="btn btn-secondary btn-full btn-sm" id="goalAutofillBtn" style="display:none;margin-bottom:6px;" onclick="Goals.autofillCurrent()">Güncel değeri uygulamadan çek</button>
   <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('goalModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Goals.saveGoal()">Kaydet</button></div>
 </div></div>
 <div class="modal-overlay" id="aiModal" onclick="UI.overlayClose(event,'aiModal')"><div class="modal"><div class="modal-handle"></div>
@@ -675,6 +691,8 @@ const trDateShort = (dateStr) => new Date(dateStr + 'T12:00:00').toLocaleDateStr
 const monthKey = (dateStr) => (dateStr || '').slice(0, 7);
 const ageOf = (birth) => { if (!birth) return null; const b = new Date(birth + 'T12:00:00'), n = new Date(); let a = n.getFullYear() - b.getFullYear(); const m = n.getMonth() - b.getMonth(); if (m < 0 || (m === 0 && n.getDate() < b.getDate())) a--; return a; };
 function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2200); }
+/* Dosya yükleme gibi kısa async işlemler için buton içi yükleniyor durumu */
+function setBusy(btn, busyText) { if (!btn) return () => {}; const orig = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> ' + (busyText || 'Kaydediliyor…'); return () => { btn.disabled = false; btn.innerHTML = orig; }; }
 function haptic() { try { navigator.vibrate && navigator.vibrate(10); } catch (e) {} }
 function fileToDataURL(file) { return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file); }); }
 
@@ -706,7 +724,9 @@ const Store = {
     /* Yapay Zeka: sohbet geçmişi (gerçek API yok, sadece altyapı) */
     aiChats: [], aiActiveChatId: null,
     /* Hedefler + bulut yedekleme tercihi */
-    goals: [], cloudBackup: { provider: null }
+    goals: [], cloudBackup: { provider: null },
+    /* Çöp Kutusu: 30 gün geri yükleme desteği */
+    trash: []
   }; },
   load() {
     let raw = {};
@@ -774,11 +794,11 @@ const Router = {
     Router.current = id;
     $('topbarTitle').textContent = title || '';
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    const navMap = { 'sec-home': 'sec-home', 'sec-calendar': 'sec-calendar', 'sec-finance': 'sec-finance', 'sec-health': 'sec-health', 'sec-notes': 'more', 'sec-family': 'more', 'sec-documents': 'more', 'sec-settings': 'more', 'sec-ai': 'more' };
+    const navMap = { 'sec-home': 'sec-home', 'sec-calendar': 'sec-calendar', 'sec-finance': 'sec-finance', 'sec-health': 'sec-health', 'sec-notes': 'more', 'sec-family': 'more', 'sec-documents': 'more', 'sec-settings': 'more', 'sec-ai': 'more', 'sec-trash': 'more', 'sec-stats': 'more' };
     const nav = document.querySelector('.nav-item[data-nav="' + navMap[id] + '"]');
     if (nav) nav.classList.add('active');
     window.scrollTo({ top: 0 });
-    const R = { 'sec-home': () => Home.render(), 'sec-calendar': () => Cal.render(), 'sec-finance': () => Fin.render(), 'sec-health': () => Health.render(), 'sec-family': () => Fam.render(), 'sec-documents': () => Docs.render(), 'sec-notes': () => Notes.render(), 'sec-settings': () => Settings.render(), 'sec-ai': () => AI.renderHome() };
+    const R = { 'sec-home': () => Home.render(), 'sec-calendar': () => Cal.render(), 'sec-finance': () => Fin.render(), 'sec-health': () => Health.render(), 'sec-family': () => Fam.render(), 'sec-documents': () => Docs.render(), 'sec-notes': () => Notes.render(), 'sec-settings': () => Settings.render(), 'sec-ai': () => AI.renderHome(), 'sec-trash': () => Trash.render(), 'sec-stats': () => Stats.render() };
     if (R[id]) R[id]();
   }
 };
@@ -799,6 +819,9 @@ const EVENT_CATS = ['Toplantı', 'Doktor', 'Hastane', 'İş', 'Seyahat', 'Görev
 const DOC_CATS = ['Kimlik', 'Pasaport', 'Ehliyet', 'Tapu', 'Araç Ruhsatı', 'Sigorta', 'Sağlık', 'Vergi', 'Garanti Belgeleri', 'Faturalar', 'Diğer'];
 const DOC_CAT_ICON = { 'Kimlik': 'i-shield', 'Pasaport': 'i-doc', 'Ehliyet': 'i-doc', 'Tapu': 'i-home', 'Araç Ruhsatı': 'i-doc', 'Sigorta': 'i-shield', 'Sağlık': 'i-heart', 'Vergi': 'i-wallet', 'Garanti Belgeleri': 'i-doc', 'Faturalar': 'i-wallet', 'Diğer': 'i-doc' };
 const QUICK_PROMPTS = ['Finansımı analiz et', 'Bugünkü durumumu özetle', 'Yaklaşan ödemeleri göster', 'Yaklaşan randevuları göster', 'Belgelerimi kontrol et', 'Sağlık özetini göster'];
+const GOAL_CATS = ['Finans', 'Sağlık', 'Kilo', 'Su', 'Adım', 'Borç', 'Yatırım', 'Sigara', 'Alkol', 'Diğer'];
+const GOAL_CAT_ICON = { 'Finans': 'i-wallet', 'Sağlık': 'i-heart', 'Kilo': 'i-scale', 'Su': 'i-drop', 'Adım': 'i-trend', 'Borç': 'i-wallet', 'Yatırım': 'i-coins', 'Sigara': 'i-smoke', 'Alkol': 'i-glass', 'Diğer': 'i-check' };
+const TRASH_TYPES = { assets: { label: 'Varlık', icon: 'i-coins' }, debts: { label: 'Borç / Alacak', icon: 'i-wallet' }, payments: { label: 'Ödeme', icon: 'i-repeat' }, docs: { label: 'Belge', icon: 'i-doc' }, events: { label: 'Ajanda Kaydı', icon: 'i-cal' }, notes: { label: 'Not', icon: 'i-note' } };
 const SPECIAL_DAY_TYPES = { anniversary: 'Evlilik Yıldönümü', meeting: 'Tanışma Yıldönümü', graduation: 'Mezuniyet', custom: 'Özel Gün' };
 /* Bildirim altyapısı (gerçek push yok — sadece hesaplama): kayıt tarihine göre "bugün hatırlatma günü mü" hesaplanır */
 const NOTIFY_LEADS = { same: 0, '1d': 1, '3d': 3, '7d': 7 };
@@ -877,6 +900,24 @@ const QUOTES = [
   { t: 'Zaman, nereye gittiğini bilmeyenler için hiç yetmez.', a: 'Seneca' }
 ];
 const Home = {
+  /* Net Servet — bugün/bu ay/bu yıl değişim çipleri (Fin'in mevcut hesaplamasını yeniden kullanır) */
+  netWorthChipsHTML() {
+    const nw = Fin.netWorth(), mk = monthKey(todayStr());
+    const dayChg = Fin.snapshotBefore(todayStr()), monthChg = Fin.snapshotBefore(mk + '-01'), yearChg = Fin.snapshotBefore(todayStr().slice(0, 4) + '-01-01');
+    const chip = (lbl, base) => { const v = base === null ? null : nw - base; return '<div><div class="hint" style="font-size:10px;">' + lbl + '</div><div class="num" style="font-size:14px;font-weight:800;color:' + (v === null ? 'var(--text3)' : v >= 0 ? 'var(--green)' : 'var(--rose)') + '">' + (v === null ? '—' : (v >= 0 ? '+' : '') + para(v)) + '</div></div>'; };
+    return '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-trend"/></svg> Net Servet</div><div class="big-center"><div class="big-num num" style="color:' + (nw >= 0 ? 'var(--green)' : 'var(--rose)') + '">' + para(nw) + '</div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px;text-align:center;">' + chip('BUGÜN', dayChg) + chip('BU AY', monthChg) + chip('BU YIL', yearChg) + '</div></div>';
+  },
+  /* Son İşlemler + en çok kazandıran/kaybettiren varlık */
+  finHighlightsHTML() {
+    const s = S();
+    const tx = [...s.incomes.map(x => ({ ...x, kind: 'income' })), ...s.expenses.map(x => ({ ...x, kind: 'expense' }))].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
+    const pnlList = s.assets.map(a => ({ a, pnl: Fin.assetPnl(a) })).filter(x => x.pnl !== 0).sort((x, y) => y.pnl - x.pnl);
+    const best = pnlList[0], worst = pnlList[pnlList.length - 1];
+    if (!tx.length && !best) return '';
+    const txRow = (t) => '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:12.5px;"><span style="color:var(--text2);">' + esc(t.desc) + '</span><b class="num" style="color:' + (t.kind === 'income' ? 'var(--green)' : 'var(--rose)') + '">' + (t.kind === 'income' ? '+' : '−') + para(t.amount) + '</b></div>';
+    const pnlRow = (label, x, color) => x ? '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:12.5px;border-top:1px solid var(--border);margin-top:4px;"><span style="color:var(--text2);">' + label + ': ' + esc(x.a.name) + '</span><b class="num" style="color:' + color + '">' + (x.pnl >= 0 ? '+' : '') + para(x.pnl) + '</b></div>' : '';
+    return '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-wallet"/></svg> Finans Öne Çıkanlar</div>' + (tx.length ? '<div class="hint" style="font-weight:700;margin-bottom:2px;">SON İŞLEMLER</div>' + tx.map(txRow).join('') : '') + pnlRow('En Çok Kazandıran', best, 'var(--green)') + pnlRow('En Çok Kaybettiren', worst !== best ? worst : null, 'var(--rose)') + '</div>';
+  },
   timelineHTML(items) {
     if (!items.length) return '';
     const row = (e) => { const st = e.kind === 'event' ? (EVENT_CAT_STYLE[e.cat] || EVENT_CAT_STYLE['Diğer']) : (EV_STYLE[e.kind] || EV_STYLE.event);
@@ -925,7 +966,7 @@ const Home = {
   goalsHTML() {
     const s = S();
     const row = (g) => { const pct = g.target ? Math.min(100, Math.round((Number(g.current) || 0) / g.target * 100)) : ((Number(g.current) || 0) > 0 ? 100 : 0);
-      return '<div style="margin-bottom:13px;cursor:pointer;" onclick="Goals.openGoal(\'' + g.id + '\')"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;"><span style="font-size:13px;font-weight:700;">' + esc(g.title) + '</span><span class="hint num">' + (g.current || 0) + (g.unit ? ' ' + esc(g.unit) : '') + (g.target ? ' / ' + g.target + (g.unit ? ' ' + esc(g.unit) : '') : '') + '</span></div><div class="progress-track"><div class="progress-fill" style="width:' + pct + '%;background:' + (pct >= 100 ? 'var(--green)' : 'var(--accent)') + '"></div></div></div>'; };
+      return '<div style="margin-bottom:13px;cursor:pointer;" onclick="Goals.openGoal(\'' + g.id + '\')"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;"><span style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px;">' + (g.cat ? '<svg class="ic sm" style="color:var(--text2);"><use href="#' + (GOAL_CAT_ICON[g.cat] || 'i-check') + '"/></svg>' : '') + esc(g.title) + '</span><span class="hint num">' + (g.current || 0) + (g.unit ? ' ' + esc(g.unit) : '') + (g.target ? ' / ' + g.target + (g.unit ? ' ' + esc(g.unit) : '') : '') + '</span></div><div class="progress-track"><div class="progress-fill" style="width:' + pct + '%;background:' + (pct >= 100 ? 'var(--green)' : 'var(--accent)') + '"></div></div></div>'; };
     return '<div class="card"><div class="card-title" style="justify-content:space-between;"><span style="display:flex;align-items:center;gap:8px;"><svg class="ic"><use href="#i-check"/></svg> Hedeflerim</span><button class="icon-btn" onclick="Goals.openGoal()"><svg class="ic sm"><use href="#i-plus"/></svg></button></div>' + (s.goals.length ? s.goals.map(row).join('') : '<p class="hint">83 kg, 1.000.000 TL yatırım, sigarayı bırakmak, 10.000 adım gibi hedefler ekle.</p>') + '</div>';
   },
   render() {
@@ -961,7 +1002,9 @@ const Home = {
       '<div class="stagger"><div class="hello"><div class="greeting">' + greet + (name ? ', <span>' + esc(name) + '</span>' : '') + '</div><div class="hello-date">' + new Date().toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long' }) + '</div></div>' +
       '<div class="module-grid">' + cardsHTML + '</div>' +
       Home.lifeScoreHTML() +
+      Home.netWorthChipsHTML() +
       Home.smartSummaryHTML() +
+      Home.finHighlightsHTML() +
       Home.timelineHTML(todayEvents) +
       Fin.upcomingPaymentsHTML() +
       Home.goalsHTML() +
@@ -973,11 +1016,25 @@ const Home = {
 /* ═══ Hedefler ═══ */
 const Goals = {
   _editId: null,
+  AUTOFILL: {
+    'Kilo': () => { const s = S(), l = [...s.weights].sort((a, b) => a.date.localeCompare(b.date)).slice(-1)[0]; return l ? l.kg : null; },
+    'Su': () => S().water.today,
+    'Adım': () => { const s = S(), t = s.steps.find(x => x.date === todayStr()); return t ? t.count : 0; },
+    'Sigara': () => S().smokeQuit ? Math.floor((Date.now() - new Date(S().smokeQuit)) / 86400000) : 0,
+    'Borç': () => Fin.openDebt(),
+    'Yatırım': () => Fin.assetsTotal(),
+    'Finans': () => Fin.netWorth(),
+    'Alkol': () => { const s = S(), wk = addDays(todayStr(), -7); return s.alcohol.filter(a => a.date >= wk).reduce((a, b) => a + Number(b.qty || 0), 0); }
+  },
+  autofillHint() { const cat = $('goalCat').value; $('goalAutofillBtn').style.display = Goals.AUTOFILL[cat] ? 'block' : 'none'; },
+  autofillCurrent() { const cat = $('goalCat').value, fn = Goals.AUTOFILL[cat]; if (!fn) return; const v = fn(); if (v !== null && v !== undefined) { $('goalCurrent').value = v; toast('Güncel değer dolduruldu'); } },
   openGoal(id) {
     const g = id ? S().goals.find(x => x.id === id) : null;
     Goals._editId = id || null;
     $('goalModalTitle').textContent = g ? 'Hedefi Düzenle' : 'Hedef Ekle';
+    $('goalCat').innerHTML = GOAL_CATS.map(c => '<option' + (g && g.cat === c ? ' selected' : '') + '>' + c + '</option>').join('');
     $('goalTitle').value = g ? g.title : ''; $('goalTarget').value = g ? g.target : ''; $('goalCurrent').value = g ? g.current : 0; $('goalUnit').value = g ? (g.unit || '') : '';
+    Goals.autofillHint();
     let del = document.getElementById('goalDelBtn');
     if (!del) { del = document.createElement('button'); del.id = 'goalDelBtn'; del.className = 'btn btn-danger btn-sm btn-full'; del.textContent = 'Hedefi Sil'; document.querySelector('#goalModal .modal-actions').before(del); }
     del.style.display = g ? 'block' : 'none';
@@ -986,7 +1043,7 @@ const Goals = {
   },
   saveGoal() {
     const t = $('goalTitle').value.trim(); if (!t) { toast('Başlık zorunlu'); return; }
-    const data = { title: t, target: Number($('goalTarget').value) || 0, current: Number($('goalCurrent').value) || 0, unit: $('goalUnit').value.trim() };
+    const data = { title: t, cat: $('goalCat').value, target: Number($('goalTarget').value) || 0, current: Number($('goalCurrent').value) || 0, unit: $('goalUnit').value.trim() };
     if (Goals._editId) Object.assign(S().goals.find(x => x.id === Goals._editId), data);
     else S().goals.push({ id: uid(), ...data });
     Store.save(); UI.close('goalModal'); Home.render(); toast('Kaydedildi');
@@ -1051,7 +1108,7 @@ const Cal = {
     else S().events.push({ id: uid(), ...data });
     Store.save(); UI.close('addEventModal'); Cal.render(); toast('Kaydedildi'); if (Router.current === 'sec-home') Home.render();
   },
-  delEvent(id) { if (!UI.confirm('Etkinlik silinsin mi?')) return; S().events = S().events.filter(e => e.id !== id); Store.save(); Cal.render(); if (Router.current === 'sec-home') Home.render(); }
+  delEvent(id) { const ev = S().events.find(e => e.id === id); if (!ev || !UI.confirm('Etkinlik silinsin mi?')) return; Trash.softDelete('events', ev); Cal.render(); if (Router.current === 'sec-home') Home.render(); }
 };
 
 /* ═══ Global Arama ═══ */
@@ -1078,6 +1135,7 @@ const Search = {
     for (const p of s.photos) if (hit(p.title)) add('Fotoğraflar', p.title || 'Fotoğraf', p.date ? trDateShort(p.date) : '', "Router.go('sec-family',null,'Aile');Fam.goTab('photos')");
     for (const dc of s.docs) if (hit(dc.title) || hit(dc.cat) || (dc.tags || []).some(t => hit(t))) add('Belgeler', dc.title, dc.cat + (Docs.daysLeft(dc.expiryDate) !== null ? ' · ' + trDateShort(dc.expiryDate) : ''), "Router.go('sec-documents',null,'Belgeler')");
     for (const md of s.meds) if (hit(md.name)) add('İlaçlar', md.name, md.dose || '', "Health.goTab('meds')");
+    for (const g of s.goals) if (hit(g.title) || hit(g.cat)) add('Hedefler', g.title, (g.current || 0) + (g.unit ? ' ' + g.unit : '') + (g.target ? ' / ' + g.target : ''), "Router.go('sec-home',null,'Ana Sayfa')");
     box.innerHTML = groups.length
       ? groups.map(g => '<div class="sr-group">' + esc(g.g) + '</div>' + g.items.map(i => '<div class="list-item" style="cursor:pointer" onclick="Search.close();' + i.go + '"><div class="li-left"><div class="li-title">' + esc(i.title) + '</div>' + (i.sub ? '<div class="li-sub">' + esc(i.sub) + '</div>' : '') + '</div><span style="color:var(--text3)">›</span></div>').join('')).join('')
       : '<div class="empty"><div class="empty-text">"' + esc(q) + '" için sonuç yok</div></div>';
@@ -1195,7 +1253,7 @@ const Fin = {
     Store.save(); UI.close('debtModal'); ['debtDesc', 'debtTotal', 'debtMonthly', 'debtCount', 'debtStart'].forEach(i => $(i).value = ''); Fin.render(); toast('Kaydedildi'); if (Router.current === 'sec-home') Home.render();
   },
   editDebt(id) { Fin.openDebtModal(id); },
-  delDebt(id) { if (!UI.confirm('Silinsin mi?')) return; S().debts = S().debts.filter(x => x.id !== id); Store.save(); Fin.render(); if (Router.current === 'sec-home') Home.render(); },
+  delDebt(id) { const d = S().debts.find(x => x.id === id); if (!d || !UI.confirm('Silinsin mi?')) return; Trash.softDelete('debts', d); Fin.render(); if (Router.current === 'sec-home') Home.render(); },
   renderDebts() {
     const s = S();
     const row = (d) => { let paid = 0; if (d.startDate && d.monthly && d.instCount) { for (let k = 0; k < d.instCount; k++) if (addMonths(d.startDate, k) <= todayStr()) paid++; } const rem = d.instCount ? d.instCount - paid : 0; return '<div class="list-item"><div class="li-left"><div class="li-title">' + esc(d.desc) + '</div><div class="li-sub">' + esc(d.cat || 'Diğer') + (d.monthly ? ' · ' + para(d.monthly) + '/ay' : '') + (d.instCount ? ' · kalan ' + rem + '/' + d.instCount + ' taksit' : '') + '</div></div><div class="li-right"><span class="badge ' + (d.type === 'borrow' ? 'badge-red' : 'badge-green') + ' num">' + para(d.total) + '</span><button class="icon-btn" onclick="Fin.editDebt(\'' + d.id + '\')"><svg class="ic sm"><use href="#i-edit"/></svg></button><button class="icon-btn" onclick="Fin.duplicate(\'debts\',\'' + d.id + '\')"><svg class="ic sm"><use href="#i-copy"/></svg></button><button class="icon-btn del" onclick="Fin.delDebt(\'' + d.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></div></div>'; };
@@ -1298,7 +1356,7 @@ const Fin = {
     Store.save(); UI.close('assetModal'); Fin.render(); toast('Kaydedildi'); if (Router.current === 'sec-home') Home.render();
   },
   editAsset(id) { Fin.openAsset(id); },
-  delAsset(id) { if (!UI.confirm('Varlık silinsin mi?')) return; S().assets = S().assets.filter(x => x.id !== id); Store.save(); Fin.render(); if (Router.current === 'sec-home') Home.render(); },
+  delAsset(id) { const a = S().assets.find(x => x.id === id); if (!a || !UI.confirm('Varlık silinsin mi?')) return; Trash.softDelete('assets', a); Fin.render(); if (Router.current === 'sec-home') Home.render(); },
   duplicate(key, id) {
     const arr = S()[key], item = arr.find(x => x.id === id); if (!item) return;
     const copy = { ...item, id: uid() };
@@ -1368,7 +1426,7 @@ const Fin = {
     Store.save(); UI.close('paymentModal'); Fin.render(); toast('Kaydedildi'); if (Router.current === 'sec-home') Home.render();
   },
   editPayment(id) { Fin.openPayment(id); },
-  delPayment(id) { if (!UI.confirm('Ödeme silinsin mi?')) return; S().payments = S().payments.filter(x => x.id !== id); Store.save(); Fin.render(); if (Router.current === 'sec-home') Home.render(); },
+  delPayment(id) { const p = S().payments.find(x => x.id === id); if (!p || !UI.confirm('Ödeme silinsin mi?')) return; Trash.softDelete('payments', p); Fin.render(); if (Router.current === 'sec-home') Home.render(); },
   renderPayments() {
     const s = S();
     const row = (p) => { const paidNow = Fin.isPaidNow(p), next = Fin.nextDue(p);
@@ -1525,11 +1583,12 @@ const Fam = {
     const name = $('memberName').value.trim(); if (!name) { toast('İsim zorunlu'); return; }
     const data = { name, role: $('memberRole').value, birth: $('memberBirth').value, blood: $('memberBlood').value, allergy: $('memberAllergy').value.trim(), meds: $('memberMeds').value.trim(), phone: $('memberPhone').value.trim(), email: $('memberEmail').value.trim(), address: $('memberAddress').value.trim(), doctor: $('memberDoctor').value.trim(), doctorTel: $('memberDoctorTel').value.trim(), note: $('memberNote').value.trim() };
     let id = $('memberId').value;
+    const done = setBusy(document.querySelector('#memberModal .btn-primary'), 'Kaydediliyor…');
     if (id) Object.assign(S().members.find(x => x.id === id), data);
     else { id = uid(); S().members.push({ id, specialDays: [], ...data }); }
     const f = $('memberPhotoFile').files[0];
     if (f) { await IDB.put('member-' + id, await fileToDataURL(f)); const mm = S().members.find(x => x.id === id); mm.photo = true; }
-    Store.save(); UI.close('memberModal'); Fam.rMembers(); toast('Kaydedildi');
+    done(); Store.save(); UI.close('memberModal'); Fam.rMembers(); toast('Kaydedildi');
   },
   /* ── Özel Günler (doğum günü hariç — o zaten üyenin doğum tarihinden otomatik gelir) ── */
   renderMemberSpecialDays(memberId) {
@@ -1621,15 +1680,27 @@ const Docs = {
   },
   expiringSoon(limit) { return S().docs.filter(d => { const dl = Docs.daysLeft(d.expiryDate); return dl !== null && dl >= 0 && dl <= (limit || 30); }).sort((a, b) => Docs.daysLeft(a.expiryDate) - Docs.daysLeft(b.expiryDate)); },
   setCat(c) { Docs.cat = c; Docs.render(); },
+  toggleFav(id) { const d = S().docs.find(x => x.id === id); if (!d) return; d.favorite = !d.favorite; Store.save(); Docs.render(); },
+  async viewFile(id) { const d = S().docs.find(x => x.id === id); if (!d) return; if (!d.hasFile) { Docs.openDoc(id); return; } d.lastViewedAt = Date.now(); Store.save(); await Fam.viewFile('doc-' + id, d.title); },
+  row(d, s) {
+    const m = s.members.find(x => x.id === d.memberId);
+    return '<div class="list-item" style="cursor:pointer;align-items:flex-start;" onclick="Docs.viewFile(\'' + d.id + '\')"><div class="li-left" style="display:flex;align-items:flex-start;gap:10px;">' +
+      (d.hasFile ? '<div class="doc-thumb" id="thumb-' + d.id + '"><svg class="ic sm"><use href="#' + (DOC_CAT_ICON[d.cat] || 'i-doc') + '"/></svg></div>' : '<svg class="ic" style="color:var(--accent);flex-shrink:0;margin-top:2px;"><use href="#' + (DOC_CAT_ICON[d.cat] || 'i-doc') + '"/></svg>') +
+      '<div><div class="li-title">' + (d.favorite ? '⭐ ' : '') + esc(d.title) + '</div><div class="li-sub">' + esc(d.cat) + (m ? ' · ' + esc(m.name) : '') + (d.docDate ? ' · ' + trDateShort(d.docDate) : '') + '</div>' + (d.tags && d.tags.length ? '<div style="margin-top:4px;">' + d.tags.map(t => '<span class="badge badge-blue" style="margin-right:4px;">#' + esc(t) + '</span>').join('') + '</div>' : '') + '</div></div><div class="li-right" style="flex-direction:column;align-items:flex-end;gap:5px;">' + Docs.expiryBadge(d) + '<span style="display:flex;gap:2px;"><button class="icon-btn" style="min-width:30px;min-height:30px;color:' + (d.favorite ? 'var(--gold)' : '') + '" onclick="event.stopPropagation();Docs.toggleFav(\'' + d.id + '\')">' + (d.favorite ? '★' : '☆') + '</button><button class="icon-btn" style="min-width:30px;min-height:30px;" onclick="event.stopPropagation();Docs.openDoc(\'' + d.id + '\')"><svg class="ic sm"><use href="#i-edit"/></svg></button><button class="icon-btn" style="min-width:30px;min-height:30px;" onclick="event.stopPropagation();Docs.duplicate(\'' + d.id + '\')"><svg class="ic sm"><use href="#i-copy"/></svg></button><button class="icon-btn del" style="min-width:30px;min-height:30px;" onclick="event.stopPropagation();Docs.delDoc(\'' + d.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></span></div></div>';
+  },
+  async fillThumbs(list) {
+    for (const d of list) { if (!d.hasFile) continue; const el = document.getElementById('thumb-' + d.id); if (!el) continue; const src = await IDB.get('doc-' + d.id); if (src && src.startsWith('data:image')) el.innerHTML = '<img src="' + src + '" alt="">'; }
+  },
   render() {
     const s = S(), q = ($('docSearch') ? $('docSearch').value : '').trim().toLowerCase();
-    $('docCatChips').innerHTML = ['all', ...DOC_CATS].map(c => '<div class="tab' + (Docs.cat === c ? ' active' : '') + '" onclick="Docs.setCat(\'' + c + '\')">' + (c === 'all' ? 'Tümü' : c) + '</div>').join('');
-    let list = s.docs.filter(d => Docs.cat === 'all' || d.cat === Docs.cat);
+    $('docCatChips').innerHTML = ['all', 'fav', ...DOC_CATS].map(c => '<div class="tab' + (Docs.cat === c ? ' active' : '') + '" onclick="Docs.setCat(\'' + c + '\')">' + (c === 'all' ? 'Tümü' : c === 'fav' ? '⭐ Favoriler' : c) + '</div>').join('');
+    let list = s.docs.filter(d => Docs.cat === 'all' || (Docs.cat === 'fav' ? d.favorite : d.cat === Docs.cat));
     if (q) list = list.filter(d => (d.title || '').toLowerCase().includes(q) || (d.tags || []).some(t => t.toLowerCase().includes(q)) || (d.cat || '').toLowerCase().includes(q));
     list = list.slice().sort((a, b) => (Docs.daysLeft(a.expiryDate) ?? 9999) - (Docs.daysLeft(b.expiryDate) ?? 9999));
-    const row = (d) => { const m = s.members.find(x => x.id === d.memberId);
-      return '<div class="list-item" style="cursor:pointer;align-items:flex-start;" onclick="' + (d.hasFile ? "Fam.viewFile('doc-" + d.id + "','" + esc(d.title).replace(/'/g, '') + "')" : "Docs.openDoc('" + d.id + "')") + '"><div class="li-left" style="display:flex;align-items:flex-start;gap:10px;"><svg class="ic" style="color:var(--accent);flex-shrink:0;margin-top:2px;"><use href="#' + (DOC_CAT_ICON[d.cat] || 'i-doc') + '"/></svg><div><div class="li-title">' + esc(d.title) + '</div><div class="li-sub">' + esc(d.cat) + (m ? ' · ' + esc(m.name) : '') + (d.docDate ? ' · ' + trDateShort(d.docDate) : '') + '</div>' + (d.tags && d.tags.length ? '<div style="margin-top:4px;">' + d.tags.map(t => '<span class="badge badge-blue" style="margin-right:4px;">#' + esc(t) + '</span>').join('') + '</div>' : '') + '</div></div><div class="li-right" style="flex-direction:column;align-items:flex-end;gap:5px;">' + Docs.expiryBadge(d) + '<span style="display:flex;gap:2px;"><button class="icon-btn" style="min-width:30px;min-height:30px;" onclick="event.stopPropagation();Docs.openDoc(\'' + d.id + '\')"><svg class="ic sm"><use href="#i-edit"/></svg></button><button class="icon-btn" style="min-width:30px;min-height:30px;" onclick="event.stopPropagation();Docs.duplicate(\'' + d.id + '\')"><svg class="ic sm"><use href="#i-copy"/></svg></button><button class="icon-btn del" style="min-width:30px;min-height:30px;" onclick="event.stopPropagation();Docs.delDoc(\'' + d.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></span></div></div>'; };
-    $('docsList').innerHTML = list.length ? list.map(row).join('') : '<div class="empty"><svg class="ic"><use href="#i-doc"/></svg><div class="empty-text">' + (q ? '"' + esc(q) + '" için belge yok' : 'Kimlik, tapu, poliçe — önemli belgeler elinin altında') + '</div></div>';
+    const recent = [...s.docs].filter(d => d.lastViewedAt).sort((a, b) => b.lastViewedAt - a.lastViewedAt).slice(0, 5);
+    const recentHTML = (!q && Docs.cat === 'all' && recent.length) ? '<div class="card-title" style="margin:2px 0 8px;">Son Kullanılanlar</div>' + recent.map(d => Docs.row(d, s)).join('') + '<div class="card-title" style="margin:16px 0 8px;">Tüm Belgeler</div>' : '';
+    $('docsList').innerHTML = recentHTML + (list.length ? list.map(d => Docs.row(d, s)).join('') : '<div class="empty"><svg class="ic"><use href="#i-doc"/></svg><div class="empty-text">' + (q ? '"' + esc(q) + '" için belge yok' : 'Kimlik, tapu, poliçe — önemli belgeler elinin altında') + '</div></div>');
+    Docs.fillThumbs([...recent, ...list]);
   },
   openDoc(id) {
     const d = id ? S().docs.find(x => x.id === id) : null;
@@ -1651,12 +1722,94 @@ const Docs = {
     const data = { title: t, cat: $('docCat').value, desc: $('docDesc').value.trim(), docDate: $('docDate').value, expiryDate: $('docExpiry').value, memberId: $('docMember').value, tags, note: $('docNote').value.trim() };
     const f = $('docFile').files[0];
     let id = Docs._editId;
+    const done = setBusy(document.querySelector('#docModal .btn-primary'), 'Kaydediliyor…');
     if (id) { const d = S().docs.find(x => x.id === id); Object.assign(d, data); if (f) { await IDB.put('doc-' + id, await fileToDataURL(f)); d.hasFile = true; } }
     else { id = uid(); if (f) { await IDB.put('doc-' + id, await fileToDataURL(f)); } S().docs.push({ id, hasFile: !!f, date: data.docDate, ...data }); }
-    Store.save(); UI.close('docModal'); Docs.render(); toast('Kaydedildi'); if (Router.current === 'sec-home') Home.render();
+    done(); Store.save(); UI.close('docModal'); Docs.render(); toast('Kaydedildi'); if (Router.current === 'sec-home') Home.render();
   },
   duplicate(id) { const d = S().docs.find(x => x.id === id); if (!d) return; const copy = { ...d, id: uid(), title: d.title + ' (kopya)' }; S().docs.push(copy); Store.save(); Docs.render(); toast('Kopyalandı'); },
-  async delDoc(id) { if (!UI.confirm('Belge silinsin mi?')) return; await IDB.del('doc-' + id); S().docs = S().docs.filter(d => d.id !== id); Store.save(); Docs.render(); if (Router.current === 'sec-home') Home.render(); }
+  async delDoc(id) { const d = S().docs.find(x => x.id === id); if (!d || !UI.confirm('Belge silinsin mi?')) return; Trash.softDelete('docs', d); Docs.render(); if (Router.current === 'sec-home') Home.render(); }
+};
+
+/* ═══ Çöp Kutusu — 30 gün geri yükleme ═══ */
+const Trash = {
+  softDelete(key, item) {
+    const s = S();
+    s.trash.push({ id: uid(), key, item: JSON.parse(JSON.stringify(item)), deletedAt: Date.now() });
+    s[key] = s[key].filter(x => x.id !== item.id);
+    Store.save();
+  },
+  purgeOld() {
+    const s = S(), cutoff = Date.now() - 30 * 86400000;
+    const expired = s.trash.filter(t => t.deletedAt < cutoff);
+    if (!expired.length) return;
+    expired.forEach(t => { if (t.key === 'docs' && t.item.hasFile) IDB.del('doc-' + t.item.id); });
+    s.trash = s.trash.filter(t => t.deletedAt >= cutoff);
+    Store.save();
+  },
+  restore(trashId) {
+    const s = S(); const t = s.trash.find(x => x.id === trashId); if (!t) return;
+    s[t.key].push(t.item); s.trash = s.trash.filter(x => x.id !== trashId);
+    Store.save(); Trash.render(); toast('Geri yüklendi'); if (Router.current === 'sec-home') Home.render();
+  },
+  purgeOne(trashId) { const s = S(); const t = s.trash.find(x => x.id === trashId); if (!t || !UI.confirm('Kalıcı olarak silinsin mi? Bu işlem geri alınamaz.')) return; if (t.key === 'docs' && t.item.hasFile) IDB.del('doc-' + t.item.id); s.trash = s.trash.filter(x => x.id !== trashId); Store.save(); Trash.render(); },
+  emptyAll() { const s = S(); if (!s.trash.length) return; if (!UI.confirm('Çöp kutusundaki tüm kayıtlar kalıcı olarak silinsin mi?')) return; s.trash.forEach(t => { if (t.key === 'docs' && t.item.hasFile) IDB.del('doc-' + t.item.id); }); s.trash = []; Store.save(); Trash.render(); },
+  render() {
+    Trash.purgeOld();
+    const list = [...S().trash].sort((a, b) => b.deletedAt - a.deletedAt);
+    $('trashList').innerHTML = (list.length ? '<button class="btn btn-danger btn-full btn-sm" style="margin-bottom:12px;" onclick="Trash.emptyAll()">Çöp Kutusunu Boşalt</button>' : '') +
+      (list.length ? list.map(t => {
+        const conf = TRASH_TYPES[t.key] || { label: t.key, icon: 'i-doc' };
+        const name = t.item.title || t.item.desc || t.item.name || 'Kayıt';
+        const daysLeft = Math.max(0, 30 - Math.floor((Date.now() - t.deletedAt) / 86400000));
+        return '<div class="list-item"><div class="li-left" style="display:flex;align-items:center;gap:10px;"><svg class="ic" style="color:var(--text2)"><use href="#' + conf.icon + '"/></svg><div><div class="li-title">' + esc(name) + '</div><div class="li-sub">' + conf.label + ' · ' + daysLeft + ' gün sonra kalıcı silinir</div></div></div><div class="li-right" style="gap:6px;"><button class="btn btn-secondary btn-sm" onclick="Trash.restore(\'' + t.id + '\')">Geri Yükle</button><button class="icon-btn del" onclick="Trash.purgeOne(\'' + t.id + '\')"><svg class="ic sm"><use href="#i-trash"/></svg></button></div></div>';
+      }).join('') : '<div class="empty"><svg class="ic"><use href="#i-trash"/></svg><div class="empty-text">Çöp kutusu boş</div></div>');
+  }
+};
+
+/* ═══ İstatistikler ═══ */
+const Stats = {
+  sparkCard(title, icon, color, series, fmt) {
+    if (!series.length) return '<div class="card"><div class="card-title"><svg class="ic" style="color:' + color + '"><use href="#' + icon + '"/></svg> ' + title + '</div><p class="hint">Henüz yeterli veri yok.</p></div>';
+    const max = Math.max(1, ...series.map(x => x.v)), min = Math.min(0, ...series.map(x => x.v));
+    const range = (max - min) || 1;
+    const bars = series.map(x => '<i style="height:' + Math.max(4, (x.v - min) / range * 100) + '%;background:' + color + '"></i>').join('');
+    const last = series[series.length - 1];
+    return '<div class="card"><div class="card-title"><svg class="ic" style="color:' + color + '"><use href="#' + icon + '"/></svg> ' + title + '</div><div class="spark">' + bars + '</div><div class="hint" style="margin-top:6px;">Son: <b class="num" style="color:var(--text);">' + fmt(last.v) + '</b> · ' + series.length + ' kayıt</div></div>';
+  },
+  render() {
+    const s = S(), today = todayStr();
+    /* Net Servet — son 30 anlık görüntü */
+    const nw = s.netWorthHistory.slice(-30).map(h => ({ v: h.value }));
+    /* Gelir / Gider — son 6 ay */
+    const months = []; for (let i = 5; i >= 0; i--) months.push(monthKey(addMonths(today, -i)));
+    const incSeries = months.map(mk => ({ v: s.incomes.filter(x => monthKey(x.date) === mk).reduce((a, b) => a + Number(b.amount), 0) }));
+    const expSeries = months.map(mk => ({ v: s.expenses.filter(x => monthKey(x.date) === mk).reduce((a, b) => a + Number(b.amount), 0) }));
+    /* Adım / Kilo / Sigara / Alkol — son 14 gün */
+    const stepsSeries = [...s.steps].sort((a, b) => a.date.localeCompare(b.date)).slice(-14).map(x => ({ v: x.count }));
+    const weightSeries = [...s.weights].sort((a, b) => a.date.localeCompare(b.date)).slice(-14).map(x => ({ v: x.kg }));
+    const smokeSeries = [...s.smokeLog].sort((a, b) => a.date.localeCompare(b.date)).slice(-14).map(x => ({ v: x.count }));
+    const alcMap = {}; s.alcohol.forEach(a => { alcMap[a.date] = (alcMap[a.date] || 0) + Number(a.qty || 0); });
+    const alcSeries = Object.keys(alcMap).sort().slice(-14).map(d => ({ v: alcMap[d] }));
+    const wPct = Math.min(100, Math.round(s.water.today / (s.water.goal || 1) * 100) || 0);
+    /* Varlık / Borç — kategori dağılımı (zaman serisi yerine anlık kırılım) */
+    const catTotals = {}; s.assets.forEach(a => { const c = CAT_FOR_TYPE[a.type] || 'Diğer'; catTotals[c] = (catTotals[c] || 0) + Fin.assetValue(a); });
+    const catRows = Object.entries(catTotals).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    const debtRows = s.debts.filter(d => d.type === 'borrow');
+
+    $('statsBody').innerHTML =
+      '<div class="card"><div class="big-center"><div class="hint">TOPLAM NET SERVET</div><div class="big-num num" style="font-size:30px;">' + para(Fin.netWorth()) + '</div></div></div>' +
+      Stats.sparkCard('Net Servet Eğilimi', 'i-trend', 'var(--green)', nw, para) +
+      Stats.sparkCard('Gelir (6 Ay)', 'i-wallet', 'var(--green)', incSeries, para) +
+      Stats.sparkCard('Gider (6 Ay)', 'i-wallet', 'var(--rose)', expSeries, para) +
+      '<div class="card"><div class="card-title"><svg class="ic" style="color:var(--gold)"><use href="#i-coins"/></svg> Varlık Dağılımı</div>' + (catRows.length ? catRows.map(([c, v]) => '<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;"><span>' + esc(c) + '</span><b class="num">' + para(v) + '</b></div>').join('') : '<p class="hint">Henüz varlık eklenmedi.</p>') + '</div>' +
+      '<div class="card"><div class="card-title"><svg class="ic" style="color:var(--rose)"><use href="#i-wallet"/></svg> Borç</div><div class="big-center"><div class="big-num num" style="font-size:24px;color:var(--rose)">' + para(Fin.openDebt()) + '</div></div>' + (debtRows.length ? '<p class="hint" style="margin-top:6px;">' + debtRows.length + ' açık borç kaydı</p>' : '<p class="hint">Açık borç yok 🎉</p>') + '</div>' +
+      Stats.sparkCard('Adım (14 Gün)', 'i-trend', 'var(--green)', stepsSeries, v => v.toLocaleString('tr-TR')) +
+      '<div class="card"><div class="card-title"><svg class="ic" style="color:var(--accent)"><use href="#i-drop"/></svg> Su (Bugün)</div><div class="progress-track" style="margin-top:6px;"><div class="progress-fill" style="width:' + wPct + '%"></div></div><div class="hint" style="margin-top:6px;">%' + wPct + ' · ' + s.water.today + '/' + s.water.goal + ' ml</div></div>' +
+      Stats.sparkCard('Sigara (14 Gün)', 'i-smoke', 'var(--gold)', smokeSeries, v => v + ' adet') +
+      Stats.sparkCard('Alkol (14 Gün)', 'i-glass', 'var(--violet)', alcSeries, v => v + ' adet') +
+      Stats.sparkCard('Kilo (Son Kayıtlar)', 'i-scale', 'var(--accent)', weightSeries, v => v + ' kg');
+  }
 };
 
 /* ═══ Notlar ═══ */
@@ -1681,7 +1834,7 @@ const Notes = {
     lines[idx] = lines[idx].startsWith('[x] ') ? lines[idx].slice(4) : '[x] ' + lines[idx];
     n.content = lines.join('\n'); Store.save(); haptic(); Notes.render();
   },
-  del(id) { if (!UI.confirm('Not silinsin mi?')) return; S().notes = S().notes.filter(n => n.id !== id); Store.save(); Notes.render(); },
+  del(id) { const n = S().notes.find(x => x.id === id); if (!n || !UI.confirm('Not silinsin mi?')) return; Trash.softDelete('notes', n); Notes.render(); },
   render() {
     const s = S(), q = ($('noteSearch').value || '').toLowerCase();
     const tags = ['all', ...new Set(s.notes.map(n => n.tag || 'Genel'))];
@@ -1807,8 +1960,8 @@ const AI = {
 const Settings = {
   cloudBackupCard() {
     const cur = S().cloudBackup.provider;
-    const opt = (id, name, emoji) => '<button class="btn ' + (cur === id ? 'btn-primary' : 'btn-secondary') + '" style="flex:1;flex-direction:column;gap:4px;padding:14px 8px;" onclick="Settings.setCloud(\'' + id + '\')"><span style="font-size:20px;">' + emoji + '</span><span style="font-size:11.5px;">' + name + '</span></button>';
-    return '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-upload"/></svg> Bulut Yedekleme</div><p class="hint" style="margin-bottom:10px;">Otomatik bulut senkronizasyonu altyapısı — bağlantı yakında aktif olacak. Şimdilik tercihini seçebilirsin.</p><div style="display:flex;gap:8px;">' + opt('icloud', 'iCloud', '☁️') + opt('gdrive', 'Google Drive', '📁') + opt('onedrive', 'OneDrive', '🗂️') + '</div>' + (cur ? '<p class="hint" style="margin-top:10px;">' + { icloud: 'iCloud', gdrive: 'Google Drive', onedrive: 'OneDrive' }[cur] + ' seçili — bağlantı aktif olduğunda otomatik senkronize edilecek.</p>' : '') + '</div>';
+    const opt = (id, name, emoji) => '<button class="btn ' + (cur === id ? 'btn-primary' : 'btn-secondary') + '" style="flex-direction:column;gap:4px;padding:14px 8px;" onclick="Settings.setCloud(\'' + id + '\')"><span style="font-size:20px;">' + emoji + '</span><span style="font-size:11.5px;">' + name + '</span></button>';
+    return '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-upload"/></svg> Bulut Yedekleme</div><p class="hint" style="margin-bottom:10px;">Otomatik bulut senkronizasyonu altyapısı — bağlantı yakında aktif olacak. Şimdilik tercihini seçebilirsin.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">' + opt('icloud', 'iCloud', '☁️') + opt('gdrive', 'Google Drive', '📁') + opt('onedrive', 'OneDrive', '🗂️') + opt('dropbox', 'Dropbox', '📦') + '</div>' + (cur ? '<p class="hint" style="margin-top:10px;">' + { icloud: 'iCloud', gdrive: 'Google Drive', onedrive: 'OneDrive', dropbox: 'Dropbox' }[cur] + ' seçili — bağlantı aktif olduğunda otomatik senkronize edilecek.</p>' : '') + '</div>';
   },
   setCloud(id) { const s = S(); s.cloudBackup.provider = s.cloudBackup.provider === id ? null : id; Store.save(); Settings.render(); toast('Kaydedildi — bulut bağlantısı yakında aktif olacak'); },
   render() {
