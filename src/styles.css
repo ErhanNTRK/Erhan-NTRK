@@ -1,0 +1,141 @@
+
+/* ═══ v6.0.0 — GENİŞ EKRAN DÜZENİ (PC birincil) ═══ */
+@media (min-width: 1200px) {
+  .step, .topbar-inner, .navbar-inner, .progress-inner { max-width: 1500px; }
+  .floor-table input, .cols input { min-width: 0; }
+}
+@media (min-width: 1700px) {
+  .step, .topbar-inner, .navbar-inner, .progress-inner { max-width: 1620px; }
+}
+
+/* Etiketli alan deseni (Dora ile ortak dil) */
+.hrow-labeled { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: flex-end; }
+.pfield { display: flex; flex-direction: column; gap: 3px; min-width: 120px; flex: 1; }
+.pfield--s { flex: 0 0 auto; width: 150px; }
+.pfield--ro { flex: 0 0 auto; min-width: 140px; }
+.pfield > span { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; opacity: .6; white-space: normal; line-height: 1.3; display: block; min-height: 14px; }
+.pfield > span em { text-transform: none; font-style: normal; font-weight: 600; opacity: .9; cursor: help; }
+.pfield input, .pfield select { padding: 9px 10px; font-size: 14px; border: 1.5px solid var(--line, #c9d3df); border-radius: 8px; background: var(--card, #fff); width: 100%; color: inherit; }
+.pfield input:focus, .pfield select:focus { border-color: var(--navy, #12365e); outline: none; }
+.pfield--ro b { font-size: 15px; padding: 9px 0; white-space: nowrap; }
+.pfield--big b { font-size: 20px; color: var(--navy, #12365e); }
+
+.prop-card { border: 1px solid var(--line, #dfe6ee); border-radius: 12px; padding: 12px 14px; margin: 10px 0; background: var(--card, #fff); }
+.prop-card__top, .prop-card__bottom { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: flex-end; }
+.prop-card__bottom { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line, #dfe6ee); }
+.b-del { border: none; background: none; color: #b3261e; font-size: 15px; cursor: pointer; padding: 8px; }
+
+.dual-values { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 14px; }
+.dual-box { flex: 1; min-width: 240px; border: 2px solid var(--navy, #12365e); border-radius: 12px; padding: 14px 16px; text-align: center; }
+.dual-box > span { display: block; font-size: 11px; font-weight: 800; letter-spacing: .06em; opacity: .65; }
+.dual-box > b { display: block; font-size: 24px; margin: 6px 0 2px; color: var(--navy, #12365e); }
+.dual-box > em { font-style: normal; font-size: 12px; opacity: .7; }
+.dual-box.dual-box--chosen { background: rgba(18,54,94,.06); }
+.warn-line { color: #8a4b00; background: rgba(255,170,0,.1); border-radius: 8px; padding: 8px 10px; font-size: 13px; margin-top: 8px; }
+
+/* v6: sonuç/PDF kat tablosu — 4 kolon gerçek genişlikte, başlıklar hizalı */
+.floor-result .floor-head, .floor-result .floor-row {
+  display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 8px; align-items: baseline;
+}
+.floor-result .floor-head span { font-size: 11px; font-weight: 800; letter-spacing: .04em; opacity: .65; }
+.floor-result .floor-cell { text-align: right; white-space: nowrap; }
+
+/* v6: Kat Kurgusu — dar/orta ekranda sıkışan 5-kolonlu ızgara yerine
+   etiketli iki-katlı kartlar (Dora Toplu Excel'deki prop-card deseniyle
+   aynı dil). Kat sayısı ne kadar artarsa artsın kutular üst üste binmez. */
+.floor-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; align-items: start; }
+.floor-card.prop-card { padding: 10px 12px; margin: 0; }
+.floor-card__title { font-size: 13px; font-weight: 700; color: var(--text-1, #17202c); margin-bottom: 6px; }
+.floor-card .prop-card__top { gap: 10px 14px; }
+.floor-card .pfield { min-width: 130px; }
+.floor-total.floor-card {
+  grid-column: 1 / -1;
+  display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  border: none; background: rgba(15,42,71,.05); border-radius: 10px; padding: 10px 14px;
+  font-size: 13.5px;
+}
+.floor-total .floor-label { font-weight: 800; margin-right: 4px; }
+
+/* v6: Üst Hakkı — DCF önizleme tablosu (tam liste PDF/Excel'de) */
+.dcf-table { display: flex; flex-direction: column; gap: 3px; margin-top: 10px; }
+.dcf-head, .dcf-row {
+  display: grid; grid-template-columns: 0.5fr 1.1fr 1.2fr 1.2fr 1.2fr; gap: 6px;
+  padding: 5px 6px; font-size: 12.5px; align-items: center;
+}
+.dcf-head { font-size: 10.5px; font-weight: 800; letter-spacing: .03em; opacity: .6; text-transform: uppercase; }
+.dcf-row:nth-child(even) { background: rgba(15,42,71,.03); border-radius: 6px; }
+.dcf-row span:not(:first-child) { text-align: right; }
+.dcf-more { text-align: center; opacity: .6; font-style: italic; grid-template-columns: 1fr; }
+.year-label-input { width: 44px; padding: 1px 3px; font-size: 10.5px; border: 1px solid #c7cfdb; border-radius: 4px; text-align: center; }
+.pdf-toggle { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+
+/* v6: Açık/Koyu tema geçişi — mevcut tasarım korunur, yalnız değişkenler değişir */
+[data-theme="dark"] {
+  --navy-50: #16232f;
+  --accent-dim: #2c2418;
+  --green-dim: #16261c;
+  --red-dim: #2c1917;
+  --amber-dim: #2b2210;
+  --bg: #0e141b;
+  --surface: #171f29;
+  --line: #2a3543;
+  --line-2: #384454;
+  --text: #eef2f6;
+  --text-2: #b8c2cc;
+  --text-3: #8894a1;
+  --shadow: 0 1px 2px rgba(0,0,0,.35), 0 8px 24px rgba(0,0,0,.45);
+}
+[data-theme="dark"] body { background: var(--bg); color: var(--text); }
+[data-theme="dark"] .card, [data-theme="dark"] .step, [data-theme="dark"] .prop-card,
+[data-theme="dark"] .floor-card, [data-theme="dark"] .dcf-row:nth-child(even) { background: var(--surface); }
+[data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea {
+  background: #1d2733; color: var(--text); border-color: var(--line-2);
+}
+[data-theme="dark"] .choice, [data-theme="dark"] .btn-ghost { background: var(--surface); color: var(--text); border-color: var(--line-2); }
+[data-theme="dark"] .brand-logo, [data-theme="dark"] .brand-logo--hero { background: #fff; }
+[data-theme="dark"] .pfield--ro b { color: #d9c48a; }
+
+.theme-toggle {
+  position: fixed; right: 16px; bottom: 16px; z-index: 999;
+  width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line-2, #c8d2de);
+  background: var(--surface, #fff); box-shadow: var(--shadow, 0 4px 14px rgba(0,0,0,.15));
+  font-size: 19px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+@media print { .theme-toggle { display: none; } }
+.lang-toggle-fab {
+  position: fixed; right: 68px; bottom: 16px; z-index: 999;
+  height: 44px; padding: 0 14px; border-radius: 22px; border: 1px solid var(--line-2, #c8d2de);
+  background: var(--surface, #fff); box-shadow: var(--shadow, 0 4px 14px rgba(0,0,0,.15));
+  font-size: 13px; font-weight: 700; cursor: pointer;
+}
+@media print { .lang-toggle-fab { display: none; } }
+.pct-badge {
+  display: inline-flex; align-items: center; padding: 6px 10px; margin-top: 20px;
+  background: rgba(15,42,71,.07); border-radius: 8px; font-size: 12.5px; font-weight: 700;
+  color: var(--navy, #0f2a47); white-space: nowrap; align-self: flex-end;
+}
+.pct-badge--room { background: rgba(178,141,66,.16); }
+.card-optional { border: 1.5px dashed var(--line-2, #c8d2de); background: rgba(15,42,71,.02); }
+details summary.card-title { list-style: none; }
+details summary.card-title::-webkit-details-marker { display: none; }
+details summary.card-title::before { content: '▸'; display: inline-block; margin-right: 6px; color: var(--text-3, #94a1ae); transition: transform .15s; }
+details[open] summary.card-title::before { transform: rotate(90deg); }
+.optional-badge {
+  font-size: 10px; font-weight: 800; letter-spacing: .05em; color: var(--accent, #b4884b);
+  background: rgba(178,141,66,.14); border-radius: 5px; padding: 3px 7px;
+}
+.en-partial-note {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 998;
+  background: #3a2c10; color: #f6efe3; font-size: 12px; text-align: center;
+  padding: 6px 70px 6px 12px;
+}
+@media print { .en-partial-note { display: none; } }
+@media (max-width: 700px) {
+  .dcf-head, .dcf-row { grid-template-columns: 0.4fr 1fr 1fr 1fr 1fr; font-size: 11px; gap: 4px; }
+}
+
+/* v6: Tarımsal Ürün — yan ürün alt satırı, dışa aktarma satırı, küçük bağlantı düğmesi */
+.linklike { border: none; background: none; color: var(--navy, #12365e); text-decoration: underline;
+  font-size: 12px; cursor: pointer; padding: 2px 4px; }
+.byproduct-row { background: var(--faint, rgba(15,42,71,.035)); border-radius: 8px; padding: 8px 10px; margin-top: 6px; }
+.export-row { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
