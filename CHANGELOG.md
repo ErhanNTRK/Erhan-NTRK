@@ -6,6 +6,42 @@ dosyalarına bakabilirsin.
 
 ---
 
+## Oturum 10 — Canlı Veri Katmanı, Gerçek Yerel Bildirimler, Modülerleşme
+
+### 1) Canlı Veri (BIST / Döviz / Altın / Kripto)
+- Tüm API adresleri **tek yerde** toplandı: `MARKET_API` sabiti (index.html, "CANLI VERİ KAYNAKLARI" başlığı altında). Bir kaynak bozulursa ya da değiştirilmek istenirse sadece bu bloktaki adres güncellenir.
+- Kullanılan ücretsiz, anahtarsız kaynaklar:
+  - **Döviz**: Frankfurter API (USD/TRY, EUR/TRY)
+  - **Altın**: GenelPara API (gram altın, TRY)
+  - **Kripto**: CoinGecko Simple Price API (kullanıcının sahip olduğu coinler için, TRY/USD)
+  - **BIST / ABD Hisse**: Yahoo Finance Chart API (sembol bazlı anlık fiyat)
+- Yeni **`Market`** modülü: `Market.updateAll()` — Varlıklar sekmesindeki **"Fiyatları Güncelle"** butonuna basılınca çalışır. Hisse/Altın/Kripto tipindeki varlıkların `price` alanını otomatik doldurur; eşleşmeyenler sessizce atlanır, sonunda özet toast gösterilir ("X varlık güncellendi · Y eşleşmedi").
+- **Arka planda otomatik istek YOK** — sadece buton tetikler, talimata birebir uyuldu.
+- Varlıklar sekmesine bir **"Piyasa Verileri"** kartı eklendi: son çekilen USD/TRY, EUR/TRY, gram altın değerleri + son güncelleme zamanı.
+- Sandbox test ortamının dış API'lere ağ erişimi kısıtlı olduğu için gerçek fiyat çekme uçtan uca doğrulanamadı (Google Fonts ile aynı kısıtlama); bunun yerine hata durumunun uygulamayı çökertmediği, kullanıcıya net bir mesaj gösterdiği ve diğer her şeyin sorunsuz çalışmaya devam ettiği doğrulandı.
+
+### 2) Gerçek Yerel Bildirim Sistemi
+- Yeni **`Notify`** modülü — **Ajanda, İlaç, Ödemeler, Doğum Günleri (üye + çocuk + özel günler), Belgeler** hepsi tek ortak fonksiyondan (`Notify.fire()`) geçiyor.
+- Tarayıcının yerel `Notification` API'si kullanılıyor (gerçek bir push sunucusu olmadığından, iş bu platformda ancak "uygulama açıkken" çalışabilir — bu dürüstçe not edilmiştir). İzin verilmese bile **uygulama içi bildirim (toast) her zaman gösterilir**, böylece hatırlatma hiçbir zaman sessizce kaybolmaz.
+- Ayarlar'a **"Bildirimler"** kartı eklendi: izin durumu gösteriliyor, "Bildirimleri Etkinleştir/Kapat" butonu var.
+- Tarama mantığı: uygulama açılışında bir kez + açıkken **5 dakikada bir** yerel olarak çalışır (ağ isteği içermez, sadece cihazdaki veriyi kontrol eder). Aynı hatırlatma günde bir kez gösterilir (tekrar önleme, `notifiedIds`).
+- Var olan `notify`/`notifyLead` alanları (oturum 4-5'te eklenmişti) bu gerçek bildirim sistemine bağlandı.
+
+### 3) Kod Yapısı — Modülerleşme
+- CSS, tek `index.html` içinden ayrılıp **`styles.css`** dosyasına taşındı (240 satır). `index.html` artık sadece iskelet + mantık içeriyor, `<link rel="stylesheet">` ile stil dosyasını çağırıyor.
+- `sw.js` (service worker) güncellendi: `styles.css` önbellek listesine eklendi, cache sürümü artırıldı — çevrimdışı çalışma bozulmadı.
+- `YUKLEME-TALIMATI.txt` güncellendi: `styles.css` artık zorunlu bir dosya olarak listelendi.
+- JS mantığı bilinçli olarak **tek dosyada bırakıldı**: modüller arası çalışma zamanı bağımlılıkları (ileri referanslar) ve script yükleme sırası riskleri nedeniyle, JS'i çoklu dosyaya bölmek "çalışan sistemi bozma" riskini gereksiz yere artırırdı. Kod zaten net başlıklarla (`═══ Finans ═══`, `═══ Sağlık ═══` vb.) modüler olarak organize edilmiş durumda.
+
+### Test Sonucu
+- Gömülü JS söz dizimi `node --check` ile doğrulandı.
+- Playwright ile: CSS'in doğru yüklendiği (stillerin uygulandığı), Piyasa Verileri kartının render olduğu, "Fiyatları Güncelle" butonunun hata durumunda uygulamayı çökertmeden net bir toast gösterdiği, bildirim izni akışının çalıştığı, `Notify.checkAll()`'ın doğru koşulda tetiklenip aynı gün tekrar tetiklenmediği (dedup) doğrulandı.
+- 360px dar ekranda tüm bölümlerde (Ana Sayfa, Ajanda, Finans, Sağlık, Belgeler, İstatistikler, Çöp Kutusu, Yapay Zeka, Ayarlar, Aile) taşma yok.
+- Finans (6 sekme, 14 varlık tipi) regresyon testinden sağlam çıktı — mevcut sistem bozulmadı.
+- Konsol hataları: yalnızca sandbox ortamının dış API'lere (Google Fonts, Frankfurter, GenelPara, CoinGecko, Yahoo Finance) erişememesinden kaynaklanan beklenen ağ hataları; bunlar gerçek tarayıcı/barındırma ortamında oluşmaz.
+
+---
+
 ## Oturum 9 — Akıllı Ana Sayfa, İstatistikler, Çöp Kutusu, UX Cilası
 
 ### Ana Sayfa
@@ -94,12 +130,14 @@ Finans hesaplama mantığı, Sağlık kayıtları, Ajanda mantığı — değiş
 ## Bir Sonraki Sürüm İçin Geliştirme Önerileri
 
 1. **Yapay Zeka'ya gerçek API bağlanması** — sohbet arayüzü, mesaj geçmişi ve sabit komut altyapısı tamamen hazır; sadece bir dil modeli uç noktasına bağlanması yeterli.
-2. **Gerçek push bildirimleri** (Web Push API + Service Worker) — `notify`/`notifyLead` alanları tüm ilgili kayıtlarda (ajanda, özel günler, ilaç, ödemeler) zaten mevcut.
-3. **Canlı döviz/altın/borsa fiyat entegrasyonu** — varlık kayıtlarında `currency`/`price` alanları hazır; sadece bir fiyat kaynağına bağlanıp `price` alanının otomatik güncellenmesi yeterli.
-4. **Bulut yedekleme sağlayıcılarının gerçek bağlantısı** (iCloud/Drive/OneDrive/Dropbox OAuth + otomatik senkronizasyon).
-5. **Çöp Kutusu kapsamının genişletilmesi** — şu an Varlık/Borç/Ödeme/Belge/Ajanda/Not için aktif; Aile üyeleri, çocuk profilleri, fotoğraflar gibi diğer kayıt türlerine de uygulanabilir.
-6. **İstatistikler ekranına tarih aralığı seçimi** (şu an sabit son 6 ay / 14 gün / 30 kayıt) ve dışa aktarma (PDF/CSV) desteği.
-7. **Hedeflerin otomatik güncellenmesi** — şu an manuel "çek" butonuyla dolduruluyor; günlük otomatik senkronizasyon (örn. her gün adım hedefinin güncel adım sayısıyla otomatik güncellenmesi) eklenebilir.
-8. **Belgelerde OCR / otomatik son kullanma tarihi tanıma** (fotoğraftan tarih okuma).
-9. **Aile özel günleri için ayrı bir "Yaklaşan Özel Günler" dashboard kartı** (şu an sadece en yakın doğum günü öne çıkıyor).
-10. **Çoklu cihaz senkronizasyonu** — bulut bağlantısı gerçek hale gelince, verinin cihazlar arası tutarlılığı için bir çakışma çözümleme (conflict resolution) stratejisi tasarlanmalı.
+2. **Gerçek Web Push desteği** (arka planda, uygulama kapalıyken de çalışan bildirimler) — şu anki yerel bildirim sistemi yalnızca uygulama açıkken çalışıyor; tam arka plan desteği için bir push sunucusu (VAPID anahtarları vb.) gerekir.
+3. **Döviz varlıkları için otomatik kur çevrimi** — şu an USD/EUR varlık tipleri "basit tutar" olarak (TL karşılığı elle girilerek) tutuluyor; canlı kur artık çekilebildiğine göre, döviz cinsinden miktar girilip TL karşılığının otomatik hesaplanması bir sonraki adım olabilir.
+4. **BIST/ABD hisse fiyat kaynağının doğrulanması** — Yahoo Finance uç noktası bazı ağlarda/tarayıcılarda CORS kısıtlamasına takılabilir; gerçek kullanımda sorun çıkarsa `MARKET_API.stock` adresi tek satırdan değiştirilebilir.
+5. **Bulut yedekleme sağlayıcılarının gerçek bağlantısı** (iCloud/Drive/OneDrive/Dropbox OAuth + otomatik senkronizasyon).
+6. **Çöp Kutusu kapsamının genişletilmesi** — şu an Varlık/Borç/Ödeme/Belge/Ajanda/Not için aktif; Aile üyeleri, çocuk profilleri, fotoğraflar gibi diğer kayıt türlerine de uygulanabilir.
+7. **İstatistikler ekranına tarih aralığı seçimi** ve dışa aktarma (PDF/CSV) desteği.
+8. **Hedeflerin otomatik güncellenmesi** — şu an manuel "çek" butonuyla dolduruluyor; günlük otomatik senkronizasyon eklenebilir.
+9. **Belgelerde OCR / otomatik son kullanma tarihi tanıma** (fotoğraftan tarih okuma).
+10. **JS'in de modüllere ayrılması** — bu oturumda CSS ayrıldı; ileride bir build adımı (örn. basit bir bundler) eklenirse JS de güvenli şekilde dosyalara bölünebilir; şu an tek dosyada kalmasının nedeni script yükleme sırası risklerini sıfırda tutmaktı.
+11. **Çoklu cihaz senkronizasyonu** — bulut bağlantısı gerçek hale gelince, verinin cihazlar arası tutarlılığı için bir çakışma çözümleme (conflict resolution) stratejisi tasarlanmalı.
+

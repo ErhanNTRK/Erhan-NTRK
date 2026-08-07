@@ -1,7 +1,7 @@
 /* NTRK Service Worker — sürüm değişince eski önbellek silinir ve uygulamada
    "Yeni sürüm hazır" şeridi çıkar. Her güncellemede CACHE adını değiştir. */
-const CACHE = 'ntrk-v2.0.0';
-const ASSETS = ['./', './index.html', './manifest.json', './icons/icon-192.png', './icons/icon-512.png'];
+const CACHE = 'ntrk-v2.1.0';
+const ASSETS = ['./', './index.html', './styles.css', './manifest.json', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
