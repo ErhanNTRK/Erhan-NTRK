@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="theme-color" content="#050b16">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,6 +16,14 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body class="theme-premium">
+
+<div id="lockScreen" style="display:none;position:fixed;inset:0;z-index:99999;background:#050b16;color:#fff;align-items:center;justify-content:center;flex-direction:column;gap:14px;padding:24px;text-align:center;">
+  <div style="font-size:42px;">🔒</div>
+  <div style="font-size:20px;font-weight:700;">NTRK kilitli</div>
+  <input id="lockPin" type="password" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="PIN" style="text-align:center;font-size:24px;letter-spacing:6px;max-width:220px;" onkeydown="if(event.key==='Enter')Lock.unlock()">
+  <div id="lockErr" style="color:#ff8a8a;font-size:13px;min-height:18px;"></div>
+  <button class="btn btn-primary" style="min-width:200px;" onclick="Lock.unlock()">Aç</button>
+</div>
 
 <div id="app">
   <div class="topbar">
@@ -357,6 +366,7 @@
     <label style="display:flex;align-items:center;gap:8px;font-size:13.5px;cursor:pointer;"><input type="checkbox" id="paymentAutopay" style="width:18px;height:18px;"> Otomatik Ödeme</label>
     <label style="display:flex;align-items:center;gap:8px;font-size:13.5px;cursor:pointer;"><input type="checkbox" id="paymentNotify" style="width:18px;height:18px;" checked> Bildirim</label>
   </div>
+  <div class="form-row"><label class="form-label">Ne zaman hatırlat? (ödeme günü her zaman hatırlatılır)</label><select id="paymentLead"><option value="same">Sadece ödeme günü</option><option value="1d" selected>1 gün önce</option><option value="3d">3 gün önce</option><option value="7d">7 gün önce</option></select></div>
   <div class="modal-actions"><button class="btn btn-secondary btn-full" onclick="UI.close('paymentModal')">İptal</button><button class="btn btn-primary btn-full" onclick="Fin.savePayment()">Kaydet</button></div>
 </div></div>
 
@@ -432,7 +442,7 @@
 /* ═══════════════ NTRK v2 — Uygulama Çekirdeği ═══════════════
    Dosya içi modül disiplini: Store, Auth, UI, Router + her sekme kendi nesnesi.
    Veri: localStorage 'ntrk_data' (v1'den otomatik miras) + IndexedDB 'ntrk-files' (fotoğraf/belge). */
-const APP_VERSION = 'NTRK v2.1 · 2026.08.06';
+const APP_VERSION = 'NTRK v2.2 · 2026.11.06';
 
 /* ── Yardımcılar ── */
 const $ = (id) => document.getElementById(id);
@@ -570,9 +580,11 @@ const Router = {
 /* ── Boot: uygulama doğrudan açılır, telefon güvenliği yeterlidir ── */
 const Boot = {
   async enter() {
+    Lock.init();
     Store.load(); await Store.migrate();
     document.body.className = 'theme-' + (localStorage.getItem('ntrk_theme') || 'premium');
     Home.render(); Notes.scheduleReminders();
+    try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
     Notify.checkAll();
     setInterval(Notify.checkAll, 5 * 60 * 1000); /* uygulama açıkken 5 dakikada bir yerel tarama — ağ isteği yok */
   }
@@ -592,7 +604,7 @@ const SPECIAL_DAY_TYPES = { anniversary: 'Evlilik Yıldönümü', meeting: 'Tan�
 /* Bildirim altyapısı (gerçek push yok — sadece hesaplama): kayıt tarihine göre "bugün hatırlatma günü mü" hesaplanır */
 const NOTIFY_LEADS = { same: 0, '1d': 1, '3d': 3, '7d': 7 };
 const NOTIFY_LEAD_LABELS = { same: 'Aynı gün', '1d': '1 gün önce', '3d': '3 gün önce', '7d': '7 gün önce' };
-function isReminderToday(dateStr, notify, lead) { if (!notify || !dateStr) return false; const days = NOTIFY_LEADS[lead] ?? 0; return addDays(dateStr, -days) === todayStr(); }
+function isReminderToday(dateStr, notify, lead, on) { if (!notify || !dateStr) return false; const days = NOTIFY_LEADS[lead] ?? 0; return addDays(dateStr, -days) === (on || todayStr()); }
 const EV_STYLE = {
   event:   { color: 'var(--accent)', dim: 'var(--accent-dim)', icon: 'i-cal' },
   health:  { color: 'var(--green)',  dim: 'var(--green-dim)',  icon: 'i-heart' },
@@ -1185,6 +1197,11 @@ const Fin = {
     for (let i = 0; i < 400; i++) { const d = addDays(todayStr(), i); if (isRecurringOnDate({ date: p.dueDate, repeat: p.repeat }, d)) { if (!(p.paidPeriods || []).includes(Fin.paymentPeriodKey(p, d))) return d; } }
     return null;
   },
+  /* Belirli bir günde bu ödeme vadesi geliyor mu ve o dönem ödenmemiş mi? (bildirimler için) */
+  dueOn(p, d) {
+    if (!p.repeat || p.repeat === 'none') return !p.paid && p.dueDate === d;
+    return isRecurringOnDate({ date: p.dueDate, repeat: p.repeat }, d) && !(p.paidPeriods || []).includes(Fin.paymentPeriodKey(p, d));
+  },
   togglePaid(id) {
     const p = S().payments.find(x => x.id === id); if (!p) return;
     if (!p.repeat || p.repeat === 'none') p.paid = !p.paid;
@@ -1202,12 +1219,13 @@ const Fin = {
     $('paymentRepeat').value = p ? (p.repeat || 'monthly') : 'monthly';
     $('paymentAutopay').checked = p ? !!p.autopay : false;
     $('paymentNotify').checked = p ? (p.notify !== false) : true;
+    $('paymentLead').value = p ? (p.notifyLead || 'same') : '1d';
     UI.open('paymentModal');
   },
   savePayment() {
     const cat = $('paymentCat').value, name = $('paymentName').value.trim(), amount = Number($('paymentAmount').value), due = $('paymentDue').value;
     if (!name || !amount || !due) { toast('Ad, tutar ve tarih zorunlu'); return; }
-    const data = { cat, name, amount, dueDate: due, repeat: $('paymentRepeat').value, autopay: $('paymentAutopay').checked, notify: $('paymentNotify').checked };
+    const data = { cat, name, amount, dueDate: due, repeat: $('paymentRepeat').value, autopay: $('paymentAutopay').checked, notify: $('paymentNotify').checked, notifyLead: $('paymentLead').value };
     if (Fin._editPaymentId) { const p = S().payments.find(x => x.id === Fin._editPaymentId); Object.assign(p, data); }
     else S().payments.push({ id: uid(), paidPeriods: [], paid: false, ...data });
     Store.save(); UI.close('paymentModal'); Fin.render(); toast('Kaydedildi'); if (Router.current === 'sec-home') Home.render();
@@ -1344,18 +1362,75 @@ const Notify = {
     }
     toast('🔔 ' + title);
   },
-  /* Tek tarama fonksiyonu: tüm modüllerdeki bugüne ait hatırlatıcıları bulur ve Notify.fire() üzerinden gönderir. */
-  checkAll() {
-    const s = S(), today = todayStr();
-    for (const ev of s.events) if (ev.notify && isRecurringOnDate(ev, today) && isReminderToday(ev.date, ev.notify, ev.notifyLead)) Notify.fire('ev-' + ev.id + '-' + today, ev.title, (ev.time ? ev.time + ' · ' : '') + 'Ajanda hatırlatması');
-    for (const m of s.meds) { if (!m.notify || !m.time) continue; if (m.startDate && m.startDate > today) continue; if (m.endDate && m.endDate < today) continue; if (s.medsTaken.date === today && s.medsTaken.ids.includes(m.id)) continue; Notify.fire('med-' + m.id + '-' + today, m.name + ' zamanı geldi', m.dose || 'İlaç hatırlatması'); }
-    for (const p of s.payments) { if (!p.notify) continue; const due = Fin.nextDue(p); if (due === today) Notify.fire('pay-' + p.id + '-' + today, p.name + ' ödeme günü', para(p.amount)); }
-    for (const m of s.members) {
-      if (m.birth && m.birth.slice(5) === today.slice(5)) Notify.fire('bday-' + m.id + '-' + today, m.name + ' — Doğum Günü 🎈', 'Bugün doğum günü!');
-      for (const sd of (m.specialDays || [])) { if (!sd.notify || !sd.date) continue; const thisYear = today.slice(0, 4) + '-' + sd.date.slice(5); if (isReminderToday(thisYear, sd.notify, sd.notifyLead)) Notify.fire('sd-' + sd.id + '-' + today, m.name + ' — ' + (SPECIAL_DAY_TYPES[sd.type] || 'Özel Gün'), sd.title || ''); }
+  /* Bir gün için gösterilecek tüm hatırlatıcıları üretir (saf fonksiyon: bildirim göndermez).
+     Hem yerel tarama (bugün) hem de arka plan push takvimi (gelecek günler) bunu kullanır. */
+  listFor(d) {
+    const s = S(), out = [], isToday = d === todayStr();
+    const add = (id, title, body) => out.push({ id, title, body: body || '' });
+    for (const ev of s.events) if (ev.notify && isRecurringOnDate(ev, d) && isReminderToday(ev.date, ev.notify, ev.notifyLead, d)) add('ev-' + ev.id + '-' + d, ev.title, (ev.time ? ev.time + ' · ' : '') + 'Ajanda hatırlatması');
+    if (isToday) for (const m of s.meds) { if (!m.notify || !m.time) continue; if (m.startDate && m.startDate > d) continue; if (m.endDate && m.endDate < d) continue; if (s.medsTaken.date === d && s.medsTaken.ids.includes(m.id)) continue; add('med-' + m.id + '-' + d, m.name + ' zamanı geldi', m.dose || 'İlaç hatırlatması'); }
+    /* Ödemeler: seçilen gün önce + ödeme günü + (yalnızca bugün için) gecikmiş */
+    for (const p of s.payments) {
+      if (!p.notify) continue;
+      if (Fin.dueOn(p, d)) add('pay-' + p.id + '-' + d, p.name + ' ödeme günü', para(p.amount) + ' · bugün son gün');
+      const lead = NOTIFY_LEADS[p.notifyLead] || 0;
+      if (lead > 0) { const due = addDays(d, lead); if (Fin.dueOn(p, due)) add('paylead-' + p.id + '-' + due + '-' + d, p.name + ' ödemesi yaklaşıyor', para(p.amount) + ' · ' + lead + ' gün kaldı (' + trDateShort(due) + ')'); }
+      if (isToday && (!p.repeat || p.repeat === 'none') && !p.paid && p.dueDate < d) add('payover-' + p.id + '-' + d, p.name + ' ödemesi gecikti ⚠️', para(p.amount) + ' · son tarih ' + trDateShort(p.dueDate));
     }
-    for (const c of s.children) if (c.birth && c.birth.slice(5) === today.slice(5)) Notify.fire('bday-' + c.id + '-' + today, c.name + ' — Doğum Günü 🎈', 'Bugün doğum günü!');
-    for (const d of s.docs) { const dl = Docs.daysLeft(d.expiryDate); if (dl === null) continue; if ([30, 7, 1, 0].includes(dl)) Notify.fire('doc-' + d.id + '-' + dl + '-' + today, d.title + ' süresi ' + (dl === 0 ? 'bugün doluyor' : 'yaklaşıyor'), dl === 0 ? 'Son gün' : dl + ' gün kaldı'); }
+    for (const m of s.members) {
+      if (m.birth && m.birth.slice(5) === d.slice(5)) add('bday-' + m.id + '-' + d, m.name + ' — Doğum Günü 🎈', 'Bugün doğum günü!');
+      for (const sd of (m.specialDays || [])) { if (!sd.notify || !sd.date) continue; const thisYear = d.slice(0, 4) + '-' + sd.date.slice(5); if (isReminderToday(thisYear, sd.notify, sd.notifyLead, d)) add('sd-' + sd.id + '-' + d, m.name + ' — ' + (SPECIAL_DAY_TYPES[sd.type] || 'Özel Gün'), sd.title || ''); }
+    }
+    for (const c of s.children) if (c.birth && c.birth.slice(5) === d.slice(5)) add('bday-' + c.id + '-' + d, c.name + ' — Doğum Günü 🎈', 'Bugün doğum günü!');
+    for (const doc of s.docs) { if (!doc.expiryDate) continue; const dl = Math.round((new Date(doc.expiryDate + 'T12:00:00') - new Date(d + 'T12:00:00')) / 86400000); if ([30, 7, 1, 0].includes(dl)) add('doc-' + doc.id + '-' + dl + '-' + d, doc.title + ' süresi ' + (dl === 0 ? 'bugün doluyor' : 'yaklaşıyor'), dl === 0 ? 'Son gün' : dl + ' gün kaldı'); }
+    return out;
+  },
+  checkAll() {
+    const today = todayStr();
+    for (const r of Notify.listFor(today)) Notify.fire(r.id, r.title, r.body);
+    /* Haftalık yedek hatırlatması */
+    const s = S(), hasData = (s.payments.length + s.assets.length + s.events.length + s.docs.length + s.notes.length) > 0;
+    if (hasData && Date.now() - (s.lastBackup || 0) > 7 * 86400000) Notify.fire('backup-' + Math.floor(Date.now() / (7 * 86400000)), 'Yedek zamanı 💾', 'Verilerini Ayarlar > Yedek Al ile kaydet');
+    Notify.queueSync();
+  },
+  /* ── Arka plan (push) bildirimi: kapalıyken de gelir. Worker + Web Push gerekir (docs/PUSH-KURULUM.md) ── */
+  pushSupported() { return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window; },
+  pushOn() { return localStorage.getItem('ntrk_push') === '1'; },
+  buildSchedule() { const items = []; const dates = []; for (let i = 0; i < 45; i++) { const d = addDays(todayStr(), i); const list = Notify.listFor(d); if (list.length) { dates.push(d); for (const r of list) items.push({ date: d, id: r.id, title: r.title, body: r.body }); } } return { items, dates }; },
+  _syncT: null,
+  queueSync() { if (!Notify.pushOn()) return; clearTimeout(Notify._syncT); Notify._syncT = setTimeout(Notify.syncPush, 2500); },
+  async syncPush() {
+    if (!Notify.pushOn() || !Notify.pushSupported() || !AI.url()) return;
+    try {
+      const { items, dates } = Notify.buildSchedule();
+      await IDB.put('push-reminders', JSON.stringify(items));
+      const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription();
+      if (!sub) return;
+      await fetch(AI.url().replace(/\/+$/, '') + '/push/sync', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Access-Code': AI.code() }, body: JSON.stringify({ subscription: sub.toJSON(), dates }) });
+    } catch (e) { /* çevrimdışıysa sonraki taramada tekrar denenir */ }
+  },
+  async enablePush() {
+    if (!Notify.pushSupported()) { toast('Bu tarayıcı arka plan bildirimini desteklemiyor (iPhone: önce Ana Ekrana Ekle)'); return; }
+    if (!AI.url()) { toast('Önce Ayarlar > AI Asistan bölümüne Worker adresini gir'); return; }
+    if (Notification.permission !== 'granted') { const p = await Notification.requestPermission(); if (p !== 'granted') { toast('Bildirim izni verilmedi'); return; } S().notifyEnabled = true; Store.save(); }
+    try {
+      const base = AI.url().replace(/\/+$/, '');
+      const kr = await fetch(base + '/push/key', { headers: { 'X-Access-Code': AI.code() } });
+      if (!kr.ok) throw new Error('Worker push anahtarı vermedi (' + kr.status + ')');
+      const { publicKey } = await kr.json();
+      const pad = '='.repeat((4 - publicKey.length % 4) % 4), raw = atob((publicKey + pad).replace(/-/g, '+').replace(/_/g, '/'));
+      const key = Uint8Array.from(raw, c => c.charCodeAt(0));
+      const reg = await navigator.serviceWorker.ready;
+      const sub = (await reg.pushManager.getSubscription()) || await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
+      localStorage.setItem('ntrk_push', '1');
+      await Notify.syncPush();
+      toast('Arka plan bildirimi açıldı 🔔'); if (Router.current === 'sec-settings') Settings.render();
+      return sub;
+    } catch (e) { toast('Push açılamadı: ' + (e.message || e)); }
+  },
+  async disablePush() {
+    try { const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription(); if (sub) await sub.unsubscribe(); } catch (e) {}
+    localStorage.removeItem('ntrk_push'); toast('Arka plan bildirimi kapatıldı'); if (Router.current === 'sec-settings') Settings.render();
   }
 };
 
@@ -1392,7 +1467,7 @@ const Health = {
   rMeds() {
     const s = S(), taken = s.medsTaken.ids;
     $('ht-meds').innerHTML = '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-pill"/></svg> İlaç & Vitamin — Bugün</div>' +
-      (s.meds.length ? s.meds.map(m => { const ok = taken.includes(m.id); return '<div class="check-line ' + (ok ? 'done' : '') + '" onclick="Health.toggleMed(\'' + m.id + '\')"><span class="check-box"><svg class="ic sm"><use href="#i-check"/></svg></span><span style="flex:1;">' + esc(m.name) + (m.dose ? ' <span class="hint">· ' + esc(m.dose) + '</span>' : '') + (m.time ? ' <span class="hint">· ' + m.time + '</span>' : '') + (m.notify ? ' 🔔' : '') + '</span><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="event.stopPropagation();if(UI.confirm(\'Silinsin mi?\')){S().meds=S().meds.filter(x=>x.id!==\'' + m.id + '\');Store.save();Health.rMeds()}"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>'; }).join('') : '<p class="hint">Düzenli ilaç/vitaminlerini ekle; her gün dokunarak işaretle, durum brifinge düşer.</p>') +
+      (s.meds.length ? s.meds.map(m => { const ok = taken.includes(m.id); return '<div class="check-line ' + (ok ? 'done' : '') + '" onclick="Health.toggleMed(\'' + m.id + '\')"><span class="check-box"><svg class="ic sm"><use href="#i-check"/></svg></span><span style="flex:1;">' + esc(m.name) + (m.dose ? ' <span class="hint">· ' + esc(m.dose) + '</span>' : '') + (m.time ? ' <span class="hint">· ' + esc(m.time) + '</span>' : '') + (m.notify ? ' 🔔' : '') + '</span><button class="icon-btn del" style="min-width:32px;min-height:32px;" onclick="event.stopPropagation();if(UI.confirm(\'Silinsin mi?\')){S().meds=S().meds.filter(x=>x.id!==\'' + m.id + '\');Store.save();Health.rMeds()}"><svg class="ic sm"><use href="#i-trash"/></svg></button></div>'; }).join('') : '<p class="hint">Düzenli ilaç/vitaminlerini ekle; her gün dokunarak işaretle, durum brifinge düşer.</p>') +
       '<button class="btn btn-primary btn-full btn-sm" style="margin-top:10px;" onclick="Health.openMed()"><svg class="ic sm"><use href="#i-plus"/></svg> Ekle</button></div>';
   },
   openMed() { $('medName').value = ''; $('medDose').value = ''; $('medTime').value = ''; $('medStart').value = ''; $('medEnd').value = ''; $('medNotify').checked = false; UI.open('medModal'); },
@@ -1773,22 +1848,92 @@ const Notes = {
   }
 };
 
+/* ═══ Şifreleme yardımcıları (WebCrypto: PBKDF2 + AES-GCM) ═══ */
+const Crypt = {
+  b64(buf) { let s = ''; for (const b of new Uint8Array(buf)) s += String.fromCharCode(b); return btoa(s); },
+  unb64(s) { return Uint8Array.from(atob(s), c => c.charCodeAt(0)); },
+  async key(pass, salt, usage) {
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 200000, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, usage);
+  },
+  async encrypt(text, pass) {
+    const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+    const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, await Crypt.key(pass, salt, ['encrypt']), new TextEncoder().encode(text));
+    return { app: 'ntrk', enc: 1, salt: Crypt.b64(salt), iv: Crypt.b64(iv), data: Crypt.b64(ct) };
+  },
+  async decrypt(o, pass) {
+    const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: Crypt.unb64(o.iv) }, await Crypt.key(pass, Crypt.unb64(o.salt), ['decrypt']), Crypt.unb64(o.data));
+    return new TextDecoder().decode(pt);
+  }
+};
+
+/* ═══ Uygulama kilidi (PIN) — ekranı kilitler; veri şifreleme değildir, şifreli yedek ayrıca vardır ═══ */
+const Lock = {
+  has() { return !!localStorage.getItem('ntrk_lock'); },
+  async hash(pin, saltB64) {
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pin), 'PBKDF2', false, ['deriveBits']);
+    return Crypt.b64(await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: Crypt.unb64(saltB64), iterations: 200000, hash: 'SHA-256' }, base, 256));
+  },
+  async set(pin) {
+    if (!/^\d{4,12}$/.test(pin)) { toast('PIN 4-12 haneli rakam olmalı'); return false; }
+    const salt = Crypt.b64(crypto.getRandomValues(new Uint8Array(16)));
+    localStorage.setItem('ntrk_lock', JSON.stringify({ salt, hash: await Lock.hash(pin, salt) }));
+    return true;
+  },
+  show() { const el = $('lockScreen'); el.style.display = 'flex'; $('lockPin').value = ''; $('lockErr').textContent = ''; setTimeout(() => $('lockPin').focus(), 50); },
+  hide() { $('lockScreen').style.display = 'none'; },
+  async unlock() {
+    const rec = JSON.parse(localStorage.getItem('ntrk_lock') || 'null'); if (!rec) { Lock.hide(); return; }
+    const pin = $('lockPin').value;
+    if (await Lock.hash(pin, rec.salt) === rec.hash) { Lock._fails = 0; Lock.hide(); }
+    else { Lock._fails = (Lock._fails || 0) + 1; $('lockErr').textContent = 'PIN yanlış' + (Lock._fails >= 3 ? ' (' + Lock._fails + ' deneme)' : ''); $('lockPin').value = ''; }
+  },
+  async enable() { const pin = $('setPin').value.trim(); if (await Lock.set(pin)) { toast('Kilit açıldı 🔒'); Settings.render(); } },
+  disable() { if (!UI.confirm('Uygulama kilidi kaldırılsın mı?')) return; localStorage.removeItem('ntrk_lock'); toast('Kilit kaldırıldı'); Settings.render(); },
+  init() {
+    if (Lock.has()) Lock.show();
+    /* Uygulama 1 dakikadan uzun arka planda kalırsa yeniden kilitlenir */
+    let hiddenAt = 0;
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) hiddenAt = Date.now();
+      else if (Lock.has() && hiddenAt && Date.now() - hiddenAt > 60000) Lock.show();
+    });
+  }
+};
+
 /* ═══ Yedekleme ═══ */
 const Backup = {
   async export() {
     const files = {};
     for (const k of await IDB.keys()) files[k] = await IDB.get(k);
     const data = { app: 'ntrk', backupVersion: 2, exportedAt: new Date().toISOString(), name: localStorage.getItem('ntrk_name') || '', theme: localStorage.getItem('ntrk_theme') || 'dark', state: S(), files };
-    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+    let out = JSON.stringify(data);
+    const pw = window.prompt('Yedeği şifrelemek için bir parola yaz (boş bırakırsan şifresiz indirilir). Parolayı unutursan yedek açılamaz.', '');
+    if (pw) out = JSON.stringify(await Crypt.encrypt(out, pw));
+    const blob = new Blob([out], { type: 'application/json' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
     a.download = 'ntrk-yedek-' + todayStr() + '.json'; a.click(); URL.revokeObjectURL(a.href);
+    S().lastBackup = Date.now(); Store.save();
     toast('Yedek indirildi — güvenli bir yere kopyala');
+  },
+  /* Yedek dosyasını içeri almadan önce yapısını doğrular (bozuk dosya mevcut veriyi ezmesin) */
+  validate(data) {
+    const st = data.state;
+    if (typeof st !== 'object' || Array.isArray(st)) return 'veri bölümü bozuk';
+    for (const k of ['events', 'payments', 'assets', 'debts', 'docs', 'notes', 'members', 'children', 'meds', 'goals', 'platforms']) if (st[k] !== undefined && !Array.isArray(st[k])) return k + ' listesi bozuk';
+    for (const [k, v] of Object.entries(data.files || {})) { if (typeof v !== 'string') return 'dosya "' + k + '" bozuk'; }
+    return '';
   },
   async import(file) {
     if (!file) return;
     try {
-      const data = JSON.parse(await file.text());
+      let data = JSON.parse(await file.text());
+      if (data.enc) {
+        const pw = window.prompt('Bu yedek şifreli. Parolayı yaz:'); if (!pw) return;
+        try { data = JSON.parse(await Crypt.decrypt(data, pw)); } catch (e) { toast('Parola yanlış ya da dosya bozuk'); return; }
+      }
       if (data.app !== 'ntrk' || !data.state) { toast('Bu bir NTRK yedeği değil'); return; }
+      const problem = Backup.validate(data); if (problem) { toast('Yedek geçersiz: ' + problem); return; }
       if (!UI.confirm('Yedek geri yüklenecek ve mevcut verilerin yedektekiyle DEĞİŞTİRİLECEK. Devam edilsin mi?')) return;
       Store.state = data.state; Store.save();
       if (data.name) localStorage.setItem('ntrk_name', data.name);
@@ -1876,6 +2021,7 @@ const Settings = {
       (supported && perm !== 'granted' ? '<button class="btn btn-primary btn-full" onclick="Notify.requestPermission()"><svg class="ic sm"><use href="#i-bell"/></svg> Bildirimleri Etkinleştir</button>' : '') +
       (supported && perm === 'granted' && s.notifyEnabled ? '<button class="btn btn-secondary btn-full" onclick="Notify.disable()">Bildirimleri Kapat</button>' : '') +
       (supported && perm === 'granted' && !s.notifyEnabled ? '<button class="btn btn-primary btn-full" onclick="Notify.requestPermission()"><svg class="ic sm"><use href="#i-bell"/></svg> Bildirimleri Etkinleştir</button>' : '') +
+      (Notify.pushSupported() ? '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);"><div style="font-size:13px;font-weight:600;margin-bottom:4px;">Uygulama kapalıyken de bildir (push) ' + (Notify.pushOn() ? '<span style="color:var(--green)">· Açık</span>' : '') + '</div><p class="hint" style="margin-bottom:8px;">Ödeme, ajanda, doğum günü ve belge hatırlatmaları her sabah 09:00\'da telefonuna gelir. Worker kurulumu gerekir (docs/PUSH-KURULUM.md).</p>' + (Notify.pushOn() ? '<button class="btn btn-secondary btn-full" onclick="Notify.disablePush()">Arka Plan Bildirimini Kapat</button>' : '<button class="btn btn-primary btn-full" onclick="Notify.enablePush()">Arka Plan Bildirimini Aç</button>') + '</div>' : '') +
       '</div>';
   },
   cloudBackupCard() {
@@ -1893,7 +2039,7 @@ const Settings = {
       '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-download"/></svg> Yedekleme</div><p class="hint" style="margin-bottom:10px;">Tüm veriler yalnızca bu cihazda. Düzenli yedek al; yeni cihazda geri yükle, kaldığın yerden devam et. Fotoğraf ve belgeler yedeğe dahildir.</p><button class="btn btn-primary btn-full" onclick="Backup.export()"><svg class="ic sm"><use href="#i-download"/></svg> Yedek Al (JSON)</button><div class="form-row" style="margin-top:10px;"><label class="form-label">Yedeği Geri Yükle</label><input type="file" accept="application/json,.json" onchange="Backup.import(this.files[0])"></div></div>' +
       Settings.notifyCard() +
       Settings.cloudBackupCard() +
-      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-shield"/></svg> Gizlilik</div><p class="hint">Uygulamada ayrı bir giriş şifresi yok — cihazının kendi kilidi (PIN, Face ID, parmak izi) yeterli güvenliği sağlar. Tüm veriler yalnızca bu cihazda saklanır.</p></div>' +
+      '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-shield"/></svg> Gizlilik & Kilit</div><p class="hint" style="margin-bottom:10px;">Veriler yalnızca bu cihazda saklanır. PIN, uygulamayı açarken ve 1 dakikadan uzun arka planda kaldığında ekranı kilitler (cihazın kendi kilidinin yerine geçmez; veri şifrelemesi değildir). Şifreli yedek için Yedek Al sırasında parola gir.</p>' + (Lock.has() ? '<div style="color:var(--green);font-size:13px;margin-bottom:8px;">🔒 Kilit açık</div><button class="btn btn-secondary btn-full" onclick="Lock.disable()">Kilidi Kaldır</button>' : '<div class="form-row"><label class="form-label">PIN belirle (4-12 rakam)</label><input id="setPin" type="password" inputmode="numeric" maxlength="12" autocomplete="off"></div><button class="btn btn-primary btn-full" onclick="Lock.enable()">Kilidi Aç</button>') + '</div>' +
       '<div class="card"><div class="card-title"><svg class="ic"><use href="#i-spark"/></svg> AI Asistan (isteğe bağlı)</div><p class="hint" style="margin-bottom:10px;">Kendi Cloudflare Worker proxy\'n ile çalışır (paketteki worker-ai-proxy.js dosyasında adım adım kurulum var). Adres boşsa AI kapalıdır; uygulamanın geri kalanı AI\'sız tam çalışır.</p><div class="form-row"><label class="form-label">Worker Adresi</label><input id="aiUrl" placeholder="https://ntrk-ai.hesabin.workers.dev" value="' + esc(AI.url()) + '"></div><div class="form-row"><label class="form-label">Erişim Kodu</label><input id="aiCode" value="' + esc(AI.code()) + '"></div><div style="display:flex;gap:8px;"><button class="btn btn-secondary btn-sm" style="flex:1;" onclick="localStorage.setItem(\'ntrk_ai_url\',$(\'aiUrl\').value.trim());localStorage.setItem(\'ntrk_ai_code\',$(\'aiCode\').value.trim());toast(\'AI ayarları kaydedildi\')">Kaydet</button><button class="btn btn-primary btn-sm" style="flex:1;" onclick="AI.weekly()"><svg class="ic sm"><use href="#i-spark"/></svg> Aylık Özet Al</button></div></div>' +
       '<div class="card"><div class="card-title" style="color:var(--rose)"><svg class="ic" style="color:var(--rose)"><use href="#i-trash"/></svg> Tehlikeli Alan</div><button class="btn btn-danger btn-full" onclick="if(UI.confirm(\'TÜM veriler kalıcı olarak silinecek. Yedeğin var mı? Emin misin?\')&&UI.confirm(\'Son kez: geri dönüş YOK. Silinsin mi?\')){localStorage.clear();indexedDB.deleteDatabase(\'ntrk-files\');location.reload()}">Tüm Verileri Sil</button></div>' +
       '<p style="text-align:center;font-size:11.5px;color:var(--text3);margin:14px 0;">' + APP_VERSION + '</p>';

@@ -1,5 +1,18 @@
 # NTRK v2 — CHANGELOG
 
+## v2.2 — Ödeme bildirimleri, güvenlik, kilit, testler
+
+- **Ödeme bildirimleri:** ödeme formuna "Ne zaman hatırlat?" (ödeme günü / 1 / 3 / 7 gün önce) eklendi; ödeme günü her zaman ayrıca bildirilir; vadesi geçmiş tek seferlik ödemeler için günlük "gecikti" uyarısı; ödenen dönem için bildirim yok.
+- **Arka plan push:** uygulama kapalıyken de bildirim (Worker + Web Push, bkz. docs/PUSH-KURULUM.md).
+- **Hata düzeltmesi:** AI erişim kodu gövdede gidiyor, Worker başlıkta arıyordu; ikisi de kabul ediliyor.
+- **Güvenlik:** Content-Security-Policy, Worker CORS kısıtı (yalnız site adresi), IP başına hız sınırı, sabit zamanlı kod karşılaştırma, istemci model seçimi kaldırıldı, bir kullanıcı alanı için eksik `esc()` eklendi.
+- **Veri güvenliği:** kalıcı depolama isteği, yedek içe aktarmada doğrulama, haftalık yedek hatırlatması, parola ile şifreli yedek (AES-GCM).
+- **PIN kilidi** (Ayarlar > Gizlilik & Kilit).
+- **Service worker:** önce-ağ stratejisi, tek tek dosya ekleme, push ve bildirim tıklama.
+- **Testler:** `npm test` (14 test: mevduat, ödeme vadesi, bildirim listesi, yedek doğrulama).
+- **Repo düzeni:** eski `NTRK-v2/` kopyası silindi, ArsaPlan dosyaları `arsaplan-arsiv/`, notlar `docs/` altına taşındı.
+
+---
 Bu dosya, uygulamanın tüm geliştirme oturumları boyunca yapılan değişikliklerin
 özetidir. Oturum bazlı ayrıntılı notlar için `OTURUM-*-DEGISIKLIKLER.md`
 dosyalarına bakabilirsin.
