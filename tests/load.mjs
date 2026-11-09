@@ -9,7 +9,7 @@ const dir = path.dirname(fileURLToPath(import.meta.url));
    ve test edilecek nesneleri döndürür. `today` verilirse takvim bugünü sabitler. */
 export function loadApp(today) {
   const html = fs.readFileSync(path.join(dir, '..', 'index.html'), 'utf8');
-  const code = html.match(/<script>([\s\S]*?)<\/script>/)[1];
+  const code = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]).sort((a, b) => b.length - a.length)[0];
   const el = () => new Proxy(function () {}, {
     get: (t, k) => (k === Symbol.toPrimitive ? () => '' : el()),
     apply: () => el(),

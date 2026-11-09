@@ -1,6 +1,6 @@
 /* NTRK Service Worker — çevrimdışı çalışma, güncelleme şeridi ve arka plan bildirimi (push).
    Sürüm değişince eski önbellek silinir. Her güncellemede CACHE adını değiştir. */
-const CACHE = 'ntrk-v2.2.0';
+const CACHE = 'ntrk-v2.3.0';
 const ASSETS = ['./', './index.html', './styles.css', './manifest.json', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {

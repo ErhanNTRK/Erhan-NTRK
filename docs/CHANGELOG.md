@@ -1,5 +1,17 @@
 # NTRK v2 — CHANGELOG
 
+## v2.3 — Hata düzeltmeleri
+
+- **Ajanda:** tekrarlayan olaylarda "x gün önce" hatırlatması hiç gelmiyordu, düzeltildi.
+- **Piyasa verisi:** altın ve gümüş artık gold-api.com ons fiyatından hesaplanıyor (GenelPara kapanmıştı); döviz yeni Frankfurter adresine taşındı; BIST/ABD hisse fiyatı Worker üzerinden alınıyor (Yahoo tarayıcıya izin vermiyordu).
+- **Push:** takvim her kayıtta eşitleniyor ve değişmediyse ağa gitmiyor; gecikmiş ödemeler uygulama kapalıyken de bildiriliyor.
+- **Worker:** hız sınırı KV yerine bellekte (kota saldırısı kapandı), yanlış kod denemeleri ayrıca sınırlı, /market/stock eklendi.
+- **PIN:** 5 yanlış denemeden sonra bekleme (30 sn, her hatada iki kat); yüklenirken içerik görünmüyor.
+- **Düzen:** README, GitHub Actions test kontrolü, sürüm tutarlılık testi (index.html / sw.js / package.json). 21 test.
+
+---
+
+
 ## v2.2 — Ödeme bildirimleri, güvenlik, kilit, testler
 
 - **Ödeme bildirimleri:** ödeme formuna "Ne zaman hatırlat?" (ödeme günü / 1 / 3 / 7 gün önce) eklendi; ödeme günü her zaman ayrıca bildirilir; vadesi geçmiş tek seferlik ödemeler için günlük "gecikti" uyarısı; ödenen dönem için bildirim yok.

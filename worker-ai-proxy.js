@@ -11,7 +11,7 @@
      VAPID_SUBJECT      [Text]    mailto:senin@epostan
      ALLOWED_ORIGIN     [Text]    (isteğe bağlı) varsayılan https://erhanntrk.github.io
    Bağlamalar:
-     NTRK_KV            KV Namespace (push abonelikleri + hız sınırı)
+     NTRK_KV            KV Namespace (yalnızca push abonelikleri)
    Cron Trigger: 0 6 * * *   (UTC 06:00 = Türkiye 09:00)
    ═══════════════════════════════════════════════════════════════════ */
 
@@ -38,20 +38,16 @@ function b64u(buf) {
 function b64uText(str) { return b64u(new TextEncoder().encode(str)); }
 function trToday() { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Istanbul' }).format(new Date()); }
 
-/* Dakikada en fazla 20 istek (IP başına) */
-async function rateLimited(request, env) {
-  const ip = request.headers.get('CF-Connecting-IP') || 'x';
-  const key = 'rl:' + ip + ':' + Math.floor(Date.now() / 60000);
-  if (env.NTRK_KV) {
-    const n = Number(await env.NTRK_KV.get(key)) || 0;
-    if (n >= 20) return true;
-    await env.NTRK_KV.put(key, String(n + 1), { expirationTtl: 120 });
-    return false;
-  }
+/* Hız sınırı bellekte tutulur (KV'ye yazmaz): KV'nin ücretsiz günlük yazma kotası
+   saldırıyla tüketilip push durdurulamasın. Daha sert koruma için Cloudflare panelinden
+   Security > WAF > Rate limiting kuralı eklenebilir. */
+function hit(bucket, ip, limit) {
+  const key = bucket + ':' + ip + ':' + Math.floor(Date.now() / 60000);
   const n = (mem.get(key) || 0) + 1; mem.set(key, n);
-  if (mem.size > 500) mem.clear();
-  return n > 20;
+  if (mem.size > 2000) mem.clear();
+  return n > limit;
 }
+const ipOf = (request) => request.headers.get('CF-Connecting-IP') || 'x';
 
 /* Sabit zamanlı karşılaştırma */
 function safeEqual(a, b) {
@@ -102,15 +98,32 @@ export default {
 
     const origin = request.headers.get('Origin');
     if (origin && origin !== allowedOrigin(env)) return json({ error: 'İzinsiz kaynak' }, 403, H);
-    if (await rateLimited(request, env)) return json({ error: 'Çok fazla istek, biraz bekle' }, 429, H);
+    if (hit('all', ipOf(request), 60)) return json({ error: 'Çok fazla istek, biraz bekle' }, 429, H);
 
     let body = {};
     if (request.method === 'POST') { try { body = await request.json(); } catch { return json({ error: 'Geçersiz istek' }, 400, H); } }
 
-    /* Erişim kodu: başlıkta (X-Access-Code) ya da gövdede (code) kabul edilir */
-    if (env.ACCESS_CODE && !safeEqual(request.headers.get('X-Access-Code') || body.code, env.ACCESS_CODE)) return json({ error: 'Erişim kodu hatalı' }, 401, H);
+    /* Erişim kodu: başlıkta (X-Access-Code) ya da gövdede (code) kabul edilir. Yanlış denemeler ayrıca sınırlanır. */
+    if (env.ACCESS_CODE && !safeEqual(request.headers.get('X-Access-Code') || body.code, env.ACCESS_CODE)) {
+      if (hit('fail', ipOf(request), 10)) return json({ error: 'Çok fazla hatalı deneme' }, 429, H);
+      return json({ error: 'Erişim kodu hatalı' }, 401, H);
+    }
 
     const path = new URL(request.url).pathname.replace(/\/+$/, '');
+
+    /* Hisse fiyatı: Yahoo tarayıcıdan CORS ile çağrılamaz, Worker aracılık eder */
+    if (path === '/market/stock' && request.method === 'GET') {
+      const sym = (new URL(request.url).searchParams.get('symbol') || '').toUpperCase();
+      if (!/^[A-Z0-9.\-^=]{1,15}$/.test(sym)) return json({ error: 'Geçersiz sembol' }, 400, H);
+      try {
+        const r = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(sym), { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; NTRK)' } });
+        if (!r.ok) return json({ error: 'Fiyat kaynağı hata verdi (' + r.status + ')' }, 502, H);
+        const d = await r.json();
+        const price = d && d.chart && d.chart.result && d.chart.result[0] && d.chart.result[0].meta ? d.chart.result[0].meta.regularMarketPrice : null;
+        if (!price) return json({ error: 'Sembol bulunamadı' }, 404, H);
+        return json({ symbol: sym, price }, 200, H);
+      } catch (e) { return json({ error: 'Bağlantı hatası' }, 502, H); }
+    }
 
     if (path === '/push/key' && request.method === 'GET') {
       if (!env.VAPID_PUBLIC) return json({ error: 'VAPID_PUBLIC tanımlı değil' }, 500, H);

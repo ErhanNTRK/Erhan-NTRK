@@ -13,6 +13,8 @@
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
 <title>NTRK — Kişisel Asistan</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Fraunces:ital,wght@0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>html[data-locked="1"] #app{visibility:hidden}</style>
+<script>try{if(localStorage.getItem('ntrk_lock'))document.documentElement.setAttribute('data-locked','1')}catch(e){}</script>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body class="theme-premium">
@@ -442,7 +444,7 @@
 /* ═══════════════ NTRK v2 — Uygulama Çekirdeği ═══════════════
    Dosya içi modül disiplini: Store, Auth, UI, Router + her sekme kendi nesnesi.
    Veri: localStorage 'ntrk_data' (v1'den otomatik miras) + IndexedDB 'ntrk-files' (fotoğraf/belge). */
-const APP_VERSION = 'NTRK v2.2 · 2026.11.06';
+const APP_VERSION = 'NTRK v2.3 · 2026.11.09';
 
 /* ── Yardımcılar ── */
 const $ = (id) => document.getElementById(id);
@@ -539,6 +541,7 @@ const Store = {
   save() {
     try { localStorage.setItem('ntrk_data', JSON.stringify(Store.state)); }
     catch (e) { toast('Kayıt hatası: depolama dolu olabilir. Ayarlar > Yedek alın!'); }
+    try { if (typeof Notify !== 'undefined') Notify.queueSync(); } catch (e) { /* push kapalıysa sessizce geç */ }
   },
   /* v1 göçü: base64 fotoğraflar localStorage'dan IndexedDB'ye taşınır */
   async migrate() {
@@ -946,13 +949,12 @@ const DEFAULT_PLATFORMS = ['İş Bankası', 'Garanti BBVA', 'Akbank', 'Yapı Kre
    ═══════════════════════════════════════════════════════════════════ */
 const MARKET_API = {
   /* Döviz kuru (USD/TRY, EUR/TRY) — Frankfurter (ECB verisi, ücretsiz, anahtarsız) */
-  fx: (from, to) => 'https://api.frankfurter.app/latest?from=' + from + '&to=' + to,
-  /* Gram altın (TRY) — GenelPara (ücretsiz, anahtarsız, Türkiye bazlı) */
-  gold: () => 'https://api.genelpara.com/embed/altin.json',
+  fx: (from, to) => 'https://api.frankfurter.dev/v1/latest?from=' + from + '&to=' + to,
+  /* Altın / gümüş ons fiyatı (USD) — gold-api.com (ücretsiz, anahtarsız, CORS açık). Gram TRY = ons / 31.1035 × USD/TRY */
+  metal: (sym) => 'https://api.gold-api.com/price/' + sym,
   /* Kripto (TRY/USD) — CoinGecko Simple Price (ücretsiz, anahtarsız) */
   crypto: (ids) => 'https://api.coingecko.com/api/v3/simple/price?ids=' + ids + '&vs_currencies=try,usd',
-  /* Hisse (BIST için .IS uzantılı, ABD için düz sembol) — Yahoo Finance Chart (ücretsiz, anahtarsız) */
-  stock: (symbol) => 'https://query1.finance.yahoo.com/v8/finance/chart/' + symbol
+  /* Hisse fiyatı: Yahoo tarayıcıdan doğrudan çağrılamaz (CORS), bu yüzden kendi Worker'ın üzerinden alınır (/market/stock) */
 };
 /* Kripto varlık adı -> CoinGecko id eşlemesi (yaygın coinler) */
 const COIN_ID_MAP = { BTC: 'bitcoin', ETH: 'ethereum', USDT: 'tether', BNB: 'binancecoin', SOL: 'solana', DOGE: 'dogecoin', ADA: 'cardano', XRP: 'ripple', AVAX: 'avalanche-2', MATIC: 'matic-network', TRX: 'tron', DOT: 'polkadot', LTC: 'litecoin', SHIB: 'shiba-inu' };
@@ -1260,20 +1262,20 @@ const Market = {
   fmtTime(ts) { if (!ts) return ''; return new Date(ts).toLocaleString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); },
   /* Referans kurları çeker: USD/TRY, EUR/TRY, gram altın (TRY). Her kaynak bağımsız dener; biri başarısız olursa diğerleri etkilenmez. */
   async fetchRates() {
-    const rates = { usdTry: null, eurTry: null, goldGram: null, crypto: {} };
+    const rates = { usdTry: null, eurTry: null, goldGram: null, silverGram: null, crypto: {} };
     const results = await Promise.allSettled([
       webFetchSafe(MARKET_API.fx('USD', 'TRY')),
       webFetchSafe(MARKET_API.fx('EUR', 'TRY')),
-      webFetchSafe(MARKET_API.gold())
+      webFetchSafe(MARKET_API.metal('XAU')),
+      webFetchSafe(MARKET_API.metal('XAG'))
     ]);
     if (results[0].status === 'fulfilled' && results[0].value && results[0].value.rates) rates.usdTry = results[0].value.rates.TRY;
     if (results[1].status === 'fulfilled' && results[1].value && results[1].value.rates) rates.eurTry = results[1].value.rates.TRY;
-    if (results[2].status === 'fulfilled' && results[2].value) {
-      const g = results[2].value;
-      /* GenelPara formatı: { "GRA": { "alis": "...", "satis": "..." }, ... } — gram altın satış fiyatı alınır */
-      const gra = g.GRA || g.gram || null;
-      if (gra) rates.goldGram = Number(String(gra.satis || gra.alis || '').replace(',', '.')) || null;
-    }
+    const oz = 31.1034768;
+    const ozAu = results[2].status === 'fulfilled' && results[2].value ? Number(results[2].value.price) : 0;
+    const ozAg = results[3].status === 'fulfilled' && results[3].value ? Number(results[3].value.price) : 0;
+    if (ozAu && rates.usdTry) rates.goldGram = Math.round(ozAu / oz * rates.usdTry * 100) / 100;
+    if (ozAg && rates.usdTry) rates.silverGram = Math.round(ozAg / oz * rates.usdTry * 100) / 100;
     /* Kripto: yalnızca kullanıcının varlıklarında bulunan coinler için istek at */
     const s = S();
     const coinIds = [...new Set(s.assets.filter(a => a.type === 'Kripto').map(a => COIN_ID_MAP[(a.name || '').trim().toUpperCase()]).filter(Boolean))];
@@ -1283,6 +1285,15 @@ const Market = {
     }
     return rates;
   },
+  /* Hisse fiyatı: Worker üzerinden (Yahoo CORS vermediği için). Worker adresi yoksa null döner. */
+  async stockPrice(sym) {
+    if (!AI.url()) return null;
+    try {
+      const r = await fetch(AI.url().replace(/\/+$/, '') + '/market/stock?symbol=' + encodeURIComponent(sym), { headers: { 'X-Access-Code': AI.code() } });
+      if (!r.ok) return null;
+      return Number((await r.json()).price) || null;
+    } catch (e) { return null; }
+  },
   /* Varlıklardaki güncel fiyatları (a.price) mümkün olduğunca otomatik doldurur */
   async updateAssetPrices(rates) {
     const s = S(); let updated = 0, skipped = 0;
@@ -1290,6 +1301,7 @@ const Market = {
       const sh = Fin.shapeFor(a.type);
       if (sh !== 'market') continue;
       if (a.type === 'Gram Altın' && rates.goldGram) { a.price = rates.goldGram; updated++; }
+      else if (a.type === 'Gümüş' && rates.silverGram) { a.price = rates.silverGram; updated++; }
       else if (a.type === 'Kripto') {
         const cid = COIN_ID_MAP[(a.name || '').trim().toUpperCase()];
         if (cid && rates.crypto[cid] && rates.crypto[cid].try) { a.price = rates.crypto[cid].try; updated++; } else skipped++;
@@ -1299,8 +1311,7 @@ const Market = {
         if (!symbol) { skipped++; continue; }
         const ySym = a.type === 'BIST Hisse' ? (symbol.endsWith('.IS') ? symbol : symbol + '.IS') : symbol;
         try {
-          const d = await webFetchSafe(MARKET_API.stock(ySym));
-          const p = d && d.chart && d.chart.result && d.chart.result[0] && d.chart.result[0].meta ? d.chart.result[0].meta.regularMarketPrice : null;
+          const p = await Market.stockPrice(ySym);
           if (p) { a.price = p; updated++; } else skipped++;
         } catch (e) { skipped++; }
       } else skipped++;
@@ -1321,6 +1332,7 @@ const Market = {
       if (rates.usdTry || rates.eurTry || rates.goldGram) parts.push('kur/altın alındı');
       if (updated) parts.push(updated + ' varlık güncellendi');
       if (skipped) parts.push(skipped + ' varlık eşleşmedi/atlandı');
+      if (!AI.url() && S().assets.some(a => a.type === 'BIST Hisse' || a.type === 'ABD Hisse')) parts.push('hisse fiyatı için Ayarlar\'da Worker adresi gerekli');
       toast(parts.length ? parts.join(' · ') : 'Fiyatlar alınamadı — bağlantını kontrol et');
     } catch (e) {
       toast('Fiyatlar alınamadı — bağlantını kontrol et');
@@ -1367,7 +1379,12 @@ const Notify = {
   listFor(d) {
     const s = S(), out = [], isToday = d === todayStr();
     const add = (id, title, body) => out.push({ id, title, body: body || '' });
-    for (const ev of s.events) if (ev.notify && isRecurringOnDate(ev, d) && isReminderToday(ev.date, ev.notify, ev.notifyLead, d)) add('ev-' + ev.id + '-' + d, ev.title, (ev.time ? ev.time + ' · ' : '') + 'Ajanda hatırlatması');
+    /* Hatırlatma günü d ise, olayın gerçekleşeceği gün d + önceden-gün'dür; tekrarlayan olayda o güne denk gelen tekrar aranır */
+    for (const ev of s.events) {
+      if (!ev.notify) continue;
+      const lead = NOTIFY_LEADS[ev.notifyLead] || 0, occ = addDays(d, lead);
+      if (isRecurringOnDate(ev, occ)) add('ev-' + ev.id + '-' + occ + '-' + d, ev.title, (ev.time ? ev.time + ' · ' : '') + (lead ? lead + ' gün sonra · ' : '') + 'Ajanda hatırlatması');
+    }
     if (isToday) for (const m of s.meds) { if (!m.notify || !m.time) continue; if (m.startDate && m.startDate > d) continue; if (m.endDate && m.endDate < d) continue; if (s.medsTaken.date === d && s.medsTaken.ids.includes(m.id)) continue; add('med-' + m.id + '-' + d, m.name + ' zamanı geldi', m.dose || 'İlaç hatırlatması'); }
     /* Ödemeler: seçilen gün önce + ödeme günü + (yalnızca bugün için) gecikmiş */
     for (const p of s.payments) {
@@ -1375,7 +1392,7 @@ const Notify = {
       if (Fin.dueOn(p, d)) add('pay-' + p.id + '-' + d, p.name + ' ödeme günü', para(p.amount) + ' · bugün son gün');
       const lead = NOTIFY_LEADS[p.notifyLead] || 0;
       if (lead > 0) { const due = addDays(d, lead); if (Fin.dueOn(p, due)) add('paylead-' + p.id + '-' + due + '-' + d, p.name + ' ödemesi yaklaşıyor', para(p.amount) + ' · ' + lead + ' gün kaldı (' + trDateShort(due) + ')'); }
-      if (isToday && (!p.repeat || p.repeat === 'none') && !p.paid && p.dueDate < d) add('payover-' + p.id + '-' + d, p.name + ' ödemesi gecikti ⚠️', para(p.amount) + ' · son tarih ' + trDateShort(p.dueDate));
+      if ((!p.repeat || p.repeat === 'none') && !p.paid && p.dueDate < d) add('payover-' + p.id + '-' + d, p.name + ' ödemesi gecikti ⚠️', para(p.amount) + ' · son tarih ' + trDateShort(p.dueDate));
     }
     for (const m of s.members) {
       if (m.birth && m.birth.slice(5) === d.slice(5)) add('bday-' + m.id + '-' + d, m.name + ' — Doğum Günü 🎈', 'Bugün doğum günü!');
@@ -1403,11 +1420,15 @@ const Notify = {
     if (!Notify.pushOn() || !Notify.pushSupported() || !AI.url()) return;
     try {
       const { items, dates } = Notify.buildSchedule();
-      await IDB.put('push-reminders', JSON.stringify(items));
+      await IDB.put('push-reminders', JSON.stringify(items)); /* cihazdaki kopya her zaman güncel */
       const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription();
       if (!sub) return;
-      await fetch(AI.url().replace(/\/+$/, '') + '/push/sync', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Access-Code': AI.code() }, body: JSON.stringify({ subscription: sub.toJSON(), dates }) });
-    } catch (e) { /* çevrimdışıysa sonraki taramada tekrar denenir */ }
+      /* Worker'a yalnızca tarih listesi değiştiyse (ya da yeni abonelikse) bildir */
+      const sig = AI.url() + '|' + sub.endpoint + '|' + dates.join(',');
+      if (localStorage.getItem('ntrk_push_sig') === sig) return;
+      const r = await fetch(AI.url().replace(/\/+$/, '') + '/push/sync', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Access-Code': AI.code() }, body: JSON.stringify({ subscription: sub.toJSON(), dates }) });
+      if (r.ok) localStorage.setItem('ntrk_push_sig', sig);
+    } catch (e) { /* çevrimdışıysa sonraki kayıtta tekrar denenir */ }
   },
   async enablePush() {
     if (!Notify.pushSupported()) { toast('Bu tarayıcı arka plan bildirimini desteklemiyor (iPhone: önce Ana Ekrana Ekle)'); return; }
@@ -1422,7 +1443,7 @@ const Notify = {
       const key = Uint8Array.from(raw, c => c.charCodeAt(0));
       const reg = await navigator.serviceWorker.ready;
       const sub = (await reg.pushManager.getSubscription()) || await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
-      localStorage.setItem('ntrk_push', '1');
+      localStorage.setItem('ntrk_push', '1'); localStorage.removeItem('ntrk_push_sig');
       await Notify.syncPush();
       toast('Arka plan bildirimi açıldı 🔔'); if (Router.current === 'sec-settings') Settings.render();
       return sub;
@@ -1880,16 +1901,23 @@ const Lock = {
     localStorage.setItem('ntrk_lock', JSON.stringify({ salt, hash: await Lock.hash(pin, salt) }));
     return true;
   },
-  show() { const el = $('lockScreen'); el.style.display = 'flex'; $('lockPin').value = ''; $('lockErr').textContent = ''; setTimeout(() => $('lockPin').focus(), 50); },
-  hide() { $('lockScreen').style.display = 'none'; },
+  show() { document.documentElement.setAttribute('data-locked', '1'); const el = $('lockScreen'); el.style.display = 'flex'; $('lockPin').value = ''; $('lockErr').textContent = ''; setTimeout(() => $('lockPin').focus(), 50); },
+  hide() { document.documentElement.removeAttribute('data-locked'); $('lockScreen').style.display = 'none'; },
+  /* Üst üste yanlış denemelerde bekleme: 5. denemeden sonra 30 sn, her yeni hatada iki katı */
+  fail() { try { return JSON.parse(localStorage.getItem('ntrk_lock_fail') || '{"n":0,"until":0}'); } catch (e) { return { n: 0, until: 0 }; } },
   async unlock() {
     const rec = JSON.parse(localStorage.getItem('ntrk_lock') || 'null'); if (!rec) { Lock.hide(); return; }
-    const pin = $('lockPin').value;
-    if (await Lock.hash(pin, rec.salt) === rec.hash) { Lock._fails = 0; Lock.hide(); }
-    else { Lock._fails = (Lock._fails || 0) + 1; $('lockErr').textContent = 'PIN yanlış' + (Lock._fails >= 3 ? ' (' + Lock._fails + ' deneme)' : ''); $('lockPin').value = ''; }
+    const pin = $('lockPin').value, fl = Lock.fail();
+    if (fl.until > Date.now()) { $('lockErr').textContent = Math.ceil((fl.until - Date.now()) / 1000) + ' sn sonra tekrar dene'; $('lockPin').value = ''; return; }
+    if (await Lock.hash(pin, rec.salt) === rec.hash) { localStorage.removeItem('ntrk_lock_fail'); Lock.hide(); }
+    else {
+      const n = fl.n + 1, wait = n >= 5 ? 30000 * Math.pow(2, Math.min(n - 5, 6)) : 0;
+      localStorage.setItem('ntrk_lock_fail', JSON.stringify({ n, until: wait ? Date.now() + wait : 0 }));
+      $('lockErr').textContent = wait ? 'Çok fazla deneme — ' + (wait / 1000) + ' sn bekle' : 'PIN yanlış (' + n + '/5)'; $('lockPin').value = '';
+    }
   },
   async enable() { const pin = $('setPin').value.trim(); if (await Lock.set(pin)) { toast('Kilit açıldı 🔒'); Settings.render(); } },
-  disable() { if (!UI.confirm('Uygulama kilidi kaldırılsın mı?')) return; localStorage.removeItem('ntrk_lock'); toast('Kilit kaldırıldı'); Settings.render(); },
+  disable() { if (!UI.confirm('Uygulama kilidi kaldırılsın mı?')) return; localStorage.removeItem('ntrk_lock'); localStorage.removeItem('ntrk_lock_fail'); document.documentElement.removeAttribute('data-locked'); toast('Kilit kaldırıldı'); Settings.render(); },
   init() {
     if (Lock.has()) Lock.show();
     /* Uygulama 1 dakikadan uzun arka planda kalırsa yeniden kilitlenir */

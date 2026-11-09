@@ -23,7 +23,7 @@ node scripts/vapid-keys.mjs
 ### 2) Cloudflare Worker
 1. dash.cloudflare.com → **Workers & Pages → Create → Worker** → Deploy.
 2. **Edit code** → `worker-ai-proxy.js` dosyasının tamamını yapıştır → Deploy.
-3. **Storage & Databases → KV → Create** → ad: `ntrk-kv`.
+3. **Storage & Databases → KV → Create** → ad: `ntrk-kv` (yalnızca push abonelikleri için kullanılır).
 4. Worker → **Settings → Bindings → Add → KV namespace**: değişken adı `NTRK_KV`, `ntrk-kv`'i seç.
 5. Worker → **Settings → Variables and Secrets**:
 
@@ -53,3 +53,6 @@ anında bir dürtme yollayabilirsin.
 1 / 3 / 7 gün önce seçebilirsin; ödeme günü her zaman ayrıca hatırlatılır. Ödenmemiş
 tek seferlik bir ödeme vadesini geçerse her gün "gecikti" uyarısı gelir. "Ödendi"
 işaretlenen dönem için bildirim gelmez.
+
+## Hisse fiyatı
+Worker kurulduktan sonra **Fiyatları Güncelle** BIST ve ABD hisse fiyatlarını da getirir (Worker'ın `/market/stock` yolu üzerinden). Worker adresi girilmemişse hisseler atlanır; altın, gümüş, döviz ve kripto Worker olmadan da çalışır.
